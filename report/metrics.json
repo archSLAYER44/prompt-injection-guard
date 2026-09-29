@@ -1,0 +1,392 @@
+{
+  "params": {
+    "svc__kernel": "linear",
+    "svc__C": 0.3,
+    "features__rules__weight__weight": 0.3
+  },
+  "threshold": 0.544327731736679,
+  "development": {
+    "held_out_source": {
+      "n": 11017,
+      "accuracy": 0.8776436416447309,
+      "precision": 0.9018169112508735,
+      "recall": 0.8678547410894418,
+      "f1": 0.8845099383139137,
+      "tn": 4507,
+      "fp": 562,
+      "fn": 786,
+      "tp": 5162
+    },
+    "held_out_payloads": {
+      "n": 13844,
+      "accuracy": 0.9464750072233459,
+      "precision": 0.9805495103373232,
+      "recall": 0.9234020750608428,
+      "f1": 0.9511181476350683,
+      "tn": 5894,
+      "fp": 143,
+      "fn": 598,
+      "tp": 7209
+    }
+  },
+  "development_sets": {
+    "scores": {
+      "handwritten_dev": {
+        "n": 112,
+        "accuracy": 0.9285714285714286,
+        "precision": 0.9137931034482759,
+        "recall": 0.9464285714285714,
+        "f1": 0.9298245614035088,
+        "tn": 51,
+        "fp": 5,
+        "fn": 3,
+        "tp": 53
+      },
+      "official_dev": {
+        "n": 493,
+        "accuracy": 0.9898580121703854,
+        "precision": 1.0,
+        "recall": 0.9845201238390093,
+        "f1": 0.9921996879875195,
+        "tn": 170,
+        "fp": 0,
+        "fn": 5,
+        "tp": 318
+      },
+      "official_recall_seen": 1.0,
+      "official_recall_unseen": 0.9742268041237113
+    },
+    "standards": [
+      {
+        "standard": "official recall",
+        "target": 0.9,
+        "result": 0.985,
+        "met": "yes"
+      },
+      {
+        "standard": "official precision",
+        "target": 0.95,
+        "result": 1.0,
+        "met": "yes"
+      },
+      {
+        "standard": "hand-written recall",
+        "target": 0.85,
+        "result": 0.946,
+        "met": "yes"
+      },
+      {
+        "standard": "hand-written false alarm rate",
+        "target": 0.07142857142857142,
+        "result": 0.089,
+        "met": "NO"
+      }
+    ],
+    "official_by_category": [
+      {
+        "label": 0,
+        "category": "carrier_clean",
+        "rows": 45,
+        "correct_share": 1.0,
+        "seen_in_train": true
+      },
+      {
+        "label": 0,
+        "category": "embedded_human",
+        "rows": 87,
+        "correct_share": 1.0,
+        "seen_in_train": true
+      },
+      {
+        "label": 0,
+        "category": "hard_negative",
+        "rows": 8,
+        "correct_share": 1.0,
+        "seen_in_train": true
+      },
+      {
+        "label": 0,
+        "category": "multilingual",
+        "rows": 3,
+        "correct_share": 1.0,
+        "seen_in_train": false
+      },
+      {
+        "label": 0,
+        "category": "qa",
+        "rows": 27,
+        "correct_share": 1.0,
+        "seen_in_train": true
+      },
+      {
+        "label": 1,
+        "category": "appended_override",
+        "rows": 41,
+        "correct_share": 1.0,
+        "seen_in_train": true
+      },
+      {
+        "label": 1,
+        "category": "indirect_injection",
+        "rows": 88,
+        "correct_share": 1.0,
+        "seen_in_train": true
+      },
+      {
+        "label": 1,
+        "category": "multilingual",
+        "rows": 3,
+        "correct_share": 0.6666666666666666,
+        "seen_in_train": false
+      },
+      {
+        "label": 1,
+        "category": "obfuscation",
+        "rows": 110,
+        "correct_share": 1.0,
+        "seen_in_train": false
+      },
+      {
+        "label": 1,
+        "category": "payload_split",
+        "rows": 81,
+        "correct_share": 0.9506172839506173,
+        "seen_in_train": false
+      }
+    ]
+  },
+  "ablation": [
+    {
+      "features": "legacy6",
+      "kernel": "linear",
+      "official_precision": 0.0,
+      "official_recall": 0.0,
+      "official_f1": 0.0,
+      "recall_unseen_types": 0.0,
+      "external_precision": 1.0,
+      "external_recall": 0.05750798722044728,
+      "external_f1": 0.10876132930513595,
+      "handwritten_recall": 0.0,
+      "handwritten_false_alarms": 0
+    },
+    {
+      "features": "rules16",
+      "kernel": "rbf",
+      "official_precision": 0.94824016563147,
+      "official_recall": 0.9385245901639344,
+      "official_f1": 0.9433573635427395,
+      "recall_unseen_types": 0.9183673469387755,
+      "external_precision": 0.9855769230769231,
+      "external_recall": 0.6549520766773163,
+      "external_f1": 0.7869481765834933,
+      "handwritten_recall": 0.5714285714285714,
+      "handwritten_false_alarms": 3
+    },
+    {
+      "features": "emb",
+      "kernel": "rbf",
+      "official_precision": 1.0,
+      "official_recall": 0.8913934426229508,
+      "official_f1": 0.942578548212351,
+      "recall_unseen_types": 0.8197278911564626,
+      "external_precision": 0.996,
+      "external_recall": 0.7955271565495208,
+      "external_f1": 0.8845470692717584,
+      "handwritten_recall": 0.8928571428571429,
+      "handwritten_false_alarms": 0
+    },
+    {
+      "features": "emb+rules16",
+      "kernel": "linear",
+      "official_precision": 0.9774127310061602,
+      "official_recall": 0.9754098360655737,
+      "official_f1": 0.9764102564102564,
+      "recall_unseen_types": 0.9591836734693877,
+      "external_precision": 0.9628252788104089,
+      "external_recall": 0.8274760383386581,
+      "external_f1": 0.8900343642611683,
+      "handwritten_recall": 0.9285714285714286,
+      "handwritten_false_alarms": 2
+    }
+  ],
+  "tests": {
+    "deepset": {
+      "n": 116,
+      "accuracy": 0.6637931034482759,
+      "precision": 1.0,
+      "recall": 0.35,
+      "f1": 0.5185185185185185,
+      "tn": 56,
+      "fp": 0,
+      "fn": 39,
+      "tp": 21
+    },
+    "gandalf": {
+      "n": 112,
+      "accuracy": 0.9285714285714286,
+      "precision": 1.0,
+      "recall": 0.9285714285714286,
+      "f1": 0.9629629629629629,
+      "tn": 0,
+      "fp": 0,
+      "fn": 8,
+      "tp": 104
+    },
+    "handwritten": {
+      "n": 56,
+      "accuracy": 0.9464285714285714,
+      "precision": 0.9629629629629629,
+      "recall": 0.9285714285714286,
+      "f1": 0.9454545454545454,
+      "tn": 27,
+      "fp": 1,
+      "fn": 2,
+      "tp": 26
+    },
+    "jackhhao": {
+      "n": 400,
+      "accuracy": 0.9475,
+      "precision": 0.9285714285714286,
+      "recall": 0.9219858156028369,
+      "f1": 0.9252669039145908,
+      "tn": 249,
+      "fp": 10,
+      "fn": 11,
+      "tp": 130
+    },
+    "official": {
+      "n": 736,
+      "accuracy": 0.9660326086956522,
+      "precision": 0.9753593429158111,
+      "recall": 0.9733606557377049,
+      "f1": 0.9743589743589743,
+      "tn": 236,
+      "fp": 12,
+      "fn": 13,
+      "tp": 475
+    },
+    "external": {
+      "n": 628,
+      "accuracy": 0.89171974522293,
+      "precision": 0.9622641509433962,
+      "recall": 0.8146964856230032,
+      "f1": 0.8823529411764706,
+      "tn": 305,
+      "fp": 10,
+      "fn": 58,
+      "tp": 255
+    },
+    "official_recall_seen": 1.0,
+    "official_recall_unseen": 0.95578231292517
+  },
+  "standards": [
+    {
+      "standard": "official recall",
+      "target": 0.9,
+      "result": 0.973,
+      "met": "yes"
+    },
+    {
+      "standard": "official precision",
+      "target": 0.95,
+      "result": 0.975,
+      "met": "yes"
+    },
+    {
+      "standard": "hand-written recall",
+      "target": 0.85,
+      "result": 0.929,
+      "met": "yes"
+    },
+    {
+      "standard": "hand-written false alarm rate",
+      "target": 0.07142857142857142,
+      "result": 0.036,
+      "met": "yes"
+    },
+    {
+      "standard": "external recall",
+      "target": 0.85,
+      "result": 0.815,
+      "met": "NO"
+    },
+    {
+      "standard": "external precision",
+      "target": 0.9,
+      "result": 0.962,
+      "met": "yes"
+    }
+  ],
+  "official_by_category": [
+    {
+      "label": 0,
+      "category": "carrier_clean",
+      "rows": 116,
+      "correct_share": 1.0,
+      "seen_in_train": true
+    },
+    {
+      "label": 0,
+      "category": "embedded_human",
+      "rows": 74,
+      "correct_share": 0.8513513513513513,
+      "seen_in_train": true
+    },
+    {
+      "label": 0,
+      "category": "hard_negative",
+      "rows": 12,
+      "correct_share": 0.9166666666666666,
+      "seen_in_train": true
+    },
+    {
+      "label": 0,
+      "category": "multilingual",
+      "rows": 5,
+      "correct_share": 1.0,
+      "seen_in_train": false
+    },
+    {
+      "label": 0,
+      "category": "qa",
+      "rows": 41,
+      "correct_share": 1.0,
+      "seen_in_train": true
+    },
+    {
+      "label": 1,
+      "category": "appended_override",
+      "rows": 92,
+      "correct_share": 1.0,
+      "seen_in_train": true
+    },
+    {
+      "label": 1,
+      "category": "indirect_injection",
+      "rows": 102,
+      "correct_share": 1.0,
+      "seen_in_train": true
+    },
+    {
+      "label": 1,
+      "category": "multilingual",
+      "rows": 5,
+      "correct_share": 0.8,
+      "seen_in_train": false
+    },
+    {
+      "label": 1,
+      "category": "obfuscation",
+      "rows": 190,
+      "correct_share": 0.968421052631579,
+      "seen_in_train": false
+    },
+    {
+      "label": 1,
+      "category": "payload_split",
+      "rows": 99,
+      "correct_share": 0.9393939393939394,
+      "seen_in_train": false
+    }
+  ]
+}
