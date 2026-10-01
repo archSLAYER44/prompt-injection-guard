@@ -8,3 +8,6 @@ __pycache__/
 data/raw/
 data/cache/
 report/train_log.txt
+data/cache/
+src/models/candidates/
+data/raw/

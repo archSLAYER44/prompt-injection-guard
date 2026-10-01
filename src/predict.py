@@ -8,11 +8,9 @@ import numpy as np
 
 from .pipeline import extract
 from .rules import DESCRIPTIVE_RULES, analyze, fired
-from .windows import split_units
+from .windows import MAX_SENTENCES, MAX_WINDOWS, split_units
 
 MODEL_PATH = Path(__file__).resolve().parent / "models" / "injection_model.pkl"
-MAX_WINDOWS = 64
-MAX_SENTENCES = 128
 
 
 @lru_cache(maxsize=1)
@@ -26,6 +24,32 @@ def _sigmoid(x):
     return 1.0 / (1.0 + math.exp(-max(-50.0, min(50.0, x))))
 
 
+def features(model, texts, cache_name=None):
+    """Feature matrix the way the model was trained: its feature set and its rule columns."""
+    return extract(model["feature_set"], texts, model["view"], cache_name,
+                   rule_names=model.get("rule_names"))
+
+
+def score_texts(model, texts, cache_name=None):
+    """Decision value of every text (score of its most suspicious piece), for many texts at once.
+
+    Returns (decisions, best_units) where best_units[i] is the (kind, text) pair that scored highest.
+    """
+    pieces, owner = [], []
+    for index, text in enumerate(texts):
+        units = split_units(text.strip(), MAX_WINDOWS, MAX_SENTENCES)
+        pieces.extend(units)
+        owner.extend([index] * len(units))
+    decisions = model["pipeline"].decision_function(features(model, [u for _, u in pieces], cache_name))
+    owner = np.asarray(owner)
+    best = np.full(len(texts), -np.inf)
+    top = [None] * len(texts)
+    for row, (index, value) in enumerate(zip(owner, decisions)):
+        if value > best[index]:
+            best[index], top[index] = value, pieces[row]
+    return best, top
+
+
 def predict(text):
     """Classify one text.
 
@@ -33,7 +57,7 @@ def predict(text):
       verdict        "injection" or "benign"
       confidence     0.5 to 1.0, how far the text sits from the decision threshold
       probability    calibrated probability that the text is an injection
-      features       all 16 rule values for the most suspicious part of the text
+      features       every rule value for the most suspicious part of the text
       fired          the rules that triggered, each with its value and matched snippets
       semantic_only  True when the verdict is injection but no rule fired
       segment        the most suspicious part, when the text was split into several parts
@@ -46,8 +70,7 @@ def predict(text):
     model = load_model()
     units = split_units(text, MAX_WINDOWS, MAX_SENTENCES)
     windows = [unit for _, unit in units]
-    features = extract(model["feature_set"], windows, model["view"])
-    decisions = model["pipeline"].decision_function(features)
+    decisions = model["pipeline"].decision_function(features(model, windows))
     top = int(np.argmax(decisions))
     decision = float(decisions[top])
 

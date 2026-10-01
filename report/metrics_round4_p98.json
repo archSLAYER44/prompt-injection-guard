@@ -1,0 +1,3636 @@
+{
+  "params": {
+    "svc__kernel": "linear",
+    "svc__C": 0.3,
+    "features__rules__weight__weight": 1.0
+  },
+  "candidates": {
+    "emb+rules20": {
+      "threshold": 1.3039946093370092,
+      "calibrator": [
+        2.020786099398587,
+        -0.733717214036959
+      ],
+      "params": {
+        "svc__kernel": "linear",
+        "svc__C": 0.3,
+        "features__rules__weight__weight": 1.0
+      },
+      "development": {
+        "held_out_family": {
+          "scores": {
+            "n": 17370,
+            "accuracy": 0.82671272308578,
+            "precision": 0.968139609349984,
+            "recall": 0.6826597426055543,
+            "f1": 0.8007150423728814,
+            "recall_ci": [
+              0.6728894545742407,
+              0.6922716649835722
+            ],
+            "false_alarm_rate": 0.023378759398496242,
+            "false_alarm_ci": [
+              0.0203772321160188,
+              0.026810305989433986
+            ],
+            "tn": 8313,
+            "fp": 199,
+            "fn": 2811,
+            "tp": 6047
+          },
+          "tables": {
+            "by_fold": [
+              {
+                "held out": "contrast",
+                "texts": "obfuscated copy",
+                "rows": 842,
+                "precision": 0.955,
+                "recall [95%]": "0.618 [0.58, 0.66]",
+                "missed": 211,
+                "false alarms": 16,
+                "fa rate [95%]": "0.055 [0.03, 0.09]"
+              },
+              {
+                "held out": "contrast",
+                "texts": "original",
+                "rows": 2297,
+                "precision": 0.911,
+                "recall [95%]": "0.624 [0.59, 0.65]",
+                "missed": 408,
+                "false alarms": 66,
+                "fa rate [95%]": "0.054 [0.04, 0.07]"
+              },
+              {
+                "held out": "deepset",
+                "texts": "obfuscated copy",
+                "rows": 174,
+                "precision": 1.0,
+                "recall [95%]": "0.216 [0.15, 0.31]",
+                "missed": 76,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.05]"
+              },
+              {
+                "held out": "deepset",
+                "texts": "original",
+                "rows": 539,
+                "precision": 1.0,
+                "recall [95%]": "0.215 [0.16, 0.28]",
+                "missed": 157,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "held out": "dolly",
+                "texts": "obfuscated copy",
+                "rows": 125,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "dolly",
+                "texts": "original",
+                "rows": 769,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "held out": "gandalf",
+                "texts": "obfuscated copy",
+                "rows": 488,
+                "precision": 1.0,
+                "recall [95%]": "0.641 [0.60, 0.68]",
+                "missed": 175,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "gandalf",
+                "texts": "original",
+                "rows": 1013,
+                "precision": 1.0,
+                "recall [95%]": "0.617 [0.59, 0.65]",
+                "missed": 388,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "jailbreak",
+                "texts": "obfuscated copy",
+                "rows": 340,
+                "precision": 0.694,
+                "recall [95%]": "0.342 [0.24, 0.46]",
+                "missed": 48,
+                "false alarms": 11,
+                "fa rate [95%]": "0.041 [0.02, 0.07]"
+              },
+              {
+                "held out": "jailbreak",
+                "texts": "original",
+                "rows": 2289,
+                "precision": 0.828,
+                "recall [95%]": "0.661 [0.63, 0.69]",
+                "missed": 254,
+                "false alarms": 103,
+                "fa rate [95%]": "0.067 [0.06, 0.08]"
+              },
+              {
+                "held out": "llmail",
+                "texts": "obfuscated copy",
+                "rows": 75,
+                "precision": 1.0,
+                "recall [95%]": "0.543 [0.40, 0.68]",
+                "missed": 21,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.12]"
+              },
+              {
+                "held out": "llmail",
+                "texts": "original",
+                "rows": 459,
+                "precision": 1.0,
+                "recall [95%]": "0.668 [0.62, 0.72]",
+                "missed": 110,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "mirzaakhi",
+                "texts": "obfuscated copy",
+                "rows": 1578,
+                "precision": 0.998,
+                "recall [95%]": "0.981 [0.97, 0.99]",
+                "missed": 19,
+                "false alarms": 2,
+                "fa rate [95%]": "0.004 [0.00, 0.01]"
+              },
+              {
+                "held out": "mirzaakhi",
+                "texts": "original",
+                "rows": 4209,
+                "precision": 0.999,
+                "recall [95%]": "0.996 [0.99, 1.00]",
+                "missed": 8,
+                "false alarms": 1,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "held out": "multilingual",
+                "texts": "obfuscated copy",
+                "rows": 591,
+                "precision": 1.0,
+                "recall [95%]": "0.197 [0.16, 0.24]",
+                "missed": 318,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "held out": "multilingual",
+                "texts": "original",
+                "rows": 1582,
+                "precision": 1.0,
+                "recall [95%]": "0.240 [0.21, 0.27]",
+                "missed": 618,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "held out": "ALL",
+                "texts": "",
+                "rows": 17370,
+                "precision": 0.968,
+                "recall [95%]": "0.683 [0.67, 0.69]",
+                "missed": 2811,
+                "false alarms": 199,
+                "fa rate [95%]": "0.023 [0.02, 0.03]"
+              }
+            ],
+            "by_source": [
+              {
+                "source": "aya",
+                "rows": 964,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "source": "contrast",
+                "rows": 3139,
+                "precision": 0.925,
+                "recall [95%]": "0.622 [0.60, 0.65]",
+                "missed": 619,
+                "false alarms": 82,
+                "fa rate [95%]": "0.055 [0.04, 0.07]"
+              },
+              {
+                "source": "deepset",
+                "rows": 713,
+                "precision": 1.0,
+                "recall [95%]": "0.215 [0.17, 0.27]",
+                "missed": 233,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "source": "dolly",
+                "rows": 894,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "source": "gandalf",
+                "rows": 1328,
+                "precision": 1.0,
+                "recall [95%]": "0.696 [0.67, 0.72]",
+                "missed": 404,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "source": "gsum",
+                "rows": 173,
+                "precision": 1.0,
+                "recall [95%]": "0.081 [0.05, 0.13]",
+                "missed": 159,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "source": "jackhhao",
+                "rows": 1764,
+                "precision": 0.926,
+                "recall [95%]": "0.699 [0.66, 0.74]",
+                "missed": 145,
+                "false alarms": 27,
+                "fa rate [95%]": "0.021 [0.01, 0.03]"
+              },
+              {
+                "source": "llmail",
+                "rows": 534,
+                "precision": 1.0,
+                "recall [95%]": "0.653 [0.60, 0.70]",
+                "missed": 131,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "source": "mirzaakhi",
+                "rows": 5787,
+                "precision": 0.999,
+                "recall [95%]": "0.991 [0.99, 0.99]",
+                "missed": 27,
+                "false alarms": 3,
+                "fa rate [95%]": "0.001 [0.00, 0.00]"
+              },
+              {
+                "source": "wild",
+                "rows": 865,
+                "precision": 0.678,
+                "recall [95%]": "0.538 [0.49, 0.59]",
+                "missed": 157,
+                "false alarms": 87,
+                "fa rate [95%]": "0.166 [0.14, 0.20]"
+              },
+              {
+                "source": "yanis",
+                "rows": 1209,
+                "precision": 1.0,
+                "recall [95%]": "0.226 [0.20, 0.25]",
+                "missed": 936,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              }
+            ],
+            "by_family": [
+              {
+                "family": "contrast",
+                "rows": 3139,
+                "precision": 0.925,
+                "recall [95%]": "0.622 [0.60, 0.65]",
+                "missed": 619,
+                "false alarms": 82,
+                "fa rate [95%]": "0.055 [0.04, 0.07]"
+              },
+              {
+                "family": "deepset",
+                "rows": 713,
+                "precision": 1.0,
+                "recall [95%]": "0.215 [0.17, 0.27]",
+                "missed": 233,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "family": "dolly",
+                "rows": 894,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "family": "gandalf",
+                "rows": 1501,
+                "precision": 1.0,
+                "recall [95%]": "0.625 [0.60, 0.65]",
+                "missed": 563,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "family": "jailbreak",
+                "rows": 2629,
+                "precision": 0.82,
+                "recall [95%]": "0.633 [0.60, 0.66]",
+                "missed": 302,
+                "false alarms": 114,
+                "fa rate [95%]": "0.063 [0.05, 0.08]"
+              },
+              {
+                "family": "llmail",
+                "rows": 534,
+                "precision": 1.0,
+                "recall [95%]": "0.653 [0.60, 0.70]",
+                "missed": 131,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "family": "mirzaakhi",
+                "rows": 5787,
+                "precision": 0.999,
+                "recall [95%]": "0.991 [0.99, 0.99]",
+                "missed": 27,
+                "false alarms": 3,
+                "fa rate [95%]": "0.001 [0.00, 0.00]"
+              },
+              {
+                "family": "multilingual",
+                "rows": 2173,
+                "precision": 1.0,
+                "recall [95%]": "0.226 [0.20, 0.25]",
+                "missed": 936,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              }
+            ],
+            "by_language": [
+              {
+                "language": "ar",
+                "rows": 45,
+                "precision": 1.0,
+                "recall [95%]": "0.444 [0.28, 0.63]",
+                "missed": 15,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.18]"
+              },
+              {
+                "language": "de",
+                "rows": 337,
+                "precision": 1.0,
+                "recall [95%]": "0.310 [0.25, 0.38]",
+                "missed": 138,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "language": "en",
+                "rows": 8911,
+                "precision": 0.975,
+                "recall [95%]": "0.827 [0.82, 0.84]",
+                "missed": 730,
+                "false alarms": 90,
+                "fa rate [95%]": "0.019 [0.02, 0.02]"
+              },
+              {
+                "language": "es",
+                "rows": 354,
+                "precision": 1.0,
+                "recall [95%]": "0.238 [0.19, 0.30]",
+                "missed": 160,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "language": "fr",
+                "rows": 378,
+                "precision": 1.0,
+                "recall [95%]": "0.295 [0.24, 0.36]",
+                "missed": 158,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "hi",
+                "rows": 46,
+                "precision": 1.0,
+                "recall [95%]": "0.269 [0.14, 0.46]",
+                "missed": 19,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.16]"
+              },
+              {
+                "language": "it",
+                "rows": 352,
+                "precision": 1.0,
+                "recall [95%]": "0.219 [0.17, 0.28]",
+                "missed": 150,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "ja",
+                "rows": 42,
+                "precision": 1.0,
+                "recall [95%]": "0.261 [0.13, 0.46]",
+                "missed": 17,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "language": "nl",
+                "rows": 42,
+                "precision": 1.0,
+                "recall [95%]": "0.565 [0.37, 0.74]",
+                "missed": 10,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "language": "pt",
+                "rows": 317,
+                "precision": 1.0,
+                "recall [95%]": "0.249 [0.19, 0.32]",
+                "missed": 133,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "language": "ru",
+                "rows": 44,
+                "precision": 1.0,
+                "recall [95%]": "0.500 [0.31, 0.69]",
+                "missed": 12,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.16]"
+              },
+              {
+                "language": "tr",
+                "rows": 45,
+                "precision": 1.0,
+                "recall [95%]": "0.423 [0.26, 0.61]",
+                "missed": 15,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "language": "zh",
+                "rows": 41,
+                "precision": 1.0,
+                "recall [95%]": "0.364 [0.20, 0.57]",
+                "missed": 14,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              }
+            ],
+            "by_fold_language": [
+              {
+                "held out": "contrast",
+                "language": "ar",
+                "rows": 45,
+                "precision": 1.0,
+                "recall [95%]": "0.444 [0.28, 0.63]",
+                "missed": 15,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.18]"
+              },
+              {
+                "held out": "contrast",
+                "language": "de",
+                "rows": 41,
+                "precision": 1.0,
+                "recall [95%]": "0.636 [0.43, 0.80]",
+                "missed": 8,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "held out": "contrast",
+                "language": "es",
+                "rows": 43,
+                "precision": 1.0,
+                "recall [95%]": "0.522 [0.33, 0.71]",
+                "missed": 11,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.16]"
+              },
+              {
+                "held out": "contrast",
+                "language": "fr",
+                "rows": 48,
+                "precision": 1.0,
+                "recall [95%]": "0.407 [0.25, 0.59]",
+                "missed": 16,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "hi",
+                "rows": 46,
+                "precision": 1.0,
+                "recall [95%]": "0.269 [0.14, 0.46]",
+                "missed": 19,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.16]"
+              },
+              {
+                "held out": "contrast",
+                "language": "it",
+                "rows": 45,
+                "precision": 1.0,
+                "recall [95%]": "0.500 [0.31, 0.69]",
+                "missed": 11,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.14]"
+              },
+              {
+                "held out": "contrast",
+                "language": "ja",
+                "rows": 42,
+                "precision": 1.0,
+                "recall [95%]": "0.261 [0.13, 0.46]",
+                "missed": 17,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "held out": "contrast",
+                "language": "nl",
+                "rows": 42,
+                "precision": 1.0,
+                "recall [95%]": "0.565 [0.37, 0.74]",
+                "missed": 10,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "held out": "contrast",
+                "language": "pt",
+                "rows": 46,
+                "precision": 1.0,
+                "recall [95%]": "0.480 [0.30, 0.67]",
+                "missed": 13,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "ru",
+                "rows": 44,
+                "precision": 1.0,
+                "recall [95%]": "0.500 [0.31, 0.69]",
+                "missed": 12,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.16]"
+              },
+              {
+                "held out": "contrast",
+                "language": "tr",
+                "rows": 45,
+                "precision": 1.0,
+                "recall [95%]": "0.423 [0.26, 0.61]",
+                "missed": 15,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "held out": "contrast",
+                "language": "zh",
+                "rows": 41,
+                "precision": 1.0,
+                "recall [95%]": "0.364 [0.20, 0.57]",
+                "missed": 14,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "held out": "multilingual",
+                "language": "de",
+                "rows": 296,
+                "precision": 1.0,
+                "recall [95%]": "0.270 [0.21, 0.34]",
+                "missed": 130,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "multilingual",
+                "language": "en",
+                "rows": 658,
+                "precision": 1.0,
+                "recall [95%]": "0.212 [0.17, 0.26]",
+                "missed": 256,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "held out": "multilingual",
+                "language": "es",
+                "rows": 311,
+                "precision": 1.0,
+                "recall [95%]": "0.203 [0.15, 0.27]",
+                "missed": 149,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "multilingual",
+                "language": "fr",
+                "rows": 330,
+                "precision": 1.0,
+                "recall [95%]": "0.279 [0.22, 0.35]",
+                "missed": 142,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "multilingual",
+                "language": "it",
+                "rows": 307,
+                "precision": 1.0,
+                "recall [95%]": "0.182 [0.13, 0.25]",
+                "missed": 139,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "multilingual",
+                "language": "pt",
+                "rows": 271,
+                "precision": 1.0,
+                "recall [95%]": "0.211 [0.15, 0.28]",
+                "missed": 120,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              }
+            ]
+          }
+        },
+        "held_out_payloads": {
+          "scores": {
+            "n": 21540,
+            "accuracy": 0.8845403899721448,
+            "precision": 0.9843398047838678,
+            "recall": 0.7967529084910575,
+            "f1": 0.8806679142075716,
+            "recall_ci": [
+              0.789305299810327,
+              0.8040026311023841
+            ],
+            "false_alarm_rate": 0.014567950508880463,
+            "false_alarm_ci": [
+              0.012401236295251812,
+              0.017106670552189306
+            ],
+            "tn": 9876,
+            "fp": 146,
+            "fn": 2341,
+            "tp": 9177
+          },
+          "tables": {
+            "by_fold": [
+              {
+                "held out": "aya",
+                "texts": "obfuscated copy",
+                "rows": 394,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "held out": "aya",
+                "texts": "original",
+                "rows": 769,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "held out": "contrast",
+                "texts": "obfuscated copy",
+                "rows": 1694,
+                "precision": 0.963,
+                "recall [95%]": "0.761 [0.73, 0.78]",
+                "missed": 265,
+                "false alarms": 32,
+                "fa rate [95%]": "0.055 [0.04, 0.08]"
+              },
+              {
+                "held out": "contrast",
+                "texts": "original",
+                "rows": 2297,
+                "precision": 0.957,
+                "recall [95%]": "0.771 [0.75, 0.80]",
+                "missed": 248,
+                "false alarms": 38,
+                "fa rate [95%]": "0.031 [0.02, 0.04]"
+              },
+              {
+                "held out": "deepset",
+                "texts": "obfuscated copy",
+                "rows": 318,
+                "precision": 1.0,
+                "recall [95%]": "0.213 [0.16, 0.28]",
+                "missed": 137,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "deepset",
+                "texts": "original",
+                "rows": 539,
+                "precision": 1.0,
+                "recall [95%]": "0.260 [0.20, 0.32]",
+                "missed": 148,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "held out": "dolly",
+                "texts": "obfuscated copy",
+                "rows": 242,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "held out": "dolly",
+                "texts": "original",
+                "rows": 769,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "held out": "gandalf",
+                "texts": "obfuscated copy",
+                "rows": 852,
+                "precision": 1.0,
+                "recall [95%]": "0.846 [0.82, 0.87]",
+                "missed": 131,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "gandalf",
+                "texts": "original",
+                "rows": 887,
+                "precision": 1.0,
+                "recall [95%]": "0.856 [0.83, 0.88]",
+                "missed": 128,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "gsum",
+                "texts": "obfuscated copy",
+                "rows": 89,
+                "precision": 1.0,
+                "recall [95%]": "0.112 [0.06, 0.19]",
+                "missed": 79,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "gsum",
+                "texts": "original",
+                "rows": 126,
+                "precision": 1.0,
+                "recall [95%]": "0.135 [0.09, 0.21]",
+                "missed": 109,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "jackhhao",
+                "texts": "obfuscated copy",
+                "rows": 533,
+                "precision": 0.94,
+                "recall [95%]": "0.490 [0.39, 0.59]",
+                "missed": 49,
+                "false alarms": 3,
+                "fa rate [95%]": "0.007 [0.00, 0.02]"
+              },
+              {
+                "held out": "jackhhao",
+                "texts": "original",
+                "rows": 1500,
+                "precision": 0.985,
+                "recall [95%]": "0.771 [0.73, 0.81]",
+                "missed": 100,
+                "false alarms": 5,
+                "fa rate [95%]": "0.005 [0.00, 0.01]"
+              },
+              {
+                "held out": "llmail",
+                "texts": "obfuscated copy",
+                "rows": 160,
+                "precision": 1.0,
+                "recall [95%]": "0.714 [0.62, 0.79]",
+                "missed": 30,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.07]"
+              },
+              {
+                "held out": "llmail",
+                "texts": "original",
+                "rows": 459,
+                "precision": 1.0,
+                "recall [95%]": "0.849 [0.81, 0.88]",
+                "missed": 50,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "mirzaakhi",
+                "texts": "obfuscated copy",
+                "rows": 3132,
+                "precision": 0.999,
+                "recall [95%]": "0.979 [0.97, 0.98]",
+                "missed": 42,
+                "false alarms": 3,
+                "fa rate [95%]": "0.003 [0.00, 0.01]"
+              },
+              {
+                "held out": "mirzaakhi",
+                "texts": "original",
+                "rows": 4209,
+                "precision": 0.999,
+                "recall [95%]": "0.999 [1.00, 1.00]",
+                "missed": 3,
+                "false alarms": 1,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "held out": "wild",
+                "texts": "obfuscated copy",
+                "rows": 164,
+                "precision": 0.741,
+                "recall [95%]": "0.351 [0.24, 0.48]",
+                "missed": 37,
+                "false alarms": 7,
+                "fa rate [95%]": "0.065 [0.03, 0.13]"
+              },
+              {
+                "held out": "wild",
+                "texts": "original",
+                "rows": 789,
+                "precision": 0.767,
+                "recall [95%]": "0.601 [0.55, 0.65]",
+                "missed": 125,
+                "false alarms": 57,
+                "fa rate [95%]": "0.120 [0.09, 0.15]"
+              },
+              {
+                "held out": "yanis",
+                "texts": "obfuscated copy",
+                "rows": 805,
+                "precision": 1.0,
+                "recall [95%]": "0.547 [0.51, 0.58]",
+                "missed": 365,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "yanis",
+                "texts": "original",
+                "rows": 813,
+                "precision": 1.0,
+                "recall [95%]": "0.637 [0.60, 0.67]",
+                "missed": 295,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "ALL",
+                "texts": "",
+                "rows": 21540,
+                "precision": 0.984,
+                "recall [95%]": "0.797 [0.79, 0.80]",
+                "missed": 2341,
+                "false alarms": 146,
+                "fa rate [95%]": "0.015 [0.01, 0.02]"
+              }
+            ],
+            "by_source": [
+              {
+                "source": "aya",
+                "rows": 1163,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "source": "contrast",
+                "rows": 3991,
+                "precision": 0.96,
+                "recall [95%]": "0.766 [0.75, 0.78]",
+                "missed": 513,
+                "false alarms": 70,
+                "fa rate [95%]": "0.039 [0.03, 0.05]"
+              },
+              {
+                "source": "deepset",
+                "rows": 857,
+                "precision": 1.0,
+                "recall [95%]": "0.238 [0.20, 0.28]",
+                "missed": 285,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "source": "dolly",
+                "rows": 1011,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "source": "gandalf",
+                "rows": 1739,
+                "precision": 1.0,
+                "recall [95%]": "0.851 [0.83, 0.87]",
+                "missed": 259,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "source": "gsum",
+                "rows": 215,
+                "precision": 1.0,
+                "recall [95%]": "0.126 [0.09, 0.18]",
+                "missed": 188,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "source": "jackhhao",
+                "rows": 2033,
+                "precision": 0.98,
+                "recall [95%]": "0.720 [0.68, 0.76]",
+                "missed": 149,
+                "false alarms": 8,
+                "fa rate [95%]": "0.005 [0.00, 0.01]"
+              },
+              {
+                "source": "llmail",
+                "rows": 619,
+                "precision": 1.0,
+                "recall [95%]": "0.817 [0.78, 0.85]",
+                "missed": 80,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "source": "mirzaakhi",
+                "rows": 7341,
+                "precision": 0.999,
+                "recall [95%]": "0.989 [0.99, 0.99]",
+                "missed": 45,
+                "false alarms": 4,
+                "fa rate [95%]": "0.001 [0.00, 0.00]"
+              },
+              {
+                "source": "wild",
+                "rows": 953,
+                "precision": 0.765,
+                "recall [95%]": "0.562 [0.51, 0.61]",
+                "missed": 162,
+                "false alarms": 64,
+                "fa rate [95%]": "0.110 [0.09, 0.14]"
+              },
+              {
+                "source": "yanis",
+                "rows": 1618,
+                "precision": 1.0,
+                "recall [95%]": "0.592 [0.57, 0.62]",
+                "missed": 660,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              }
+            ],
+            "by_family": [
+              {
+                "family": "contrast",
+                "rows": 3991,
+                "precision": 0.96,
+                "recall [95%]": "0.766 [0.75, 0.78]",
+                "missed": 513,
+                "false alarms": 70,
+                "fa rate [95%]": "0.039 [0.03, 0.05]"
+              },
+              {
+                "family": "deepset",
+                "rows": 857,
+                "precision": 1.0,
+                "recall [95%]": "0.238 [0.20, 0.28]",
+                "missed": 285,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "family": "dolly",
+                "rows": 1011,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "family": "gandalf",
+                "rows": 1954,
+                "precision": 1.0,
+                "recall [95%]": "0.771 [0.75, 0.79]",
+                "missed": 447,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "family": "jailbreak",
+                "rows": 2986,
+                "precision": 0.891,
+                "recall [95%]": "0.655 [0.62, 0.69]",
+                "missed": 311,
+                "false alarms": 72,
+                "fa rate [95%]": "0.035 [0.03, 0.04]"
+              },
+              {
+                "family": "llmail",
+                "rows": 619,
+                "precision": 1.0,
+                "recall [95%]": "0.817 [0.78, 0.85]",
+                "missed": 80,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "family": "mirzaakhi",
+                "rows": 7341,
+                "precision": 0.999,
+                "recall [95%]": "0.989 [0.99, 0.99]",
+                "missed": 45,
+                "false alarms": 4,
+                "fa rate [95%]": "0.001 [0.00, 0.00]"
+              },
+              {
+                "family": "multilingual",
+                "rows": 2781,
+                "precision": 1.0,
+                "recall [95%]": "0.592 [0.57, 0.62]",
+                "missed": 660,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              }
+            ],
+            "by_language": [
+              {
+                "language": "ar",
+                "rows": 57,
+                "precision": 1.0,
+                "recall [95%]": "0.528 [0.37, 0.68]",
+                "missed": 17,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "language": "de",
+                "rows": 439,
+                "precision": 1.0,
+                "recall [95%]": "0.639 [0.58, 0.69]",
+                "missed": 99,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "en",
+                "rows": 10967,
+                "precision": 0.986,
+                "recall [95%]": "0.883 [0.87, 0.89]",
+                "missed": 644,
+                "false alarms": 68,
+                "fa rate [95%]": "0.012 [0.01, 0.02]"
+              },
+              {
+                "language": "es",
+                "rows": 446,
+                "precision": 1.0,
+                "recall [95%]": "0.595 [0.54, 0.65]",
+                "missed": 111,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "fr",
+                "rows": 489,
+                "precision": 1.0,
+                "recall [95%]": "0.599 [0.54, 0.65]",
+                "missed": 121,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "hi",
+                "rows": 59,
+                "precision": 1.0,
+                "recall [95%]": "0.405 [0.26, 0.57]",
+                "missed": 22,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "language": "it",
+                "rows": 446,
+                "precision": 1.0,
+                "recall [95%]": "0.567 [0.51, 0.63]",
+                "missed": 110,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "ja",
+                "rows": 54,
+                "precision": 1.0,
+                "recall [95%]": "0.394 [0.25, 0.56]",
+                "missed": 20,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "language": "nl",
+                "rows": 55,
+                "precision": 1.0,
+                "recall [95%]": "0.517 [0.34, 0.69]",
+                "missed": 14,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.13]"
+              },
+              {
+                "language": "pt",
+                "rows": 411,
+                "precision": 1.0,
+                "recall [95%]": "0.564 [0.50, 0.63]",
+                "missed": 105,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "ru",
+                "rows": 61,
+                "precision": 1.0,
+                "recall [95%]": "0.657 [0.49, 0.79]",
+                "missed": 12,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.13]"
+              },
+              {
+                "language": "tr",
+                "rows": 58,
+                "precision": 1.0,
+                "recall [95%]": "0.600 [0.44, 0.74]",
+                "missed": 14,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.14]"
+              },
+              {
+                "language": "zh",
+                "rows": 53,
+                "precision": 1.0,
+                "recall [95%]": "0.517 [0.34, 0.69]",
+                "missed": 14,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.14]"
+              }
+            ],
+            "by_fold_language": [
+              {
+                "held out": "aya",
+                "language": "de",
+                "rows": 143,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "aya",
+                "language": "en",
+                "rows": 392,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "held out": "aya",
+                "language": "es",
+                "rows": 150,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "held out": "aya",
+                "language": "fr",
+                "rows": 166,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "held out": "aya",
+                "language": "it",
+                "rows": 167,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "held out": "aya",
+                "language": "pt",
+                "rows": 145,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "contrast",
+                "language": "ar",
+                "rows": 57,
+                "precision": 1.0,
+                "recall [95%]": "0.528 [0.37, 0.68]",
+                "missed": 17,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "de",
+                "rows": 53,
+                "precision": 1.0,
+                "recall [95%]": "0.677 [0.50, 0.81]",
+                "missed": 10,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "es",
+                "rows": 52,
+                "precision": 1.0,
+                "recall [95%]": "0.733 [0.56, 0.86]",
+                "missed": 8,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "fr",
+                "rows": 57,
+                "precision": 1.0,
+                "recall [95%]": "0.611 [0.45, 0.75]",
+                "missed": 14,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "hi",
+                "rows": 59,
+                "precision": 1.0,
+                "recall [95%]": "0.405 [0.26, 0.57]",
+                "missed": 22,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "it",
+                "rows": 57,
+                "precision": 1.0,
+                "recall [95%]": "0.719 [0.55, 0.84]",
+                "missed": 9,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.13]"
+              },
+              {
+                "held out": "contrast",
+                "language": "ja",
+                "rows": 54,
+                "precision": 1.0,
+                "recall [95%]": "0.394 [0.25, 0.56]",
+                "missed": 20,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "nl",
+                "rows": 55,
+                "precision": 1.0,
+                "recall [95%]": "0.517 [0.34, 0.69]",
+                "missed": 14,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.13]"
+              },
+              {
+                "held out": "contrast",
+                "language": "pt",
+                "rows": 59,
+                "precision": 1.0,
+                "recall [95%]": "0.588 [0.42, 0.74]",
+                "missed": 14,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.13]"
+              },
+              {
+                "held out": "contrast",
+                "language": "ru",
+                "rows": 61,
+                "precision": 1.0,
+                "recall [95%]": "0.657 [0.49, 0.79]",
+                "missed": 12,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.13]"
+              },
+              {
+                "held out": "contrast",
+                "language": "tr",
+                "rows": 58,
+                "precision": 1.0,
+                "recall [95%]": "0.600 [0.44, 0.74]",
+                "missed": 14,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.14]"
+              },
+              {
+                "held out": "contrast",
+                "language": "zh",
+                "rows": 53,
+                "precision": 1.0,
+                "recall [95%]": "0.517 [0.34, 0.69]",
+                "missed": 14,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.14]"
+              },
+              {
+                "held out": "yanis",
+                "language": "de",
+                "rows": 243,
+                "precision": 1.0,
+                "recall [95%]": "0.634 [0.57, 0.69]",
+                "missed": 89,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "yanis",
+                "language": "en",
+                "rows": 436,
+                "precision": 1.0,
+                "recall [95%]": "0.612 [0.57, 0.66]",
+                "missed": 169,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "yanis",
+                "language": "es",
+                "rows": 244,
+                "precision": 1.0,
+                "recall [95%]": "0.578 [0.52, 0.64]",
+                "missed": 103,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "yanis",
+                "language": "fr",
+                "rows": 266,
+                "precision": 1.0,
+                "recall [95%]": "0.598 [0.54, 0.65]",
+                "missed": 107,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "yanis",
+                "language": "it",
+                "rows": 222,
+                "precision": 1.0,
+                "recall [95%]": "0.545 [0.48, 0.61]",
+                "missed": 101,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "yanis",
+                "language": "pt",
+                "rows": 207,
+                "precision": 1.0,
+                "recall [95%]": "0.560 [0.49, 0.63]",
+                "missed": 91,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              }
+            ]
+          }
+        }
+      },
+      "development_sets": {
+        "scores": {
+          "handwritten_dev": {
+            "n": 112,
+            "accuracy": 0.9375,
+            "precision": 0.9454545454545454,
+            "recall": 0.9285714285714286,
+            "f1": 0.9369369369369369,
+            "recall_ci": [
+              0.830243171685138,
+              0.9718744187536204
+            ],
+            "false_alarm_rate": 0.05357142857142857,
+            "false_alarm_ci": [
+              0.01838544792866792,
+              0.14607539536429218
+            ],
+            "tn": 53,
+            "fp": 3,
+            "fn": 4,
+            "tp": 52
+          },
+          "handwritten_dev3": {
+            "n": 56,
+            "accuracy": 0.8928571428571429,
+            "precision": 0.9583333333333334,
+            "recall": 0.8214285714285714,
+            "f1": 0.8846153846153846,
+            "recall_ci": [
+              0.644082084514089,
+              0.9212161417056989
+            ],
+            "false_alarm_rate": 0.03571428571428571,
+            "false_alarm_ci": [
+              0.00633235649754188,
+              0.17712576118498663
+            ],
+            "tn": 27,
+            "fp": 1,
+            "fn": 5,
+            "tp": 23
+          },
+          "official_dev": {
+            "n": 493,
+            "accuracy": 0.8762677484787018,
+            "precision": 1.0,
+            "recall": 0.8111455108359134,
+            "f1": 0.8957264957264958,
+            "recall_ci": [
+              0.7648984145965962,
+              0.8500783815027988
+            ],
+            "false_alarm_rate": 0.0,
+            "false_alarm_ci": [
+              0.0,
+              0.022098277972591136
+            ],
+            "tn": 170,
+            "fp": 0,
+            "fn": 61,
+            "tp": 262
+          },
+          "probe_dev": {
+            "n": 216,
+            "accuracy": 0.7777777777777778,
+            "precision": 0.9152542372881356,
+            "recall": 0.5567010309278351,
+            "f1": 0.6923076923076923,
+            "recall_ci": [
+              0.45755626177249387,
+              0.6515257044001969
+            ],
+            "false_alarm_rate": 0.04201680672268908,
+            "false_alarm_ci": [
+              0.018078207847971574,
+              0.0946002333315637
+            ],
+            "tn": 114,
+            "fp": 5,
+            "fn": 43,
+            "tp": 54
+          },
+          "official_recall_seen": 0.5736434108527132,
+          "official_recall_unseen": 0.9690721649484536
+        },
+        "standards": [
+          {
+            "standard": "official recall",
+            "target": 0.9,
+            "result": 0.811,
+            "met": "NO"
+          },
+          {
+            "standard": "official precision",
+            "target": 0.95,
+            "result": 1.0,
+            "met": "yes"
+          },
+          {
+            "standard": "hand-written recall",
+            "target": 0.85,
+            "result": 0.929,
+            "met": "yes"
+          },
+          {
+            "standard": "hand-written false alarm rate",
+            "target": 0.071,
+            "result": 0.054,
+            "met": "yes"
+          }
+        ],
+        "official_by_category": [
+          {
+            "label": 0,
+            "category": "carrier_clean",
+            "rows": 45,
+            "correct_share": 1.0,
+            "correct [95%]": "1.000 [0.92, 1.00]",
+            "seen_in_train": true
+          },
+          {
+            "label": 0,
+            "category": "embedded_human",
+            "rows": 87,
+            "correct_share": 1.0,
+            "correct [95%]": "1.000 [0.96, 1.00]",
+            "seen_in_train": true
+          },
+          {
+            "label": 0,
+            "category": "hard_negative",
+            "rows": 8,
+            "correct_share": 1.0,
+            "correct [95%]": "1.000 [0.68, 1.00]",
+            "seen_in_train": true
+          },
+          {
+            "label": 0,
+            "category": "multilingual",
+            "rows": 3,
+            "correct_share": 1.0,
+            "correct [95%]": "1.000 [0.44, 1.00]",
+            "seen_in_train": false
+          },
+          {
+            "label": 0,
+            "category": "qa",
+            "rows": 27,
+            "correct_share": 1.0,
+            "correct [95%]": "1.000 [0.88, 1.00]",
+            "seen_in_train": true
+          },
+          {
+            "label": 1,
+            "category": "appended_override",
+            "rows": 41,
+            "correct_share": 0.8292682926829268,
+            "correct [95%]": "0.829 [0.69, 0.91]",
+            "seen_in_train": true
+          },
+          {
+            "label": 1,
+            "category": "indirect_injection",
+            "rows": 88,
+            "correct_share": 0.45454545454545453,
+            "correct [95%]": "0.455 [0.35, 0.56]",
+            "seen_in_train": true
+          },
+          {
+            "label": 1,
+            "category": "multilingual",
+            "rows": 3,
+            "correct_share": 0.6666666666666666,
+            "correct [95%]": "0.667 [0.21, 0.94]",
+            "seen_in_train": false
+          },
+          {
+            "label": 1,
+            "category": "obfuscation",
+            "rows": 110,
+            "correct_share": 1.0,
+            "correct [95%]": "1.000 [0.97, 1.00]",
+            "seen_in_train": false
+          },
+          {
+            "label": 1,
+            "category": "payload_split",
+            "rows": 81,
+            "correct_share": 0.9382716049382716,
+            "correct [95%]": "0.938 [0.86, 0.97]",
+            "seen_in_train": false
+          }
+        ]
+      }
+    },
+    "emb+rules16": {
+      "threshold": 1.451675066852995,
+      "calibrator": [
+        1.9230211380984141,
+        -0.7815801566982966
+      ],
+      "params": {
+        "svc__kernel": "linear",
+        "svc__C": 0.3,
+        "features__rules__weight__weight": 1.0
+      },
+      "development": {
+        "held_out_family": {
+          "scores": {
+            "n": 17370,
+            "accuracy": 0.8200921128382268,
+            "precision": 0.9664768104149716,
+            "recall": 0.6704673741250846,
+            "f1": 0.7917083250016663,
+            "recall_ci": [
+              0.6606065914695994,
+              0.6801803618878154
+            ],
+            "false_alarm_rate": 0.024201127819548873,
+            "false_alarm_ci": [
+              0.021144791150858575,
+              0.027686741835851746
+            ],
+            "tn": 8306,
+            "fp": 206,
+            "fn": 2919,
+            "tp": 5939
+          },
+          "tables": {
+            "by_fold": [
+              {
+                "held out": "contrast",
+                "texts": "obfuscated copy",
+                "rows": 842,
+                "precision": 0.95,
+                "recall [95%]": "0.549 [0.51, 0.59]",
+                "missed": 249,
+                "false alarms": 16,
+                "fa rate [95%]": "0.055 [0.03, 0.09]"
+              },
+              {
+                "held out": "contrast",
+                "texts": "original",
+                "rows": 2297,
+                "precision": 0.911,
+                "recall [95%]": "0.559 [0.53, 0.59]",
+                "missed": 479,
+                "false alarms": 59,
+                "fa rate [95%]": "0.049 [0.04, 0.06]"
+              },
+              {
+                "held out": "deepset",
+                "texts": "obfuscated copy",
+                "rows": 174,
+                "precision": 1.0,
+                "recall [95%]": "0.216 [0.15, 0.31]",
+                "missed": 76,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.05]"
+              },
+              {
+                "held out": "deepset",
+                "texts": "original",
+                "rows": 539,
+                "precision": 1.0,
+                "recall [95%]": "0.190 [0.14, 0.25]",
+                "missed": 162,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "held out": "dolly",
+                "texts": "obfuscated copy",
+                "rows": 125,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "dolly",
+                "texts": "original",
+                "rows": 769,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "held out": "gandalf",
+                "texts": "obfuscated copy",
+                "rows": 488,
+                "precision": 1.0,
+                "recall [95%]": "0.652 [0.61, 0.69]",
+                "missed": 170,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "gandalf",
+                "texts": "original",
+                "rows": 1013,
+                "precision": 1.0,
+                "recall [95%]": "0.637 [0.61, 0.67]",
+                "missed": 368,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "jailbreak",
+                "texts": "obfuscated copy",
+                "rows": 340,
+                "precision": 0.718,
+                "recall [95%]": "0.384 [0.28, 0.50]",
+                "missed": 45,
+                "false alarms": 11,
+                "fa rate [95%]": "0.041 [0.02, 0.07]"
+              },
+              {
+                "held out": "jailbreak",
+                "texts": "original",
+                "rows": 2289,
+                "precision": 0.812,
+                "recall [95%]": "0.678 [0.64, 0.71]",
+                "missed": 241,
+                "false alarms": 118,
+                "fa rate [95%]": "0.077 [0.06, 0.09]"
+              },
+              {
+                "held out": "llmail",
+                "texts": "obfuscated copy",
+                "rows": 75,
+                "precision": 1.0,
+                "recall [95%]": "0.522 [0.38, 0.66]",
+                "missed": 22,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.12]"
+              },
+              {
+                "held out": "llmail",
+                "texts": "original",
+                "rows": 459,
+                "precision": 1.0,
+                "recall [95%]": "0.640 [0.59, 0.69]",
+                "missed": 119,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "mirzaakhi",
+                "texts": "obfuscated copy",
+                "rows": 1578,
+                "precision": 0.998,
+                "recall [95%]": "0.982 [0.97, 0.99]",
+                "missed": 18,
+                "false alarms": 2,
+                "fa rate [95%]": "0.004 [0.00, 0.01]"
+              },
+              {
+                "held out": "mirzaakhi",
+                "texts": "original",
+                "rows": 4209,
+                "precision": 1.0,
+                "recall [95%]": "0.997 [0.99, 1.00]",
+                "missed": 6,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "held out": "multilingual",
+                "texts": "obfuscated copy",
+                "rows": 591,
+                "precision": 1.0,
+                "recall [95%]": "0.182 [0.15, 0.22]",
+                "missed": 324,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "held out": "multilingual",
+                "texts": "original",
+                "rows": 1582,
+                "precision": 1.0,
+                "recall [95%]": "0.213 [0.19, 0.24]",
+                "missed": 640,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "held out": "ALL",
+                "texts": "",
+                "rows": 17370,
+                "precision": 0.966,
+                "recall [95%]": "0.670 [0.66, 0.68]",
+                "missed": 2919,
+                "false alarms": 206,
+                "fa rate [95%]": "0.024 [0.02, 0.03]"
+              }
+            ],
+            "by_source": [
+              {
+                "source": "aya",
+                "rows": 964,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "source": "contrast",
+                "rows": 3139,
+                "precision": 0.924,
+                "recall [95%]": "0.555 [0.53, 0.58]",
+                "missed": 728,
+                "false alarms": 75,
+                "fa rate [95%]": "0.050 [0.04, 0.06]"
+              },
+              {
+                "source": "deepset",
+                "rows": 713,
+                "precision": 1.0,
+                "recall [95%]": "0.199 [0.16, 0.25]",
+                "missed": 238,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "source": "dolly",
+                "rows": 894,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "source": "gandalf",
+                "rows": 1328,
+                "precision": 1.0,
+                "recall [95%]": "0.716 [0.69, 0.74]",
+                "missed": 377,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "source": "gsum",
+                "rows": 173,
+                "precision": 1.0,
+                "recall [95%]": "0.069 [0.04, 0.12]",
+                "missed": 161,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "source": "jackhhao",
+                "rows": 1764,
+                "precision": 0.922,
+                "recall [95%]": "0.707 [0.67, 0.75]",
+                "missed": 141,
+                "false alarms": 29,
+                "fa rate [95%]": "0.023 [0.02, 0.03]"
+              },
+              {
+                "source": "llmail",
+                "rows": 534,
+                "precision": 1.0,
+                "recall [95%]": "0.626 [0.58, 0.67]",
+                "missed": 141,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "source": "mirzaakhi",
+                "rows": 5787,
+                "precision": 0.999,
+                "recall [95%]": "0.992 [0.99, 0.99]",
+                "missed": 24,
+                "false alarms": 2,
+                "fa rate [95%]": "0.001 [0.00, 0.00]"
+              },
+              {
+                "source": "wild",
+                "rows": 865,
+                "precision": 0.661,
+                "recall [95%]": "0.574 [0.52, 0.62]",
+                "missed": 145,
+                "false alarms": 100,
+                "fa rate [95%]": "0.190 [0.16, 0.23]"
+              },
+              {
+                "source": "yanis",
+                "rows": 1209,
+                "precision": 1.0,
+                "recall [95%]": "0.203 [0.18, 0.23]",
+                "missed": 964,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              }
+            ],
+            "by_family": [
+              {
+                "family": "contrast",
+                "rows": 3139,
+                "precision": 0.924,
+                "recall [95%]": "0.555 [0.53, 0.58]",
+                "missed": 728,
+                "false alarms": 75,
+                "fa rate [95%]": "0.050 [0.04, 0.06]"
+              },
+              {
+                "family": "deepset",
+                "rows": 713,
+                "precision": 1.0,
+                "recall [95%]": "0.199 [0.16, 0.25]",
+                "missed": 238,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "family": "dolly",
+                "rows": 894,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "family": "gandalf",
+                "rows": 1501,
+                "precision": 1.0,
+                "recall [95%]": "0.642 [0.62, 0.67]",
+                "missed": 538,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "family": "jailbreak",
+                "rows": 2629,
+                "precision": 0.806,
+                "recall [95%]": "0.652 [0.62, 0.68]",
+                "missed": 286,
+                "false alarms": 129,
+                "fa rate [95%]": "0.071 [0.06, 0.08]"
+              },
+              {
+                "family": "llmail",
+                "rows": 534,
+                "precision": 1.0,
+                "recall [95%]": "0.626 [0.58, 0.67]",
+                "missed": 141,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "family": "mirzaakhi",
+                "rows": 5787,
+                "precision": 0.999,
+                "recall [95%]": "0.992 [0.99, 0.99]",
+                "missed": 24,
+                "false alarms": 2,
+                "fa rate [95%]": "0.001 [0.00, 0.00]"
+              },
+              {
+                "family": "multilingual",
+                "rows": 2173,
+                "precision": 1.0,
+                "recall [95%]": "0.203 [0.18, 0.23]",
+                "missed": 964,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              }
+            ],
+            "by_language": [
+              {
+                "language": "ar",
+                "rows": 45,
+                "precision": 1.0,
+                "recall [95%]": "0.370 [0.22, 0.56]",
+                "missed": 17,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.18]"
+              },
+              {
+                "language": "de",
+                "rows": 337,
+                "precision": 1.0,
+                "recall [95%]": "0.205 [0.15, 0.27]",
+                "missed": 159,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "language": "en",
+                "rows": 8911,
+                "precision": 0.972,
+                "recall [95%]": "0.832 [0.82, 0.84]",
+                "missed": 709,
+                "false alarms": 102,
+                "fa rate [95%]": "0.022 [0.02, 0.03]"
+              },
+              {
+                "language": "es",
+                "rows": 354,
+                "precision": 1.0,
+                "recall [95%]": "0.205 [0.16, 0.26]",
+                "missed": 167,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "language": "fr",
+                "rows": 378,
+                "precision": 1.0,
+                "recall [95%]": "0.232 [0.18, 0.29]",
+                "missed": 172,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "hi",
+                "rows": 46,
+                "precision": 1.0,
+                "recall [95%]": "0.231 [0.11, 0.42]",
+                "missed": 20,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.16]"
+              },
+              {
+                "language": "it",
+                "rows": 352,
+                "precision": 1.0,
+                "recall [95%]": "0.167 [0.12, 0.23]",
+                "missed": 160,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "ja",
+                "rows": 42,
+                "precision": 1.0,
+                "recall [95%]": "0.217 [0.10, 0.42]",
+                "missed": 18,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "language": "nl",
+                "rows": 42,
+                "precision": 1.0,
+                "recall [95%]": "0.304 [0.16, 0.51]",
+                "missed": 16,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "language": "pt",
+                "rows": 317,
+                "precision": 1.0,
+                "recall [95%]": "0.192 [0.14, 0.26]",
+                "missed": 143,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "language": "ru",
+                "rows": 44,
+                "precision": 1.0,
+                "recall [95%]": "0.375 [0.21, 0.57]",
+                "missed": 15,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.16]"
+              },
+              {
+                "language": "tr",
+                "rows": 45,
+                "precision": 1.0,
+                "recall [95%]": "0.269 [0.14, 0.46]",
+                "missed": 19,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "language": "zh",
+                "rows": 41,
+                "precision": 1.0,
+                "recall [95%]": "0.227 [0.10, 0.43]",
+                "missed": 17,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              }
+            ],
+            "by_fold_language": [
+              {
+                "held out": "contrast",
+                "language": "ar",
+                "rows": 45,
+                "precision": 1.0,
+                "recall [95%]": "0.370 [0.22, 0.56]",
+                "missed": 17,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.18]"
+              },
+              {
+                "held out": "contrast",
+                "language": "de",
+                "rows": 41,
+                "precision": 1.0,
+                "recall [95%]": "0.364 [0.20, 0.57]",
+                "missed": 14,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "held out": "contrast",
+                "language": "es",
+                "rows": 43,
+                "precision": 1.0,
+                "recall [95%]": "0.435 [0.26, 0.63]",
+                "missed": 13,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.16]"
+              },
+              {
+                "held out": "contrast",
+                "language": "fr",
+                "rows": 48,
+                "precision": 1.0,
+                "recall [95%]": "0.370 [0.22, 0.56]",
+                "missed": 17,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "hi",
+                "rows": 46,
+                "precision": 1.0,
+                "recall [95%]": "0.231 [0.11, 0.42]",
+                "missed": 20,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.16]"
+              },
+              {
+                "held out": "contrast",
+                "language": "it",
+                "rows": 45,
+                "precision": 1.0,
+                "recall [95%]": "0.318 [0.16, 0.53]",
+                "missed": 15,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.14]"
+              },
+              {
+                "held out": "contrast",
+                "language": "ja",
+                "rows": 42,
+                "precision": 1.0,
+                "recall [95%]": "0.217 [0.10, 0.42]",
+                "missed": 18,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "held out": "contrast",
+                "language": "nl",
+                "rows": 42,
+                "precision": 1.0,
+                "recall [95%]": "0.304 [0.16, 0.51]",
+                "missed": 16,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "held out": "contrast",
+                "language": "pt",
+                "rows": 46,
+                "precision": 1.0,
+                "recall [95%]": "0.360 [0.20, 0.55]",
+                "missed": 16,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "ru",
+                "rows": 44,
+                "precision": 1.0,
+                "recall [95%]": "0.375 [0.21, 0.57]",
+                "missed": 15,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.16]"
+              },
+              {
+                "held out": "contrast",
+                "language": "tr",
+                "rows": 45,
+                "precision": 1.0,
+                "recall [95%]": "0.269 [0.14, 0.46]",
+                "missed": 19,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "held out": "contrast",
+                "language": "zh",
+                "rows": 41,
+                "precision": 1.0,
+                "recall [95%]": "0.227 [0.10, 0.43]",
+                "missed": 17,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.17]"
+              },
+              {
+                "held out": "multilingual",
+                "language": "de",
+                "rows": 296,
+                "precision": 1.0,
+                "recall [95%]": "0.185 [0.14, 0.25]",
+                "missed": 145,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "multilingual",
+                "language": "en",
+                "rows": 658,
+                "precision": 1.0,
+                "recall [95%]": "0.268 [0.22, 0.32]",
+                "missed": 238,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "held out": "multilingual",
+                "language": "es",
+                "rows": 311,
+                "precision": 1.0,
+                "recall [95%]": "0.176 [0.13, 0.24]",
+                "missed": 154,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "multilingual",
+                "language": "fr",
+                "rows": 330,
+                "precision": 1.0,
+                "recall [95%]": "0.213 [0.16, 0.28]",
+                "missed": 155,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "multilingual",
+                "language": "it",
+                "rows": 307,
+                "precision": 1.0,
+                "recall [95%]": "0.147 [0.10, 0.21]",
+                "missed": 145,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "multilingual",
+                "language": "pt",
+                "rows": 271,
+                "precision": 1.0,
+                "recall [95%]": "0.164 [0.11, 0.23]",
+                "missed": 127,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              }
+            ]
+          }
+        },
+        "held_out_payloads": {
+          "scores": {
+            "n": 21540,
+            "accuracy": 0.8668523676880223,
+            "precision": 0.9845395473896482,
+            "recall": 0.7629796839729119,
+            "f1": 0.859714341616122,
+            "recall_ci": [
+              0.7551264540653453,
+              0.7706575490752636
+            ],
+            "false_alarm_rate": 0.013769706645380164,
+            "false_alarm_ci": [
+              0.011667304816972411,
+              0.01624472602939564
+            ],
+            "tn": 9884,
+            "fp": 138,
+            "fn": 2730,
+            "tp": 8788
+          },
+          "tables": {
+            "by_fold": [
+              {
+                "held out": "aya",
+                "texts": "obfuscated copy",
+                "rows": 394,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "held out": "aya",
+                "texts": "original",
+                "rows": 769,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "held out": "contrast",
+                "texts": "obfuscated copy",
+                "rows": 1694,
+                "precision": 0.96,
+                "recall [95%]": "0.628 [0.60, 0.66]",
+                "missed": 412,
+                "false alarms": 29,
+                "fa rate [95%]": "0.049 [0.03, 0.07]"
+              },
+              {
+                "held out": "contrast",
+                "texts": "original",
+                "rows": 2297,
+                "precision": 0.953,
+                "recall [95%]": "0.639 [0.61, 0.67]",
+                "missed": 392,
+                "false alarms": 34,
+                "fa rate [95%]": "0.028 [0.02, 0.04]"
+              },
+              {
+                "held out": "deepset",
+                "texts": "obfuscated copy",
+                "rows": 318,
+                "precision": 1.0,
+                "recall [95%]": "0.195 [0.14, 0.26]",
+                "missed": 140,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "deepset",
+                "texts": "original",
+                "rows": 539,
+                "precision": 1.0,
+                "recall [95%]": "0.205 [0.15, 0.27]",
+                "missed": 159,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "held out": "dolly",
+                "texts": "obfuscated copy",
+                "rows": 242,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "held out": "dolly",
+                "texts": "original",
+                "rows": 769,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "held out": "gandalf",
+                "texts": "obfuscated copy",
+                "rows": 852,
+                "precision": 1.0,
+                "recall [95%]": "0.838 [0.81, 0.86]",
+                "missed": 138,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "gandalf",
+                "texts": "original",
+                "rows": 887,
+                "precision": 1.0,
+                "recall [95%]": "0.850 [0.83, 0.87]",
+                "missed": 133,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "gsum",
+                "texts": "obfuscated copy",
+                "rows": 89,
+                "precision": 1.0,
+                "recall [95%]": "0.124 [0.07, 0.21]",
+                "missed": 78,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "gsum",
+                "texts": "original",
+                "rows": 126,
+                "precision": 1.0,
+                "recall [95%]": "0.119 [0.07, 0.19]",
+                "missed": 111,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "jackhhao",
+                "texts": "obfuscated copy",
+                "rows": 533,
+                "precision": 0.943,
+                "recall [95%]": "0.521 [0.42, 0.62]",
+                "missed": 46,
+                "false alarms": 3,
+                "fa rate [95%]": "0.007 [0.00, 0.02]"
+              },
+              {
+                "held out": "jackhhao",
+                "texts": "original",
+                "rows": 1500,
+                "precision": 0.985,
+                "recall [95%]": "0.773 [0.73, 0.81]",
+                "missed": 99,
+                "false alarms": 5,
+                "fa rate [95%]": "0.005 [0.00, 0.01]"
+              },
+              {
+                "held out": "llmail",
+                "texts": "obfuscated copy",
+                "rows": 160,
+                "precision": 1.0,
+                "recall [95%]": "0.686 [0.59, 0.77]",
+                "missed": 33,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.07]"
+              },
+              {
+                "held out": "llmail",
+                "texts": "original",
+                "rows": 459,
+                "precision": 1.0,
+                "recall [95%]": "0.831 [0.79, 0.87]",
+                "missed": 56,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "mirzaakhi",
+                "texts": "obfuscated copy",
+                "rows": 3132,
+                "precision": 0.999,
+                "recall [95%]": "0.980 [0.97, 0.99]",
+                "missed": 41,
+                "false alarms": 2,
+                "fa rate [95%]": "0.002 [0.00, 0.01]"
+              },
+              {
+                "held out": "mirzaakhi",
+                "texts": "original",
+                "rows": 4209,
+                "precision": 0.999,
+                "recall [95%]": "0.998 [0.99, 1.00]",
+                "missed": 4,
+                "false alarms": 2,
+                "fa rate [95%]": "0.001 [0.00, 0.00]"
+              },
+              {
+                "held out": "wild",
+                "texts": "obfuscated copy",
+                "rows": 164,
+                "precision": 0.731,
+                "recall [95%]": "0.333 [0.22, 0.46]",
+                "missed": 38,
+                "false alarms": 7,
+                "fa rate [95%]": "0.065 [0.03, 0.13]"
+              },
+              {
+                "held out": "wild",
+                "texts": "original",
+                "rows": 789,
+                "precision": 0.774,
+                "recall [95%]": "0.613 [0.56, 0.67]",
+                "missed": 121,
+                "false alarms": 56,
+                "fa rate [95%]": "0.118 [0.09, 0.15]"
+              },
+              {
+                "held out": "yanis",
+                "texts": "obfuscated copy",
+                "rows": 805,
+                "precision": 1.0,
+                "recall [95%]": "0.507 [0.47, 0.54]",
+                "missed": 397,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "yanis",
+                "texts": "original",
+                "rows": 813,
+                "precision": 1.0,
+                "recall [95%]": "0.592 [0.56, 0.62]",
+                "missed": 332,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "ALL",
+                "texts": "",
+                "rows": 21540,
+                "precision": 0.985,
+                "recall [95%]": "0.763 [0.76, 0.77]",
+                "missed": 2730,
+                "false alarms": 138,
+                "fa rate [95%]": "0.014 [0.01, 0.02]"
+              }
+            ],
+            "by_source": [
+              {
+                "source": "aya",
+                "rows": 1163,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "source": "contrast",
+                "rows": 3991,
+                "precision": 0.957,
+                "recall [95%]": "0.633 [0.61, 0.65]",
+                "missed": 804,
+                "false alarms": 63,
+                "fa rate [95%]": "0.035 [0.03, 0.04]"
+              },
+              {
+                "source": "deepset",
+                "rows": 857,
+                "precision": 1.0,
+                "recall [95%]": "0.201 [0.16, 0.24]",
+                "missed": 299,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "source": "dolly",
+                "rows": 1011,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "source": "gandalf",
+                "rows": 1739,
+                "precision": 1.0,
+                "recall [95%]": "0.844 [0.83, 0.86]",
+                "missed": 271,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "source": "gsum",
+                "rows": 215,
+                "precision": 1.0,
+                "recall [95%]": "0.121 [0.08, 0.17]",
+                "missed": 189,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "source": "jackhhao",
+                "rows": 2033,
+                "precision": 0.98,
+                "recall [95%]": "0.727 [0.69, 0.76]",
+                "missed": 145,
+                "false alarms": 8,
+                "fa rate [95%]": "0.005 [0.00, 0.01]"
+              },
+              {
+                "source": "llmail",
+                "rows": 619,
+                "precision": 1.0,
+                "recall [95%]": "0.796 [0.76, 0.83]",
+                "missed": 89,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "source": "mirzaakhi",
+                "rows": 7341,
+                "precision": 0.999,
+                "recall [95%]": "0.989 [0.99, 0.99]",
+                "missed": 45,
+                "false alarms": 4,
+                "fa rate [95%]": "0.001 [0.00, 0.00]"
+              },
+              {
+                "source": "wild",
+                "rows": 953,
+                "precision": 0.77,
+                "recall [95%]": "0.570 [0.52, 0.62]",
+                "missed": 159,
+                "false alarms": 63,
+                "fa rate [95%]": "0.108 [0.09, 0.14]"
+              },
+              {
+                "source": "yanis",
+                "rows": 1618,
+                "precision": 1.0,
+                "recall [95%]": "0.549 [0.53, 0.57]",
+                "missed": 729,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              }
+            ],
+            "by_family": [
+              {
+                "family": "contrast",
+                "rows": 3991,
+                "precision": 0.957,
+                "recall [95%]": "0.633 [0.61, 0.65]",
+                "missed": 804,
+                "false alarms": 63,
+                "fa rate [95%]": "0.035 [0.03, 0.04]"
+              },
+              {
+                "family": "deepset",
+                "rows": 857,
+                "precision": 1.0,
+                "recall [95%]": "0.201 [0.16, 0.24]",
+                "missed": 299,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "family": "dolly",
+                "rows": 1011,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              },
+              {
+                "family": "gandalf",
+                "rows": 1954,
+                "precision": 1.0,
+                "recall [95%]": "0.765 [0.75, 0.78]",
+                "missed": 460,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "family": "jailbreak",
+                "rows": 2986,
+                "precision": 0.894,
+                "recall [95%]": "0.663 [0.63, 0.69]",
+                "missed": 304,
+                "false alarms": 71,
+                "fa rate [95%]": "0.034 [0.03, 0.04]"
+              },
+              {
+                "family": "llmail",
+                "rows": 619,
+                "precision": 1.0,
+                "recall [95%]": "0.796 [0.76, 0.83]",
+                "missed": 89,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "family": "mirzaakhi",
+                "rows": 7341,
+                "precision": 0.999,
+                "recall [95%]": "0.989 [0.99, 0.99]",
+                "missed": 45,
+                "false alarms": 4,
+                "fa rate [95%]": "0.001 [0.00, 0.00]"
+              },
+              {
+                "family": "multilingual",
+                "rows": 2781,
+                "precision": 1.0,
+                "recall [95%]": "0.549 [0.53, 0.57]",
+                "missed": 729,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.00]"
+              }
+            ],
+            "by_language": [
+              {
+                "language": "ar",
+                "rows": 57,
+                "precision": 1.0,
+                "recall [95%]": "0.361 [0.22, 0.52]",
+                "missed": 23,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "language": "de",
+                "rows": 439,
+                "precision": 1.0,
+                "recall [95%]": "0.555 [0.50, 0.61]",
+                "missed": 122,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "en",
+                "rows": 10967,
+                "precision": 0.986,
+                "recall [95%]": "0.880 [0.87, 0.89]",
+                "missed": 658,
+                "false alarms": 67,
+                "fa rate [95%]": "0.012 [0.01, 0.02]"
+              },
+              {
+                "language": "es",
+                "rows": 446,
+                "precision": 1.0,
+                "recall [95%]": "0.522 [0.46, 0.58]",
+                "missed": 131,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "fr",
+                "rows": 489,
+                "precision": 1.0,
+                "recall [95%]": "0.533 [0.48, 0.59]",
+                "missed": 141,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "hi",
+                "rows": 59,
+                "precision": 1.0,
+                "recall [95%]": "0.243 [0.13, 0.40]",
+                "missed": 28,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "language": "it",
+                "rows": 446,
+                "precision": 1.0,
+                "recall [95%]": "0.516 [0.45, 0.58]",
+                "missed": 123,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "ja",
+                "rows": 54,
+                "precision": 1.0,
+                "recall [95%]": "0.303 [0.17, 0.47]",
+                "missed": 23,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "language": "nl",
+                "rows": 55,
+                "precision": 1.0,
+                "recall [95%]": "0.448 [0.28, 0.62]",
+                "missed": 16,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.13]"
+              },
+              {
+                "language": "pt",
+                "rows": 411,
+                "precision": 1.0,
+                "recall [95%]": "0.494 [0.43, 0.56]",
+                "missed": 122,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "language": "ru",
+                "rows": 61,
+                "precision": 1.0,
+                "recall [95%]": "0.371 [0.23, 0.54]",
+                "missed": 22,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.13]"
+              },
+              {
+                "language": "tr",
+                "rows": 58,
+                "precision": 1.0,
+                "recall [95%]": "0.400 [0.26, 0.56]",
+                "missed": 21,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.14]"
+              },
+              {
+                "language": "zh",
+                "rows": 53,
+                "precision": 1.0,
+                "recall [95%]": "0.345 [0.20, 0.53]",
+                "missed": 19,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.14]"
+              }
+            ],
+            "by_fold_language": [
+              {
+                "held out": "aya",
+                "language": "de",
+                "rows": 143,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "aya",
+                "language": "en",
+                "rows": 392,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.01]"
+              },
+              {
+                "held out": "aya",
+                "language": "es",
+                "rows": 150,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "held out": "aya",
+                "language": "fr",
+                "rows": 166,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "held out": "aya",
+                "language": "it",
+                "rows": 167,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.02]"
+              },
+              {
+                "held out": "aya",
+                "language": "pt",
+                "rows": 145,
+                "precision": 0.0,
+                "recall [95%]": "-",
+                "missed": 0,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.03]"
+              },
+              {
+                "held out": "contrast",
+                "language": "ar",
+                "rows": 57,
+                "precision": 1.0,
+                "recall [95%]": "0.361 [0.22, 0.52]",
+                "missed": 23,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "de",
+                "rows": 53,
+                "precision": 1.0,
+                "recall [95%]": "0.452 [0.29, 0.62]",
+                "missed": 17,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "es",
+                "rows": 52,
+                "precision": 1.0,
+                "recall [95%]": "0.667 [0.49, 0.81]",
+                "missed": 10,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "fr",
+                "rows": 57,
+                "precision": 1.0,
+                "recall [95%]": "0.417 [0.27, 0.58]",
+                "missed": 21,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "hi",
+                "rows": 59,
+                "precision": 1.0,
+                "recall [95%]": "0.243 [0.13, 0.40]",
+                "missed": 28,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "it",
+                "rows": 57,
+                "precision": 1.0,
+                "recall [95%]": "0.438 [0.28, 0.61]",
+                "missed": 18,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.13]"
+              },
+              {
+                "held out": "contrast",
+                "language": "ja",
+                "rows": 54,
+                "precision": 1.0,
+                "recall [95%]": "0.303 [0.17, 0.47]",
+                "missed": 23,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.15]"
+              },
+              {
+                "held out": "contrast",
+                "language": "nl",
+                "rows": 55,
+                "precision": 1.0,
+                "recall [95%]": "0.448 [0.28, 0.62]",
+                "missed": 16,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.13]"
+              },
+              {
+                "held out": "contrast",
+                "language": "pt",
+                "rows": 59,
+                "precision": 1.0,
+                "recall [95%]": "0.412 [0.26, 0.58]",
+                "missed": 20,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.13]"
+              },
+              {
+                "held out": "contrast",
+                "language": "ru",
+                "rows": 61,
+                "precision": 1.0,
+                "recall [95%]": "0.371 [0.23, 0.54]",
+                "missed": 22,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.13]"
+              },
+              {
+                "held out": "contrast",
+                "language": "tr",
+                "rows": 58,
+                "precision": 1.0,
+                "recall [95%]": "0.400 [0.26, 0.56]",
+                "missed": 21,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.14]"
+              },
+              {
+                "held out": "contrast",
+                "language": "zh",
+                "rows": 53,
+                "precision": 1.0,
+                "recall [95%]": "0.345 [0.20, 0.53]",
+                "missed": 19,
+                "false alarms": 0,
+                "fa rate [95%]": "0.000 [0.00, 0.14]"
+              },
+              {
+                "held out": "yanis",
+                "language": "de",
+                "rows": 243,
+                "precision": 1.0,
+                "recall [95%]": "0.568 [0.51, 0.63]",
+                "missed": 105,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "yanis",
+                "language": "en",
+                "rows": 436,
+                "precision": 1.0,
+                "recall [95%]": "0.596 [0.55, 0.64]",
+                "missed": 176,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "yanis",
+                "language": "es",
+                "rows": 244,
+                "precision": 1.0,
+                "recall [95%]": "0.504 [0.44, 0.57]",
+                "missed": 121,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "yanis",
+                "language": "fr",
+                "rows": 266,
+                "precision": 1.0,
+                "recall [95%]": "0.549 [0.49, 0.61]",
+                "missed": 120,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "yanis",
+                "language": "it",
+                "rows": 222,
+                "precision": 1.0,
+                "recall [95%]": "0.527 [0.46, 0.59]",
+                "missed": 105,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              },
+              {
+                "held out": "yanis",
+                "language": "pt",
+                "rows": 207,
+                "precision": 1.0,
+                "recall [95%]": "0.507 [0.44, 0.57]",
+                "missed": 102,
+                "false alarms": 0,
+                "fa rate [95%]": "-"
+              }
+            ]
+          }
+        }
+      },
+      "development_sets": {
+        "scores": {
+          "handwritten_dev": {
+            "n": 112,
+            "accuracy": 0.9017857142857143,
+            "precision": 0.9245283018867925,
+            "recall": 0.875,
+            "f1": 0.8990825688073395,
+            "recall_ci": [
+              0.763742793023606,
+              0.9381100986103075
+            ],
+            "false_alarm_rate": 0.07142857142857142,
+            "false_alarm_ci": [
+              0.028125581246379636,
+              0.16975682831486205
+            ],
+            "tn": 52,
+            "fp": 4,
+            "fn": 7,
+            "tp": 49
+          },
+          "handwritten_dev3": {
+            "n": 56,
+            "accuracy": 0.8928571428571429,
+            "precision": 0.9583333333333334,
+            "recall": 0.8214285714285714,
+            "f1": 0.8846153846153846,
+            "recall_ci": [
+              0.644082084514089,
+              0.9212161417056989
+            ],
+            "false_alarm_rate": 0.03571428571428571,
+            "false_alarm_ci": [
+              0.00633235649754188,
+              0.17712576118498663
+            ],
+            "tn": 27,
+            "fp": 1,
+            "fn": 5,
+            "tp": 23
+          },
+          "official_dev": {
+            "n": 493,
+            "accuracy": 0.8803245436105477,
+            "precision": 1.0,
+            "recall": 0.8173374613003096,
+            "f1": 0.899488926746167,
+            "recall_ci": [
+              0.7715516033661286,
+              0.8556635369342492
+            ],
+            "false_alarm_rate": 0.0,
+            "false_alarm_ci": [
+              0.0,
+              0.022098277972591136
+            ],
+            "tn": 170,
+            "fp": 0,
+            "fn": 59,
+            "tp": 264
+          },
+          "probe_dev": {
+            "n": 216,
+            "accuracy": 0.75,
+            "precision": 0.9056603773584906,
+            "recall": 0.4948453608247423,
+            "f1": 0.64,
+            "recall_ci": [
+              0.3974565165320967,
+              0.5926269410885678
+            ],
+            "false_alarm_rate": 0.04201680672268908,
+            "false_alarm_ci": [
+              0.018078207847971574,
+              0.0946002333315637
+            ],
+            "tn": 114,
+            "fp": 5,
+            "fn": 49,
+            "tp": 48
+          },
+          "official_recall_seen": 0.5736434108527132,
+          "official_recall_unseen": 0.979381443298969
+        },
+        "standards": [
+          {
+            "standard": "official recall",
+            "target": 0.9,
+            "result": 0.817,
+            "met": "NO"
+          },
+          {
+            "standard": "official precision",
+            "target": 0.95,
+            "result": 1.0,
+            "met": "yes"
+          },
+          {
+            "standard": "hand-written recall",
+            "target": 0.85,
+            "result": 0.875,
+            "met": "yes"
+          },
+          {
+            "standard": "hand-written false alarm rate",
+            "target": 0.071,
+            "result": 0.071,
+            "met": "yes"
+          }
+        ],
+        "official_by_category": [
+          {
+            "label": 0,
+            "category": "carrier_clean",
+            "rows": 45,
+            "correct_share": 1.0,
+            "correct [95%]": "1.000 [0.92, 1.00]",
+            "seen_in_train": true
+          },
+          {
+            "label": 0,
+            "category": "embedded_human",
+            "rows": 87,
+            "correct_share": 1.0,
+            "correct [95%]": "1.000 [0.96, 1.00]",
+            "seen_in_train": true
+          },
+          {
+            "label": 0,
+            "category": "hard_negative",
+            "rows": 8,
+            "correct_share": 1.0,
+            "correct [95%]": "1.000 [0.68, 1.00]",
+            "seen_in_train": true
+          },
+          {
+            "label": 0,
+            "category": "multilingual",
+            "rows": 3,
+            "correct_share": 1.0,
+            "correct [95%]": "1.000 [0.44, 1.00]",
+            "seen_in_train": false
+          },
+          {
+            "label": 0,
+            "category": "qa",
+            "rows": 27,
+            "correct_share": 1.0,
+            "correct [95%]": "1.000 [0.88, 1.00]",
+            "seen_in_train": true
+          },
+          {
+            "label": 1,
+            "category": "appended_override",
+            "rows": 41,
+            "correct_share": 0.8292682926829268,
+            "correct [95%]": "0.829 [0.69, 0.91]",
+            "seen_in_train": true
+          },
+          {
+            "label": 1,
+            "category": "indirect_injection",
+            "rows": 88,
+            "correct_share": 0.45454545454545453,
+            "correct [95%]": "0.455 [0.35, 0.56]",
+            "seen_in_train": true
+          },
+          {
+            "label": 1,
+            "category": "multilingual",
+            "rows": 3,
+            "correct_share": 0.6666666666666666,
+            "correct [95%]": "0.667 [0.21, 0.94]",
+            "seen_in_train": false
+          },
+          {
+            "label": 1,
+            "category": "obfuscation",
+            "rows": 110,
+            "correct_share": 1.0,
+            "correct [95%]": "1.000 [0.97, 1.00]",
+            "seen_in_train": false
+          },
+          {
+            "label": 1,
+            "category": "payload_split",
+            "rows": 81,
+            "correct_share": 0.9629629629629629,
+            "correct [95%]": "0.963 [0.90, 0.99]",
+            "seen_in_train": false
+          }
+        ]
+      }
+    }
+  },
+  "ablation": [
+    {
+      "features": "legacy6",
+      "kernel": "linear",
+      "official_dev_recall": 0.0,
+      "official_dev_recall_ci": [
+        0.0,
+        0.011753705770624056
+      ],
+      "official_dev_false_alarms": 0,
+      "official_dev_false_alarm_rate": 0.0,
+      "official_dev_false_alarm_ci": [
+        0.0,
+        0.022098277972591136
+      ],
+      "official_dev_attacks": 323,
+      "official_dev_benign": 170,
+      "handwritten_dev_recall": 0.017857142857142856,
+      "handwritten_dev_recall_ci": [
+        0.003159128964463985,
+        0.0944585817919329
+      ],
+      "handwritten_dev_false_alarms": 0,
+      "handwritten_dev_false_alarm_rate": 0.0,
+      "handwritten_dev_false_alarm_ci": [
+        0.0,
+        0.06419614448811528
+      ],
+      "handwritten_dev_attacks": 56,
+      "handwritten_dev_benign": 56,
+      "handwritten_dev3_recall": 0.0,
+      "handwritten_dev3_recall_ci": [
+        0.0,
+        0.12064720365810762
+      ],
+      "handwritten_dev3_false_alarms": 0,
+      "handwritten_dev3_false_alarm_rate": 0.0,
+      "handwritten_dev3_false_alarm_ci": [
+        0.0,
+        0.12064720365810762
+      ],
+      "handwritten_dev3_attacks": 28,
+      "handwritten_dev3_benign": 28,
+      "probe_dev_recall": 0.0,
+      "probe_dev_recall_ci": [
+        0.0,
+        0.03809538920445529
+      ],
+      "probe_dev_false_alarms": 0,
+      "probe_dev_false_alarm_rate": 0.0,
+      "probe_dev_false_alarm_ci": [
+        3.469446951953614e-18,
+        0.03127279358132749
+      ],
+      "probe_dev_attacks": 97,
+      "probe_dev_benign": 119
+    },
+    {
+      "features": "rules16",
+      "kernel": "linear",
+      "official_dev_recall": 0.6965944272445821,
+      "official_dev_recall_ci": [
+        0.6443888995491953,
+        0.7441785288320144
+      ],
+      "official_dev_false_alarms": 0,
+      "official_dev_false_alarm_rate": 0.0,
+      "official_dev_false_alarm_ci": [
+        0.0,
+        0.022098277972591136
+      ],
+      "official_dev_attacks": 323,
+      "official_dev_benign": 170,
+      "handwritten_dev_recall": 0.5357142857142857,
+      "handwritten_dev_recall_ci": [
+        0.4070395665724008,
+        0.6598035659641625
+      ],
+      "handwritten_dev_false_alarms": 1,
+      "handwritten_dev_false_alarm_rate": 0.017857142857142856,
+      "handwritten_dev_false_alarm_ci": [
+        0.003159128964463985,
+        0.0944585817919329
+      ],
+      "handwritten_dev_attacks": 56,
+      "handwritten_dev_benign": 56,
+      "handwritten_dev3_recall": 0.5714285714285714,
+      "handwritten_dev3_recall_ci": [
+        0.390704789856154,
+        0.7349170381926877
+      ],
+      "handwritten_dev3_false_alarms": 1,
+      "handwritten_dev3_false_alarm_rate": 0.03571428571428571,
+      "handwritten_dev3_false_alarm_ci": [
+        0.00633235649754188,
+        0.17712576118498663
+      ],
+      "handwritten_dev3_attacks": 28,
+      "handwritten_dev3_benign": 28,
+      "probe_dev_recall": 0.20618556701030927,
+      "probe_dev_recall_ci": [
+        0.13762597270753013,
+        0.2971311116703456
+      ],
+      "probe_dev_false_alarms": 0,
+      "probe_dev_false_alarm_rate": 0.0,
+      "probe_dev_false_alarm_ci": [
+        3.469446951953614e-18,
+        0.03127279358132749
+      ],
+      "probe_dev_attacks": 97,
+      "probe_dev_benign": 119
+    },
+    {
+      "features": "emb",
+      "kernel": "linear",
+      "official_dev_recall": 0.7554179566563467,
+      "official_dev_recall_ci": [
+        0.7057184517228994,
+        0.7991132465676485
+      ],
+      "official_dev_false_alarms": 0,
+      "official_dev_false_alarm_rate": 0.0,
+      "official_dev_false_alarm_ci": [
+        0.0,
+        0.022098277972591136
+      ],
+      "official_dev_attacks": 323,
+      "official_dev_benign": 170,
+      "handwritten_dev_recall": 0.8392857142857143,
+      "handwritten_dev_recall_ci": [
+        0.7219354555032431,
+        0.9130743035941074
+      ],
+      "handwritten_dev_false_alarms": 1,
+      "handwritten_dev_false_alarm_rate": 0.017857142857142856,
+      "handwritten_dev_false_alarm_ci": [
+        0.003159128964463985,
+        0.0944585817919329
+      ],
+      "handwritten_dev_attacks": 56,
+      "handwritten_dev_benign": 56,
+      "handwritten_dev3_recall": 0.7857142857142857,
+      "handwritten_dev3_recall_ci": [
+        0.6046105292072612,
+        0.8978767829881058
+      ],
+      "handwritten_dev3_false_alarms": 0,
+      "handwritten_dev3_false_alarm_rate": 0.0,
+      "handwritten_dev3_false_alarm_ci": [
+        0.0,
+        0.12064720365810762
+      ],
+      "handwritten_dev3_attacks": 28,
+      "handwritten_dev3_benign": 28,
+      "probe_dev_recall": 0.38144329896907214,
+      "probe_dev_recall_ci": [
+        0.291045123554349,
+        0.4808744017209342
+      ],
+      "probe_dev_false_alarms": 9,
+      "probe_dev_false_alarm_rate": 0.07563025210084033,
+      "probe_dev_false_alarm_ci": [
+        0.040296784434261525,
+        0.13750617482383995
+      ],
+      "probe_dev_attacks": 97,
+      "probe_dev_benign": 119
+    },
+    {
+      "features": "emb+rules16",
+      "kernel": "linear",
+      "official_dev_recall": 0.8792569659442725,
+      "official_dev_recall_ci": [
+        0.839194613211389,
+        0.9104039690988188
+      ],
+      "official_dev_false_alarms": 0,
+      "official_dev_false_alarm_rate": 0.0,
+      "official_dev_false_alarm_ci": [
+        0.0,
+        0.022098277972591136
+      ],
+      "official_dev_attacks": 323,
+      "official_dev_benign": 170,
+      "handwritten_dev_recall": 0.9107142857142857,
+      "handwritten_dev_recall_ci": [
+        0.807437601433565,
+        0.9612584227369118
+      ],
+      "handwritten_dev_false_alarms": 4,
+      "handwritten_dev_false_alarm_rate": 0.07142857142857142,
+      "handwritten_dev_false_alarm_ci": [
+        0.028125581246379636,
+        0.16975682831486205
+      ],
+      "handwritten_dev_attacks": 56,
+      "handwritten_dev_benign": 56,
+      "handwritten_dev3_recall": 0.8214285714285714,
+      "handwritten_dev3_recall_ci": [
+        0.644082084514089,
+        0.9212161417056989
+      ],
+      "handwritten_dev3_false_alarms": 1,
+      "handwritten_dev3_false_alarm_rate": 0.03571428571428571,
+      "handwritten_dev3_false_alarm_ci": [
+        0.00633235649754188,
+        0.17712576118498663
+      ],
+      "handwritten_dev3_attacks": 28,
+      "handwritten_dev3_benign": 28,
+      "probe_dev_recall": 0.5051546391752577,
+      "probe_dev_recall_ci": [
+        0.40737305891143216,
+        0.6025434834679033
+      ],
+      "probe_dev_false_alarms": 6,
+      "probe_dev_false_alarm_rate": 0.05042016806722689,
+      "probe_dev_false_alarm_ci": [
+        0.023310004458561698,
+        0.10564956624061513
+      ],
+      "probe_dev_attacks": 97,
+      "probe_dev_benign": 119
+    },
+    {
+      "features": "emb+rules20",
+      "kernel": "linear",
+      "official_dev_recall": 0.8575851393188855,
+      "official_dev_recall_ci": [
+        0.8152616091900609,
+        0.8915027684167065
+      ],
+      "official_dev_false_alarms": 0,
+      "official_dev_false_alarm_rate": 0.0,
+      "official_dev_false_alarm_ci": [
+        0.0,
+        0.022098277972591136
+      ],
+      "official_dev_attacks": 323,
+      "official_dev_benign": 170,
+      "handwritten_dev_recall": 0.9285714285714286,
+      "handwritten_dev_recall_ci": [
+        0.830243171685138,
+        0.9718744187536204
+      ],
+      "handwritten_dev_false_alarms": 4,
+      "handwritten_dev_false_alarm_rate": 0.07142857142857142,
+      "handwritten_dev_false_alarm_ci": [
+        0.028125581246379636,
+        0.16975682831486205
+      ],
+      "handwritten_dev_attacks": 56,
+      "handwritten_dev_benign": 56,
+      "handwritten_dev3_recall": 0.8214285714285714,
+      "handwritten_dev3_recall_ci": [
+        0.644082084514089,
+        0.9212161417056989
+      ],
+      "handwritten_dev3_false_alarms": 1,
+      "handwritten_dev3_false_alarm_rate": 0.03571428571428571,
+      "handwritten_dev3_false_alarm_ci": [
+        0.00633235649754188,
+        0.17712576118498663
+      ],
+      "handwritten_dev3_attacks": 28,
+      "handwritten_dev3_benign": 28,
+      "probe_dev_recall": 0.5773195876288659,
+      "probe_dev_recall_ci": [
+        0.4779127957568308,
+        0.6708353399332019
+      ],
+      "probe_dev_false_alarms": 5,
+      "probe_dev_false_alarm_rate": 0.04201680672268908,
+      "probe_dev_false_alarm_ci": [
+        0.018078207847971574,
+        0.0946002333315637
+      ],
+      "probe_dev_attacks": 97,
+      "probe_dev_benign": 119
+    }
+  ],
+  "promoted": null
+}

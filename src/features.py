@@ -1,10 +1,11 @@
-"""Feature matrix = [384-dim sentence embedding | 16 rule features].
+"""Feature matrix = [384-dim sentence embedding | rule features].
 
 Show example vectors and the rule firing-rate table:
     python -m src.features
 """
 import hashlib
 import json
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -21,6 +22,7 @@ N_RULES = len(RULE_NAMES)
 SAVE_EVERY = 1000
 
 _model = None
+_tokenizer = None
 
 
 def get_embedder():
@@ -29,6 +31,34 @@ def get_embedder():
         from sentence_transformers import SentenceTransformer
         _model = SentenceTransformer(EMBEDDING_MODEL, device="cpu")
     return _model
+
+
+def get_tokenizer():
+    """The embedding model's tokenizer alone (no weights), or None when it cannot be loaded."""
+    global _tokenizer
+    if _tokenizer is None:
+        try:
+            if _model is not None:
+                _tokenizer = _model.tokenizer
+            else:
+                from transformers import AutoTokenizer
+                try:
+                    _tokenizer = AutoTokenizer.from_pretrained(EMBEDDING_MODEL, local_files_only=True)
+                except OSError:
+                    _tokenizer = AutoTokenizer.from_pretrained(EMBEDDING_MODEL)
+        except Exception as error:   # no local copy and no network: windows fall back to characters
+            print(f"  warning: tokenizer not available ({error}); windows are sized by characters only")
+            _tokenizer = False
+    return _tokenizer or None
+
+
+@lru_cache(maxsize=8192)
+def token_count(text):
+    """Tokens the embedding model would read for this text, or None without a tokenizer."""
+    tokenizer = get_tokenizer()
+    if tokenizer is None:
+        return None
+    return len(tokenizer(text, add_special_tokens=False, truncation=False)["input_ids"])
 
 
 def _encode(texts):
@@ -80,7 +110,16 @@ def embed(texts, cache_name=None):
 
 
 def rule_matrix(texts):
-    return np.array([rule_vector(t) for t in texts], dtype=np.float32)
+    """One column per rule in RULE_NAMES order."""
+    return np.array([rule_vector(t) for t in texts], dtype=np.float32).reshape(len(texts), len(RULE_NAMES))
+
+
+def rule_columns(names):
+    """Column positions of these rules in a rule_matrix; unknown names are an error."""
+    missing = [n for n in names if n not in RULE_NAMES]
+    if missing:
+        raise ValueError(f"rules not defined in src.rules: {missing}")
+    return [RULE_NAMES.index(n) for n in names]
 
 
 def legacy_matrix(texts):
@@ -88,7 +127,7 @@ def legacy_matrix(texts):
 
 
 def build_matrix(texts, cache_name=None):
-    """Columns 0..383 are the embedding, columns 384..399 the rules in RULE_NAMES order."""
+    """Columns 0..383 are the embedding, the rest the rules in RULE_NAMES order."""
     texts = list(texts)
     return np.hstack([embed(texts, cache_name), rule_matrix(texts)])
 

@@ -29,6 +29,10 @@ RULE_LABELS = {
     "obfuscation_score": "Obfuscation",
     "payload_split_count": "Split payload",
     "uppercase_ratio": "Uppercase letters",
+    "dangerous_action_count": "Orders a destructive command",
+    "tool_action_count": "Tool call or sending data out",
+    "multilingual_override_count": "Override wording in another language",
+    "task_pivot_count": "Replaces the given task",
 }
 
 
