@@ -36,6 +36,10 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
 | `src/gate.py` | Compares saved candidates with the round-three model on development data, promotes or keeps |
 | `scripts/` | Dataset download (`download_dataset.py`, `download_new_sources.py`), contrast set generator, rule checks, notebook builder |
 | `report/writeup.md` | Full write-up with results and limitations |
+| `report/round_four_results.md` | Round-four record: the rejected first run, diagnosis, decision, final numbers |
+| `report.txt` | Progress report of 2026-10-01: bug status, before/after table on every test set, git state |
+| `scripts/make_charts.py` | Regenerates the four charts the write-up embeds, from `report/metrics.json` |
+| `scripts/oof_floor_check.py` | Threshold per precision floor, from out-of-fold scores on the grouped folds |
 | `backup_round3/` | Frozen, runnable copy of round three (code, model, reports) |
 
 ## Commands
@@ -48,13 +52,14 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
 .venv/bin/python -m src.train --final    # also scores the held-out test sets (~65 min warm)
 ```
 
-## Status: round four is complete, not yet committed (2026-10-01 18:38)
+## Status: round four is complete and committed (48b97d7, 2026-10-01 19:09)
 
 Model in `src/models/injection_model.pkl`: embedding + 20 rules, linear SVC, C = 0.3, rule weight 1.0,
 bounded rule scaling, threshold 0.548 (96% precision floor), 36,312 training pieces. Promoted by the
 gate over round three on development data; the held-out test sets were scored once, by the same run.
 Write-up: `report/writeup.md`. Record of the round, including the rejected first run:
-`report/round_four_results.md`. Round three stays runnable in `backup_round3/`.
+`report/round_four_results.md`. Round three stays runnable in `backup_round3/`. `report.txt` holds a before/after re-score of every
+test set done on 2026-10-01; it matches the training log (one jackhhao text differs for round three).
 
 | Standard | Target | Result | Met |
 |---|---|---|---|
@@ -87,11 +92,52 @@ development data from here on; round five needs new held-out sets.**
 
 ### Housekeeping
 
-- `src/models/candidates/` (47 MB) and `data/raw/new/` (613 MB, git-ignored) can be deleted.
-- `data/cache/embeddings_norm.npy` is tracked in git and is now 130 MB.
+- `src/models/candidates/` was deleted on 2026-10-03. It is git-ignored and was never committed.
+- Keep `data/raw/new/` (613 MB, git-ignored) while a fresh held-out sample may still be drawn from it.
+- `data/cache/` (`embeddings_norm.npy` is 124 MB) is git-ignored and not tracked. A fresh clone rebuilds it
+  on the first run, which is the cold-cache time above.
 - A full run is about 65 minutes with a warm embedding cache, plus about 25 minutes per 40,000 new
   pieces. It needs AC power: start it with `setsid nohup ... & disown` and hold
   `systemd-inhibit --what=sleep:idle:handle-lid-switch --mode=block` while the PID lives.
+
+## Next steps (written 2026-10-01 evening, for whoever picks this up)
+
+**Committed** as 48b97d7 on 2026-10-01. `report.txt` and these status notes came after and are committed
+separately. The nine `src/__pycache__/*.pyc` files that slipped into history were untracked on 2026-10-03.
+
+**How to test.** Every held-out set has been read, so only new text is an honest test.
+
+1. Write hand-written set 5 before touching any code: about 60 rows, half benign. Cover
+   destructive-command orders, send/message orders, non-English attacks, task switches with no
+   override words, and benign role-play, persona and correspondence requests. Keep it out of the
+   repo until it has been scored once.
+2. Probe with the CLI (`cli.py check-text`, `--file` for documents) using real emails and documents,
+   and paraphrase a known attack until one passes: that shows how much wording it takes.
+3. For data-set numbers, draw a second sample from `data/raw/new/`, deduplicated against every
+   training, development and test file (`src.dataset.dedup_key` plus the near-duplicate filter in
+   `load_pool`).
+
+**Improvements, in order of evidence.**
+
+1. Two new rules miss their own targets (set 4): `dangerous_action_count` has `drop table` but not
+   `delete from`; `tool_action_count` needs attack evidence in nearby clauses, so "message every one
+   of my contacts" is benign. Pattern changes in `src/rules.py`, checked with `scripts/check_rules.py`.
+2. False alarms on real benign prompts (27% on wild regular): `second_person_command_ratio` fires on
+   35% of them (self-check warning). Tightening it, or adding benign persona and role-play data,
+   trades against main-dataset recall; the first round-four run shows how.
+3. Decoded readings are not cut to 126 tokens: window the readings in `split_units`
+   (`src/windows.py`) the way windows are.
+4. Non-English recall 46%: `multilingual_override_count` covers 47% of its own contrast cues; add
+   patterns per language first, then data.
+5. External recall 79.6% against 85%: intent-only deepset attacks. Accept and document, or redefine
+   the standard.
+
+**Process rule for round five.** Fix the gate rule and the precision floor before the run and do not
+change them after. New held-out sets are required: set 4 and the new-source test splits are
+development data now.
+
+**Stopping point.** Items 1 and 3 are an afternoon; 2 and 4 are a full round. If a deadline is near:
+commit, score set 5 once into the write-up, and leave the rest as future work.
 
 ## Known limits
 
@@ -105,3 +151,9 @@ development data from here on; round five needs new held-out sets.**
 - A fixed offline detector can be probed until something passes. It is a first filter, to be combined
   with limits on what the assistant may do.
 - Attacks spread over several messages are not detected.
+- Decoded readings longer than 126 tokens are read only to their first 126; the windows, decoded
+  piece by piece, still cover the content.
+- Two of the four new rules missed their own targets on set 4 (a `DELETE FROM` order, a "message all
+  my contacts" order).
+- The rule self-check (`scripts/check_rules.py`) warns that several old rules fire on 9 to 35% of
+  in-the-wild benign prompts, `second_person_command_ratio` most of all.
