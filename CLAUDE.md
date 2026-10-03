@@ -32,7 +32,7 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
 | `src/dataset.py` | Loading, duplicate checks, train / development / test separation |
 | `src/pipeline.py` | The SVM pipeline |
 | `src/train.py` | Parameter search, evaluation, saves `src/models/injection_model.pkl` |
-| `src/predict.py` | `predict(text)` |
+| `src/predict.py` | `predict(text)`; `explain(text)` (added 2026-10-03): the same computation reported in full, for the dashboard. Read-only, 125 added lines, predict() unchanged (proved on 20 texts) |
 | `src/gate.py` | Compares saved candidates with the round-three model on development data, promotes or keeps |
 | `scripts/` | Dataset download (`download_dataset.py`, `download_new_sources.py`), contrast set generator, rule checks, notebook builder |
 | `report/writeup.md` | Full write-up with results and limitations |

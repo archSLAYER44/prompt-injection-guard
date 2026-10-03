@@ -404,7 +404,7 @@ The GUI needs Tk (`sudo pacman -S tk` on Arch). The first run downloads the embe
 | `src/pipeline.py` | The SVM pipeline and the bounded rule scaling |
 | `src/train.py` | Parameter search, evaluation, saving the candidates |
 | `src/gate.py` | The gate against the round-three model |
-| `src/predict.py` | `predict(text)`, used by the CLI and the GUI |
+| `src/predict.py` | `predict(text)`, used by the CLI and the GUI; `explain(text)`, the same computation reported in full (normalization, every scored piece, the 20 rule values, the decision), for the dashboard |
 | `cli.py`, `gui.py` | Interfaces |
 | `notebooks/exploration.ipynb` | Data exploration and result charts |
 | `report/metrics.json` | All scores from the last training run |
