@@ -44,8 +44,9 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
 | `scripts/make_charts.py` | Regenerates the four charts the write-up embeds, from `report/metrics.json` |
 | `scripts/oof_floor_check.py` | Threshold per precision floor, from out-of-fold scores on the grouped folds |
 | `backup_round3/` | Frozen, runnable copy of round three (code, model, reports) |
-| `dashboard.py` | Streamlit demo (2026-10-03): a chat assistant with a secret, the frozen detector in front of it, every explain() stage shown, guard toggle, demo threshold slider, history, four presets. Stub model built in; real models through `llm_client.py` |
-| `.streamlit/config.toml`, `static/fonts/` | Dashboard theme (dark, Inter + JetBrains Mono, self-hosted, OFL licences included); the source watcher is off because it trips over transformers' lazy modules |
+| `dashboard.py` | Streamlit demo (2026-10-04): tabs Live pipeline (composer, compact score-distribution panel, conversation, 9-stage inspector), Monitoring (hero panel on out-of-fold training scores, stat tiles, score per request, rules fired, allowed vs blocked donut, recent requests), History, About. Plotly charts, Grafana palette. Stub model built in; real models through `llm_client.py`; `Load demo data` runs the four presets |
+| `.streamlit/config.toml` | Dashboard theme (Grafana-like dark palette, Streamlit's bundled font, no external fonts); the source watcher is off because it trips over transformers' lazy modules |
+| `scripts/export_score_distribution.py` | Out-of-fold scores of the training data (grouped folds, 5 fold fits, about 7 minutes) to `report/score_distribution.json` + `report/score_distribution_oof.csv`; `--from-csv` reuses a saved OOF file, `--official-test` is the labelled fallback |
 | `llm_client.py` | Dashboard chat client (2026-10-03): `chat(provider, base_url, model, api_key, messages)` over ten providers: in-process transformers model (Qwen2.5-0.5B-Instruct, no server, no key), Ollama, OpenAI-compatible servers, OpenAI, Anthropic (official SDK), Gemini, Groq, OpenRouter, Mistral, DeepSeek. Keys only in request headers, never stored |
 
 ## Commands
@@ -98,7 +99,9 @@ proved on 20 texts), `llm_client.py` (ten providers), `dashboard.py` (Streamlit,
 transcript + guard inspector, four presets, deep links `?preset=<name>&send=1`). Tested with Streamlit's
 AppTest harness (stub and the real in-process model) and screenshotted headless through Brave + Playwright
 (`playwright` is in the venv for that only; it is not in requirements.txt). Guard on: the direct injection
-is blocked; guard off: Qwen2.5-0.5B-Instruct prints the secret in 0.6 s.
+is blocked; guard off: Qwen2.5-0.5B-Instruct prints the secret in 0.6 s. Restyled 2026-10-04 to a Grafana-like
+monitoring layout with Plotly (`plotly` in requirements.txt); fonts removed; `report/score_distribution.json`
+built from a fresh out-of-fold run (identical to the round-four OOF scores). `src/` untouched throughout.
 
 ### How round four got here (2026-10-01)
 

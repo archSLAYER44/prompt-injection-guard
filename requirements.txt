@@ -13,3 +13,4 @@ matplotlib
 # needs only torch and transformers, which sentence-transformers already brings
 anthropic
 streamlit
+plotly
