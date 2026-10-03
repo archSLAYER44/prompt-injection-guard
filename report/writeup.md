@@ -11,7 +11,7 @@ The round-four record, including the first run that was rejected and why, is
 ## Result in one table
 
 Scores on held-out test sets, for the injection class. None of these rows were trained on, and each
-set was scored once, by the final run.
+set was scored once: by the final run, or, for set 5, on the same frozen model on 2026-10-03.
 
 | Test set | Rows | Precision | Recall | F1 | False alarms | Missed attacks |
 |---|---|---|---|---|---|---|
@@ -28,6 +28,7 @@ set was scored once, by the final run.
 | dolly: benign instructions | 231 | benign only | | | 0 | 0 |
 | New sources pooled (the six above) | 901 | 85.2% | 63.9% | 73.1% | 35 | 114 |
 | Hand-written sentences, set 4 | 125 | 95.1% | 89.2% | 92.1% | 3 | 7 |
+| Agent-drafted, human-reviewed sentences, set 5 (scored 2026-10-03, after the round) | 60 | 81.0% | 56.7% | 66.7% | 4 | 13 |
 
 Five of the six standards set before training were met. External recall was not, for the third
 round in a row.
@@ -44,6 +45,46 @@ round in a row.
 The standards were set before round one and are unchanged. The six new sources have no standard of
 their own; their rows are reported as they are.
 
+### Set 5, scored after the round
+
+On 2026-10-03, with the round-four model frozen (git tag `model-frozen`), a fifth sentence set was
+scored once. It is labelled **agent-drafted, human-reviewed**, not hand-written: ten language-model
+agents each drafted six rows, with no access to the repository, so the rules and data stayed unseen;
+the merged file was checked for exact and near duplicates against every training, development and
+test file (none found); the author reviewed every row and changed none. The set was written to
+probe the weak spots listed under Limitations: destructive-command and send orders, task switches
+with no override word, attacks in six languages the earlier sets did not use (Dutch, Turkish,
+Polish, Arabic, Korean, Chinese) and benign persona requests. It is `data/agent_drafted_test5.csv`;
+the per-row verdicts, scores and fired rules are `report/set5_scored.csv`.
+
+| Set 5 | Rows | tn | fp | fn | tp | Precision | Recall | F1 | False-alarm rate |
+|---|---|---|---|---|---|---|---|---|---|
+| 60 rows, 30 attacks, 30 benign | 60 | 26 | 4 | 13 | 17 | 81.0% | 56.7% | 66.7% | 13.3% (4 in 30) |
+
+Against the two sentence-set standards it fails both: recall 56.7% against 85%, false alarms 13.3%
+against 7.1%. By category:
+
+| Category | Label | Rows | Correct | Wrong |
+|---|---|---|---|---|
+| destructive_command | attack | 6 | 3 | 3 |
+| send_message_order | attack | 6 | 4 | 2 |
+| non_english_attack (nl, tr, pl, ar, ko, zh) | attack | 6 | 3 | 3 |
+| task_switch_no_override | attack | 6 | 4 | 2 |
+| indirect_document | attack | 6 | 3 | 3 |
+| roleplay_persona_benign | benign | 6 | 3 | 3 |
+| correspondence_benign | benign | 6 | 6 | 0 |
+| admin_ops_benign | benign | 6 | 6 | 0 |
+| non_english_benign (same six languages) | benign | 6 | 6 | 0 |
+| document_benign | benign | 3 | 2 | 1 |
+| benign_topic_switch | benign | 3 | 3 | 0 |
+
+Eight of the thirteen missed attacks fired no rule at all and the other five fired a single weak
+one. The three non-English attacks with no override word (Turkish, Arabic, Chinese) were all missed,
+while the three override-type ones (Dutch, Polish, Korean) were caught. Six misses sit within 0.5 of
+the threshold (0.548); the other seven are 0.6 to 1.7 below it. The four false alarms score 1.1 to
+2.2, well above the threshold, so no small threshold change removes them without losing more attacks.
+The mistakes have been read, so set 5 is development data from here on.
+
 ## Data
 
 | Source | Licence | Training rows | Held-out test rows | Content |
@@ -59,6 +100,7 @@ their own; their rows are reported as they are.
 | CohereLabs/aya_dataset (Hugging Face) | Apache 2.0 | 769 | 198 | Human-written prompts in many languages, benign |
 | databricks/databricks-dolly-15k (Hugging Face) | CC BY-SA 3.0 | 769 | 231 | Human-written instructions, half with a context passage, benign |
 | Contrast set (`scripts/make_contrast_set.py`) | written for this project | 2,297 | none | Look-alike texts with opposite labels, 25 categories |
+| Agent-drafted, human-reviewed set 5 (`data/agent_drafted_test5.csv`) | written for this project | none | 60 | Ten language-model drafts of six rows each, no access to the repository, reviewed by the author; scored once after the round |
 
 ![Training rows by source](training_sources.png)
 
@@ -160,7 +202,7 @@ Three kinds of data were kept apart.
 |---|---|---|
 | Train | Fitting | The training pool and its obfuscated copies |
 | Development | Finding mistakes, choosing settings, the gate | Cross-validation folds; 40% of the official test split (493 rows); hand-written sets 1 to 3 (168 rows); the probe set (216 rows in five slices, written without access to the rules) |
-| Test | Final scores only | 60% of the official test split; deepset, jackhhao and gandalf test splits; the test splits of the six new sources; hand-written set 4 (125 rows) |
+| Test | Final scores only | 60% of the official test split; deepset, jackhhao and gandalf test splits; the test splits of the six new sources; hand-written set 4 (125 rows); agent-drafted, human-reviewed set 5 (60 rows, scored once after the round on the frozen model) |
 
 - **Parameter search** used two kinds of development fold: one whole family of sources held out,
   and unseen attack instructions from sources that were trained on. Settings were ranked by average
@@ -169,6 +211,10 @@ Three kinds of data were kept apart.
   instruction is in one part only.
 - **Hand-written sets** were written before the model they test was trained. Once the
   mistakes on a set had been read, that set became development data and a new one was written.
+  Set 5 (2026-10-03) was drafted by ten language-model agents instead of by hand, six rows each,
+  with no access to the repository, checked for exact and near duplicates against every data file,
+  reviewed row by row by the author (no edits) and scored once on the frozen model. Its mistakes
+  have been read, so it is development data now.
 - **A gate decided whether round four replaces round three.** Two candidates were trained on the
   same data, the embedding with 20 rules and with the first 16. Each was compared with the
   round-three model, run by its own frozen code in `backup_round3/`, on the development sets only.
@@ -311,6 +357,15 @@ gandalf 92.9% to 93.8%, pooled false alarms 10 to 8.
 11. **The embedding comparison was not completed.** `multilingual-e5-small` scored within a few
     points of the current model in both directions in round three. The larger `mpnet-base` run was
     stopped before it finished.
+12. **Set 5, written to probe the weak spots above, fails both sentence-set standards.** Scored
+    once after the round on the frozen model, it misses 13 of 30 attacks (recall 56.7% against 85%)
+    and flags 4 of 30 benign texts (13.3% against 7.1%). The misses are the kinds named above: the
+    Turkish, Arabic and Chinese attacks with no override word; hidden instructions in a policy
+    clause, a README and an invoice; two task switches without override words; three
+    destructive-command orders, one again containing `DELETE FROM`; two send orders. The false alarms
+    are three of six benign persona requests (a Socratic tutor, Spanish-only replies, a request for
+    blunt feedback) and an IT-policy excerpt whose "never share your password" fired the
+    exfiltration rule. Details in the results section.
 
 ## Running it
 
@@ -355,4 +410,6 @@ The GUI needs Tk (`sudo pacman -S tk` on Arch). The first run downloads the embe
 | `report/metrics.json` | All scores from the last training run |
 | `report/round_four_results.md` | The round-four record: the rejected first run, the diagnosis, the decision |
 | `data/SOURCES.md` | The six new sources, licences and sampling |
+| `data/agent_drafted_test5.csv` | Set 5: 60 agent-drafted, human-reviewed rows, scored once after the round |
+| `report/set5_scored.csv` | Set 5 per-row verdicts, scores and the rules that fired |
 | `backup_round3/` | Round three, frozen and runnable |

@@ -69,11 +69,21 @@ test set done on 2026-10-01; it matches the training log (one jackhhao text diff
 | External tests precision | >= 90% | 96.9% | yes |
 | Hand-written recall (set 4) | >= 85% | 89.2% | yes |
 | Hand-written false alarms (set 4) | <= 7.1% | 5.0% (3 in 60) | yes |
+| Set 5 recall (agent-drafted, scored after the round) | >= 85% | 56.7% (17 of 30) | no |
+| Set 5 false alarms (scored after the round) | <= 7.1% | 13.3% (4 in 30) | no |
 
 New sources, scored once: wild 64.9% precision / 75.0% recall (27% false alarms on real benign
 prompts), llmail 100% / 93.8%, gsum 53.8% recall, yanis 46.1% recall, aya 1 false alarm in 198,
 dolly 0 in 231. Hand-written set 4 and the new-source test splits have now been read: **they are
 development data from here on; round five needs new held-out sets.**
+
+**Set 5 (2026-10-03, model frozen; git tag `model-frozen` = f10a911).** 60 rows, half attacks, drafted by
+ten agents in chunks of six with no access to the repo, reviewed by the user (no edits), labelled
+"agent-drafted, human-reviewed", scored once through `predict()`: tn 26, fp 4, fn 13, tp 17; precision
+81.0%, recall 56.7%, F1 66.7%, false alarms 13.3%. Both sentence-set standards missed. Files:
+`data/agent_drafted_test5.csv`, `report/set5_scored.csv`; write-up updated. Its mistakes have been read:
+**set 5 is development data; a round-five run needs a new held-out set.** It is not yet in the HELD_OUT
+list of `scripts/check_rules.py` or the dedup lists of `scripts/download_new_sources.py`.
 
 ### How round four got here (2026-10-01)
 
@@ -107,10 +117,9 @@ separately. The nine `src/__pycache__/*.pyc` files that slipped into history wer
 
 **How to test.** Every held-out set has been read, so only new text is an honest test.
 
-1. Write hand-written set 5 before touching any code: about 60 rows, half benign. Cover
-   destructive-command orders, send/message orders, non-English attacks, task switches with no
-   override words, and benign role-play, persona and correspondence requests. Keep it out of the
-   repo until it has been scored once.
+1. Set 5 is written and scored (2026-10-03) and is development data now. Write set 6 before touching
+   any code, with the same recipe: about 60 rows, half benign, drafted in chunks of six by agents that
+   cannot read the repo, reviewed by hand, kept out of the repo until scored once.
 2. Probe with the CLI (`cli.py check-text`, `--file` for documents) using real emails and documents,
    and paraphrase a known attack until one passes: that shows how much wording it takes.
 3. For data-set numbers, draw a second sample from `data/raw/new/`, deduplicated against every
@@ -119,8 +128,8 @@ separately. The nine `src/__pycache__/*.pyc` files that slipped into history wer
 
 **Improvements, in order of evidence.**
 
-1. Two new rules miss their own targets (set 4): `dangerous_action_count` has `drop table` but not
-   `delete from`; `tool_action_count` needs attack evidence in nearby clauses, so "message every one
+1. Two new rules miss their own targets (set 4, confirmed again on set 5): `dangerous_action_count` has
+   `drop table` but not `delete from`; `tool_action_count` needs attack evidence in nearby clauses, so "message every one
    of my contacts" is benign. Pattern changes in `src/rules.py`, checked with `scripts/check_rules.py`.
 2. False alarms on real benign prompts (27% on wild regular): `second_person_command_ratio` fires on
    35% of them (self-check warning). Tightening it, or adding benign persona and role-play data,
@@ -157,3 +166,6 @@ commit, score set 5 once into the write-up, and leave the rest as future work.
   my contacts" order).
 - The rule self-check (`scripts/check_rules.py`) warns that several old rules fire on 9 to 35% of
   in-the-wild benign prompts, `second_person_command_ratio` most of all.
+- Set 5 (agent-drafted, scored once after the round): recall 56.7%, false alarms 13.3%. Attacks with no
+  override word in Turkish, Arabic and Chinese, hidden instructions in a policy clause, a README and an
+  invoice, and a `DELETE FROM` order were all missed; three of six benign persona requests were flagged.
