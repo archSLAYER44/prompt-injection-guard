@@ -1,0 +1,71 @@
+# Theme for dashboard.py. Fonts are self-hosted from static/fonts (Inter and JetBrains Mono, both
+# SIL Open Font License), so the app looks the same offline.
+
+[server]
+enableStaticServing = true
+# The source watcher walks every imported module and trips over transformers' lazy image
+# processors (tracebacks about torchvision at startup). Off: restart the command after editing.
+fileWatcherType = "none"
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "dark"
+primaryColor = "#4f8cff"
+backgroundColor = "#0f131a"
+secondaryBackgroundColor = "#161c26"
+textColor = "#e6e9ef"
+linkColor = "#8ab4ff"
+codeBackgroundColor = "#0b0e14"
+font = "Inter, 'Segoe UI', system-ui, sans-serif"
+headingFont = "Inter, 'Segoe UI', system-ui, sans-serif"
+codeFont = "'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace"
+baseFontSize = 15
+baseRadius = "10px"
+buttonRadius = "8px"
+borderColor = "#262e3b"
+dataframeBorderColor = "#262e3b"
+showWidgetBorder = true
+showSidebarBorder = true
+headingFontWeights = [700, 650, 600, 600, 600, 600]
+
+[[theme.fontFaces]]
+family = "Inter"
+url = "app/static/fonts/InterVariable.woff2"
+weight = "100 900"
+style = "normal"
+
+[[theme.fontFaces]]
+family = "Inter"
+url = "app/static/fonts/InterVariable-Italic.woff2"
+weight = "100 900"
+style = "italic"
+
+[[theme.fontFaces]]
+family = "JetBrains Mono"
+url = "app/static/fonts/JetBrainsMono-Regular.woff2"
+weight = 400
+style = "normal"
+
+[[theme.fontFaces]]
+family = "JetBrains Mono"
+url = "app/static/fonts/JetBrainsMono-Medium.woff2"
+weight = 500
+style = "normal"
+
+[[theme.fontFaces]]
+family = "JetBrains Mono"
+url = "app/static/fonts/JetBrainsMono-SemiBold.woff2"
+weight = 600
+style = "normal"
+
+[[theme.fontFaces]]
+family = "JetBrains Mono"
+url = "app/static/fonts/JetBrainsMono-Italic.woff2"
+weight = 400
+style = "italic"
+
+[theme.sidebar]
+backgroundColor = "#0b0e14"
+secondaryBackgroundColor = "#161c26"

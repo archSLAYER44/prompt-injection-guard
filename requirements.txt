@@ -8,3 +8,8 @@ sentence-transformers
 joblib
 jupyter
 matplotlib
+
+# dashboard (optional): the Anthropic option of llm_client.py; the in-process local model
+# needs only torch and transformers, which sentence-transformers already brings
+anthropic
+streamlit

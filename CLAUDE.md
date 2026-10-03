@@ -19,6 +19,9 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
   all 8 CPU cores. Ask before starting one if the user may be away or asleep. The laptop must be on AC
   power (a run drained the battery on 2026-10-01); see the machine notes below.
 - Always use `.venv/bin/python`. The GUI needs Tk (`sudo pacman -S tk`).
+- This laptop has no Ollama (checked 2026-10-03). The working chat model for the dashboard is the in-process
+  option of `llm_client.py` (about 12 s to load, 1 to 6 s per reply on the CPU). The model is FROZEN while the
+  dashboard is built: no retraining, no new rules, no change to the scoring code.
 
 ## Layout
 
@@ -41,6 +44,9 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
 | `scripts/make_charts.py` | Regenerates the four charts the write-up embeds, from `report/metrics.json` |
 | `scripts/oof_floor_check.py` | Threshold per precision floor, from out-of-fold scores on the grouped folds |
 | `backup_round3/` | Frozen, runnable copy of round three (code, model, reports) |
+| `dashboard.py` | Streamlit demo (2026-10-03): a chat assistant with a secret, the frozen detector in front of it, every explain() stage shown, guard toggle, demo threshold slider, history, four presets. Stub model built in; real models through `llm_client.py` |
+| `.streamlit/config.toml`, `static/fonts/` | Dashboard theme (dark, Inter + JetBrains Mono, self-hosted, OFL licences included); the source watcher is off because it trips over transformers' lazy modules |
+| `llm_client.py` | Dashboard chat client (2026-10-03): `chat(provider, base_url, model, api_key, messages)` over ten providers: in-process transformers model (Qwen2.5-0.5B-Instruct, no server, no key), Ollama, OpenAI-compatible servers, OpenAI, Anthropic (official SDK), Gemini, Groq, OpenRouter, Mistral, DeepSeek. Keys only in request headers, never stored |
 
 ## Commands
 
@@ -50,6 +56,8 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
 .venv/bin/python -m src.dataset          # balance and duplicate report
 .venv/bin/python -m src.train            # development numbers only
 .venv/bin/python -m src.train --final    # also scores the held-out test sets (~65 min warm)
+.venv/bin/streamlit run dashboard.py     # the guard demo (model frozen; needs streamlit)
+.venv/bin/python llm_client.py --provider "Local (in-process)" "hi"   # chat client test
 ```
 
 ## Status: round four is complete and committed (48b97d7, 2026-10-01 19:09)
@@ -84,6 +92,13 @@ ten agents in chunks of six with no access to the repo, reviewed by the user (no
 `data/agent_drafted_test5.csv`, `report/set5_scored.csv`; write-up updated. Its mistakes have been read:
 **set 5 is development data; a round-five run needs a new held-out set.** It is not yet in the HELD_OUT
 list of `scripts/check_rules.py` or the dedup lists of `scripts/download_new_sources.py`.
+
+**Dashboard (2026-10-03, model frozen).** `explain(text)` added to `src/predict.py` (predict() unchanged,
+proved on 20 texts), `llm_client.py` (ten providers), `dashboard.py` (Streamlit, dark SOC-style theme, chat
+transcript + guard inspector, four presets, deep links `?preset=<name>&send=1`). Tested with Streamlit's
+AppTest harness (stub and the real in-process model) and screenshotted headless through Brave + Playwright
+(`playwright` is in the venv for that only; it is not in requirements.txt). Guard on: the direct injection
+is blocked; guard off: Qwen2.5-0.5B-Instruct prints the secret in 0.6 s.
 
 ### How round four got here (2026-10-01)
 
