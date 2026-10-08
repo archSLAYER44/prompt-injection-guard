@@ -1,0 +1,18 @@
+{
+  "name": "set6",
+  "input": "/home/guts/Documents/set6_review/set6_draft.csv",
+  "input_md5": "22887dc0e82cd6210210a02a14c8c0dc",
+  "model_sha1": "73b0883558c6",
+  "commit": "55d9726",
+  "threshold": 0.5472472770664605,
+  "rows": 60,
+  "tn": 25,
+  "fp": 5,
+  "fn": 19,
+  "tp": 11,
+  "precision": 0.6875,
+  "recall": 0.36666666666666664,
+  "f1": 0.4782608695652174,
+  "false_alarm_rate": 0.16666666666666666,
+  "scored_at": "2026-10-05 03:28:30"
+}

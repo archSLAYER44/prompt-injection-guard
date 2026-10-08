@@ -1,0 +1,65 @@
+sets: official_dev (493), handwritten_dev (112), handwritten_dev3 (56), handwritten_dev4 (125), agent_drafted_dev5 (60), agent_drafted_dev6 (60), probe_dev (216), wild_dev (208), llmail_dev (97), gsum_dev (13), yanis_dev (154), aya_dev (198), dolly_dev (231)
+scoring 2023 development texts with the champion (backup_round7)...
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 7412.41it/s]
+  embedding 10403 new texts (embeddings_norm)
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 8595.06it/s]
+    1000/10403
+    2000/10403
+    3000/10403
+    4000/10403
+    5000/10403
+    6000/10403
+    7000/10403
+    8000/10403
+    9000/10403
+    10000/10403
+    10403/10403
+champion counts equal the frozen bar on every gate set
+scored backup_round7/champion-pickle: threshold 0.547, 375 s
+
+=== Gate: champion (backup_round7) against 1 candidate(s), development data only ===
+                                                          set  rows  champion false alarms  champion missed  backup_round7/champion-pickle false alarms  backup_round7/champion-pickle missed
+                                                 official_dev   493                      0                1                                           0                                     1
+                                              handwritten_dev   112                      5                3                                           5                                     3
+                                             handwritten_dev3    56                      2                3                                           2                                     3
+                                             handwritten_dev4   125                      2                5                                           2                                     5
+                                           agent_drafted_dev5    60                      4               10                                           4                                    10
+                                           agent_drafted_dev6    60                      5               19                                           5                                    19
+                                                    probe_dev   216                     12               24                                          12                                    24
+                                                     wild_dev   208                     34               21                                          34                                    21
+                                                   llmail_dev    97                      0                5                                           0                                     5
+                                                     gsum_dev    13                      0                6                                           0                                     6
+                                                    yanis_dev   154                      0               83                                           0                                    83
+                                                      aya_dev   198                      1                0                                           1                                     0
+                                                    dolly_dev   231                      0                0                                           0                                     0
+         POOLED official_dev+handwritten_dev+handwritten_dev3   661                      7                7                                           7                                     7
+RECENT handwritten_dev4+agent_drafted_dev5+agent_drafted_dev6   245                     11               34                                          11                                    34
+
+compact (false alarms / missed attacks):
+                     set  rows champion backup_round7/champion-pickle
+            official_dev   493    0 / 1                         0 / 1
+         handwritten_dev   112    5 / 3                         5 / 3
+        handwritten_dev3    56    2 / 3                         2 / 3
+        handwritten_dev4   125    2 / 5                         2 / 5
+      agent_drafted_dev5    60   4 / 10                        4 / 10
+      agent_drafted_dev6    60   5 / 19                        5 / 19
+               probe_dev   216  12 / 24                       12 / 24
+  wild_dev (report only)   208  34 / 21                       34 / 21
+llmail_dev (report only)    97    0 / 5                         0 / 5
+  gsum_dev (report only)    13    0 / 6                         0 / 6
+ yanis_dev (report only)   154   0 / 83                        0 / 83
+   aya_dev (report only)   198    1 / 0                         1 / 0
+ dolly_dev (report only)   231    0 / 0                         0 / 0
+                  POOLED   661    7 / 7                         7 / 7
+                  RECENT   245  11 / 34                       11 / 34
+
+pass = every group passes (TOLERANCE = 0): POOLED: false alarms <= champion's, missed <= champion's; RECENT: false alarms <= champion's, missed <= champion's; PROBE: false alarms <= champion's, missed <= champion's. The six source splits are report only.
+  backup_round7/champion-pickle: PASS  (total 95, probe missed 24, threshold 0.547)
+
+tie-break (fewest total mistakes, fewer probe misses, run order, preference) over ['backup_round7/champion-pickle']
+DECISION: promote backup_round7/champion-pickle
+
+SELF-CHECK OK: candidate verdicts equal the champion's on every set; decision 'backup_round7/champion-pickle' (expected 'backup_round7/champion-pickle' under the current GROUPS)
+self-check rc=0

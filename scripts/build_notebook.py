@@ -63,7 +63,8 @@ def label_bars(ax, bars, fmt):
 
     ("md", """## 1. Training data
 
-Ten public sources plus a contrast set written for this project. Every source keeps its
+Thirteen public sources (ten in training; oasst1, InjecAgent and BIPIA are test-only for the
+round-seven model) plus a contrast set written for this project. Every source keeps its
 own official train/test split, or a fixed split by near-copy group where the source has none;
 test rows and near-copies of them are removed from training."""),
 
@@ -146,7 +147,7 @@ so their scores are optimistic."""),
     ("code", """metrics = json.loads((ROOT / "report" / "metrics.json").read_text())
 promoted = metrics.get("promoted")
 print("chosen parameters:", metrics["params"])
-print("promoted by the gate:", promoted or "none (the round-three model stays)")
+print("promoted by the gate:", promoted or "none (the round-four model stays)")
 if promoted:
     print("decision threshold:", round(metrics["candidates"][promoted]["threshold"], 3))
 pd.DataFrame(metrics.get("standards", []))"""),
@@ -154,10 +155,11 @@ pd.DataFrame(metrics.get("standards", []))"""),
     ("md", """### Candidates and the gate
 
 Two candidates were trained on the same data: the embedding with all 20 rules and the
-embedding with the first 16. The gate compares each with the round-three model on the
-development sets only and promotes the first that is no worse on false alarms and missed
-attacks, and better on the probe set. The table shows every candidate's mistakes per
-development set."""),
+embedding with the first 16. The gate compares each with the round-four model on the
+development sets only (pooled hand-written and official development sets, then sets 4 and 5, then
+the probe set) and promotes the first that is no worse on false alarms and missed attacks in every
+group, the probe set included (rounds four to six asked for strictly fewer probe misses; round seven
+dropped that clause before its run). The table shows every candidate's mistakes per development set."""),
 
     ("code", """rows = []
 for name, candidate in metrics["candidates"].items():
@@ -171,7 +173,7 @@ pd.DataFrame(rows).pivot(index="set", columns="candidate",
                          values=["false alarms", "missed attacks"])"""),
 
     ("code", """names = ["official", "deepset", "jackhhao", "gandalf", "external",
-         "wild", "llmail", "gsum", "yanis", "aya", "dolly", "external_new", "handwritten"]
+         "oasst1", "injecagent", "bipia", "external_new", "handwritten"]
 if "tests" in metrics:
     scores = pd.DataFrame({n: metrics["tests"][n] for n in names if n in metrics["tests"]}).T
     scores[["n", "tn", "fp", "fn", "tp"]] = scores[["n", "tn", "fp", "fn", "tp"]].astype(int)
@@ -205,7 +207,9 @@ Each feature set is tuned on the grouped development folds alone and scored on t
 development sets, so the test sets are touched by one model only. Recall is the share of
 attacks caught; the false-alarm rate is the share of benign texts flagged."""),
 
-    ("code", """ablation = pd.DataFrame(metrics["ablation"]).set_index("features")
+    ("code", """if "ablation" not in metrics:
+    raise SystemExit("metrics.json has no ablation block: run scripts/score_tests.py --ablation first")
+ablation = pd.DataFrame(metrics["ablation"]).set_index("features")
 labels = {"legacy6": "original 6 rules", "rules16": "16 rules", "emb": "embedding",
           "emb+rules16": "embedding + 16 rules", "emb+rules20": "embedding + 20 rules"}
 sets = [n for n in ("official_dev", "handwritten_dev3", "probe_dev") if f"{n}_recall" in ablation]

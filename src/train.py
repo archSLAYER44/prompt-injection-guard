@@ -68,7 +68,7 @@ STANDARDS = {
     "handwritten": {"recall": 0.85, "max_false_alarm_rate": 2 / 28},
 }
 EXTERNAL_SETS = ["deepset", "gandalf", "jackhhao"]
-NEW_SETS = ["wild", "llmail", "gsum", "yanis", "aya", "dolly"]
+NEW_SETS = ["oasst1", "injecagent", "bipia"]           # round five; the six round-four sources are development data now
 
 SVC_GRID = [{"svc__kernel": "linear", "svc__C": c} for c in (0.3, 1)]
 RULE_WEIGHTS = (0.5, 1.0, 2.0)
@@ -581,13 +581,13 @@ def dev_set_report(corpus, feature_set, candidate):
     """Scores on the development sets, with mistakes listed for the hand-written ones."""
     dev, table, frame = held_out_report(corpus, feature_set, candidate["model"], candidate["threshold"], "dev")
     print(f"\n=== {feature_set} on the development sets (held out, but used to guide improvements) ===")
-    for name in sorted(k for k in dev if k.endswith("_dev") or k.endswith("_dev3")):
+    for name in sorted(k for k, v in dev.items() if isinstance(v, dict) and "n" in v):
         print_scores(name.upper(), dev[name])
     if len(table):
         print("\nofficial_dev by category (correct_share = recall for attacks):")
         print(table.round(3).to_string(index=False))
     shown = frame.assign(text=frame["text"].str[-150:]).drop_duplicates("text")
-    for name in ("official_dev", "handwritten_dev", "handwritten_dev3"):
+    for name in ("official_dev", "handwritten_dev", "handwritten_dev3", "handwritten_dev4", "agent_drafted_dev5"):
         if name in dev:
             print_mistakes(shown, name)
     if "probe_dev" in dev and "slice" in frame.columns:
@@ -686,8 +686,8 @@ def main():
         promoted = run_gate(paths)
         metrics["promoted"] = promoted
         if promoted is None:
-            print("\nno candidate passed the gate: the test sets were not scored. The round-three "
-                  "test numbers stand (backup_round3/report/metrics.json).")
+            print("\nno candidate passed the gate: the test sets were not scored. The round-four "
+                  "test numbers stand (backup_round4/report/metrics.json).")
         else:
             candidate = candidates[promoted]
             report, table, frame = held_out_report(

@@ -1,0 +1,114 @@
+
+=== scripts/score_tests.py 2026-10-05 03:25:29: emb+rules20, threshold 0.547, pickle sha1 73b0883558c6, rules sha1 e07dbba418fe, tree r1_rules ===
+  warning: data/drafted_train7.csv not found, skipped
+training pool, class balance by language:
+          benign  injection  rows  injection_share skewed
+language                                                 
+en          3841       2981  6822            0.437       
+(none)      2423       2416  4839            0.499       
+fr           126        148   274            0.540       
+es           120        140   260            0.538       
+it           120        131   251            0.522       
+de           110        134   244            0.549       
+pt           113        130   243            0.535       
+ar            16         16    32            0.500       
+ja            16         16    32            0.500       
+hi            16         16    32            0.500       
+nl            16         16    32            0.500       
+ru            16         16    32            0.500       
+tr            16         16    32            0.500       
+zh            16         16    32            0.500       
+25435 texts -> 120928 units (82568 distinct)
+training pieces dropped for matching a held-out piece: 1953 (jackhhao: 607, gandalf: 421, llmail: 401, wild: 269, contrast: 148, aya: 43, deepset: 31, dolly: 27, gsum: 6)
+corpus built in 358 s (the training pool is the live data; only test units are scored)
+
+=== Final model (emb+rules20) on the held-out test sets ===
+
+OFFICIAL (736 rows)
+  accuracy 0.989 | injection precision 0.998 recall 0.986 [0.97, 0.99] F1 0.992 | false alarm rate 0.004 [0.00, 0.02]
+  confusion matrix      predicted benign  predicted injection
+    actual benign                    247                    1
+    actual injection                   7                  481
+  FLAG: accuracy above 97%, check for leakage or templated data
+
+DEEPSET (116 rows)
+  accuracy 0.647 | injection precision 1.000 recall 0.317 [0.21, 0.44] F1 0.481 | false alarm rate 0.000 [0.00, 0.06]
+  confusion matrix      predicted benign  predicted injection
+    actual benign                     56                    0
+    actual injection                  41                   19
+
+GANDALF (112 rows)
+  accuracy 0.938 | injection precision 1.000 recall 0.938 [0.88, 0.97] F1 0.968 | false alarm rate -
+  confusion matrix      predicted benign  predicted injection
+    actual benign                      0                    0
+    actual injection                   7                  105
+
+JACKHHAO (400 rows)
+  accuracy 0.940 | injection precision 0.940 recall 0.887 [0.82, 0.93] F1 0.912 | false alarm rate 0.031 [0.02, 0.06]
+  confusion matrix      predicted benign  predicted injection
+    actual benign                    251                    8
+    actual injection                  16                  125
+
+EXTERNAL (628 rows)
+  accuracy 0.885 | injection precision 0.969 recall 0.796 [0.75, 0.84] F1 0.874 | false alarm rate 0.025 [0.01, 0.05]
+  confusion matrix      predicted benign  predicted injection
+    actual benign                    307                    8
+    actual injection                  64                  249
+
+OASST1 (289 rows)
+  accuracy 0.976 | injection precision 0.000 recall - F1 0.000 | false alarm rate 0.024 [0.01, 0.05]
+  confusion matrix      predicted benign  predicted injection
+    actual benign                    282                    7
+    actual injection                   0                    0
+  FLAG: accuracy above 97%, check for leakage or templated data
+
+INJECAGENT (48 rows)
+  accuracy 0.667 | injection precision 1.000 recall 0.333 [0.18, 0.53] F1 0.500 | false alarm rate 0.000 [0.00, 0.14]
+  confusion matrix      predicted benign  predicted injection
+    actual benign                     24                    0
+    actual injection                  16                    8
+
+BIPIA (231 rows)
+  accuracy 0.420 | injection precision 0.955 recall 0.136 [0.09, 0.20] F1 0.239 | false alarm rate 0.013 [0.00, 0.07]
+  confusion matrix      predicted benign  predicted injection
+    actual benign                     76                    1
+    actual injection                 133                   21
+
+EXTERNAL_NEW (568 rows)
+  accuracy 0.724 | injection precision 0.784 recall 0.163 [0.12, 0.22] F1 0.270 | false alarm rate 0.021 [0.01, 0.04]
+  confusion matrix      predicted benign  predicted injection
+    actual benign                    382                    8
+    actual injection                 149                   29
+
+official test (final half) by category (correct_share = recall for attacks):
+ label           category  rows  correct_share      correct [95%]  seen_in_train
+     0      carrier_clean   116          1.000 1.000 [0.97, 1.00]           True
+     0     embedded_human    74          1.000 1.000 [0.95, 1.00]           True
+     0      hard_negative    12          0.917 0.917 [0.65, 0.99]           True
+     0       multilingual     5          1.000 1.000 [0.57, 1.00]          False
+     0                 qa    41          1.000 1.000 [0.91, 1.00]           True
+     1  appended_override    92          1.000 1.000 [0.96, 1.00]           True
+     1 indirect_injection   102          1.000 1.000 [0.96, 1.00]           True
+     1       multilingual     5          0.800 0.800 [0.38, 0.96]          False
+     1        obfuscation   190          0.968 0.968 [0.93, 0.99]          False
+     1      payload_split    99          1.000 1.000 [0.96, 1.00]          False
+
+handwritten: 0 mistakes
+
+=== Standards (held-out test sets) ===
+          standard  target  result met
+   official recall    0.90   0.986 yes
+official precision    0.95   0.998 yes
+   external recall    0.85   0.796  NO
+external precision    0.90   0.969 yes
+STANDARDS NOT MET
+
+=== Ablation on the development sets (2255 s; live training pool) ===
+   features kernel official_dev recall [95%] official_dev fa rate [95%] handwritten_dev recall [95%] handwritten_dev fa rate [95%] handwritten_dev3 recall [95%] handwritten_dev3 fa rate [95%] probe_dev recall [95%] probe_dev fa rate [95%]
+    legacy6 linear        0.000 [0.00, 0.01]         0.000 [0.00, 0.02]           0.018 [0.00, 0.09]            0.000 [0.00, 0.06]            0.000 [0.00, 0.12]             0.000 [0.00, 0.12]     0.000 [0.00, 0.04]      0.000 [0.00, 0.03]
+    rules16 linear        0.700 [0.65, 0.75]         0.000 [0.00, 0.02]           0.589 [0.46, 0.71]            0.036 [0.01, 0.12]            0.607 [0.42, 0.76]             0.071 [0.02, 0.23]     0.227 [0.15, 0.32]      0.008 [0.00, 0.05]
+        emb linear        0.879 [0.84, 0.91]         0.000 [0.00, 0.02]           0.893 [0.79, 0.95]            0.054 [0.02, 0.15]            0.821 [0.64, 0.92]             0.000 [0.00, 0.12]     0.701 [0.60, 0.78]      0.160 [0.10, 0.24]
+emb+rules16 linear        0.997 [0.98, 1.00]         0.000 [0.00, 0.02]           0.929 [0.83, 0.97]            0.089 [0.04, 0.19]            0.893 [0.73, 0.96]             0.036 [0.01, 0.18]     0.711 [0.61, 0.79]      0.143 [0.09, 0.22]
+emb+rules20 linear        0.997 [0.98, 1.00]         0.000 [0.00, 0.02]           0.946 [0.85, 0.98]            0.089 [0.04, 0.19]            0.929 [0.77, 0.98]             0.071 [0.02, 0.23]     0.753 [0.66, 0.83]      0.109 [0.06, 0.18]
+saved metrics to /home/guts/Documents/Mlproject/report/metrics.json; marker ROUND7_TESTS_SCORED.json written
+score_tests rc=

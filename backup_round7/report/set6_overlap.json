@@ -1,0 +1,22 @@
+{
+  "held_out": "/home/guts/Documents/set6_review/set6_draft.csv",
+  "rows": 60,
+  "threshold": 0.9,
+  "checked_at": "2026-10-05 03:26:43 +0530",
+  "comparisons": [
+    {
+      "against": "rounds/round7/drafted_train7.csv",
+      "rows": 312,
+      "hits": 0,
+      "highest_similarity": 0.416
+    },
+    {
+      "against": "training pool (load_pool)",
+      "rows": 13157,
+      "hits": 0,
+      "highest_similarity": 0.39
+    }
+  ],
+  "hits": [],
+  "flagged_rows": []
+}

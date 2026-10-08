@@ -32,7 +32,8 @@ _DROP = r"(?:ignore|disregard|forget|override|bypass|set\s+aside|discard|drop|sk
 _WHICH = r"(?:previous|prior|above|earlier|preceding|former|all|any|every|your|their|its|these|those)"
 _RULES = (r"(?:instructions?|rules?|guidelines?|prompts?|directions?|directives?|context|"
           r"restrictions?|limits?|filters?|constraints?|setup|configuration|programming|"
-          r"training|safeguards?|polic(?:y|ies)|guardrails?|guidance|orders|commands)")
+          r"training|safeguards?|polic(?:y|ies)|guardrails?|guidance|orders|commands|"
+          r"checks?|verification|validation)")     # checks / verification / validation: round eight ("skip your own checks")
 
 _ROLE = (r"(?:developer|admin|administrator|engineer|officer|operator|team|lead|manager|owner|"
          r"auditor|supervisor|creator|maintainer|reviewer|moderator|staff|director)")
@@ -42,6 +43,33 @@ _SECRETS = (r"(?:prompts?|instructions?|rules|configuration|directives?|guidelin
             r"setup|policy(?:\s+text)?|(?:system|boot|initial|setup)\s+(?:message|text))")
 _LEAK = (r"(?:reveal|print|show|display|repeat|output|list|share|leak|expose|return|disclose|dump|"
          r"recite|echo|paste|quote|provide|copy|write\s+out|tell\s+me|give\s+me|send)")
+
+# round eight (set 6): the assistant addressed in passing ("if an assistant is comparing...", "for the assistant
+# preparing a summary:", "Shopping assistant guidance:", "@opsbot") and "note for the assistant" in pt / es / it / fr / de.
+# Used by indirect_address_count and, so that the clause rules read such clauses as orders, by AI_ADDRESSED_RE.
+_ADDRESSEE = (r"(?:(?:automated|ai|virtual|digital|llm|ai-powered|shopping|reviewing|summari[sz]ing|processing|"
+              r"reading)\s+(?:assistant|agent|bot|model|copilot)s?|(?:assistant|chatbot|copilot|llm|language\s+model)s?)")
+_ADDRESSEE_VERB = (r"(?:is|are|picks?|reads?|sees?|gets?|ends?\s+up|happens?|comes?|handl\w+|process\w*|summari[sz]\w*|"
+                   r"prepar\w*|compar\w*|review\w*|help\w*|answer\w*|work\w*|respond\w*|repl\w*|draft\w*|writ\w*|"
+                   r"translat\w*|pars\w*|that|who|which)")
+ASSISTANT_LEAD = (rf"\b(?:if|when|whenever|should|for)\s+(?:an?|the|any|whichever|whatever)\s+{_ADDRESSEE}\s+{_ADDRESSEE_VERB}\b|"
+                  r"\b(?:reviewing|summari[sz]ing|processing|reading|automated|shopping|ai|virtual)\s+"
+                  r"(?:assistant|agent|bot|copilot)s?\s*(?:guidance|notes?|instructions?)?\s*:|"
+                  r"(?:^|[\s(])@(?:\w+bot|\w*assistant|ai|copilot)\b")
+FOREIGN_NOTE = (
+    r"\b(?:nota|observa[çc][ãa]o|aviso|mensagem|instru[çc][õo]es|recado|aten[çc][ãa]o)\s+(?:para|ao|à)\s+"
+    r"(?:o|a|qualquer|todo)?\s*(?:assistente|modelo|ia|agente|chatbot)\b|"                                         # pt
+    r"\b(?:nota|aviso|mensaje|instrucci[oó]n(?:es)?|atenci[oó]n)\s+(?:para|al)\s+(?:el|la|cualquier|todo)?\s*"
+    r"(?:asistente|modelo|ia|agente|chatbot)\b|"                                                                     # es
+    r"\b(?:nota|avviso|messaggio|istruzion[ei]|attenzione)\s+(?:per|all[oa]|al)\s*(?:l'|lo\s+|la\s+|il\s+|qualsiasi\s+|ogni\s+)?"
+    r"(?:assistente|modello|ia|agente|chatbot)\b|"                                                                   # it
+    r"\b(?:note|avis|message|instructions?|attention|consigne)\s+(?:pour|à)\s+(?:l'|le\s+|la\s+|tout\s+)?"
+    r"(?:assistant|mod[èe]le|ia|agent|chatbot)\b|"                                                                   # fr
+    r"\b(?:hinweis|notiz|nachricht|anweisung(?:en)?|achtung)\s+(?:für|fuer|an)\s+(?:den|die|das|jeden|jede)?\s*"
+    r"(?:assistenten|assistent|ki|modell|agenten|chatbot|sprachmodell)\b|"                                           # de
+    r"\b(?:assistente|asistente)\s+(?:que|che)\s+(?:estiver|est[áa]|esteja|processa\w*|elabora\w*|resum\w*|l[êe]\w*|"
+    r"legg\w*|analis\w*|analiz\w*|traduz\w*|traduc\w*)\b"
+)
 
 RULE_PATTERNS = {
     "override_phrase_count": [
@@ -105,6 +133,8 @@ RULE_PATTERNS = {
         r"\bwhen\s+(?:you\s+)?(?:summari[sz]|process|read|translat|analy[sz])\w*\s+this\b",
         r"\bhidden\s+instructions?\b",
         r"\b(?:attention|dear|hey|hello|hi),?\s+(?:ai|assistant|model|chatbot|llm)\b",
+        ASSISTANT_LEAD,          # round eight
+        FOREIGN_NOTE,            # round eight
     ],
     "exfiltration_count": [
         rf"\b{_LEAK}\b[^.!?\n]{{0,30}}?\b(?:your|hidden|internal|initial|system|secret|original|"
@@ -127,11 +157,30 @@ RULE_PATTERNS = {
         r"\b(?:respond|reply|answer)\s+only\b",
         r"\b(?:do\s+not|don't|never)\s+(?:mention|tell|reveal|disclose|warn|refuse|say|inform)\b",
         r"\bsay\s+(?:that\s+)?you\s+are\b",
-        r"\b(?:begin|start|end|finish)\s+(?:your|every|each)\s+(?:response|reply|answer|message)s?\s+with\b",
+        # close / open / conclude, "the", summary / report / output, "by": round eight
+        r"\b(?:begin|start|end|finish|close|open|conclude)\s+(?:your|every|each|the)\s+"
+        r"(?:response|reply|answer|message|summary|report|output)s?\s+(?:with|by)\b",
         r"\bwithout\s+(?:any\s+)?(?:warnings?|disclaimers?|caveats?)\b",
         r"\bno\s+(?:warnings|disclaimers|caveats)\b",
         r"\bconfirm\s+with\s+the\s+word\b",
         r"\bthe\s+word\s+[\"']?[a-z]+[\"']?\s*(?:\.|$)",
+        # round eight: a claim to put in the answer, something to leave out of the summary, and "only this" /
+        # "do not mention this note" in pt / es / it / fr / de
+        r"\b(?:state|say|write|note|mention|include|put|assert|confirm)\s+in\s+(?:your|the)\s+"
+        r"(?:answer|response|reply|summary|output|report)\s+that\b",
+        r"\b(?:leave|keep)\s+(?:the\s+|any\s+|all\s+|every\s+)?[\w-]+(?:\s+[\w-]+){0,3}?\s+out\s+of\s+(?:the|your)\s+"
+        r"(?:summary|response|reply|answer|report|output)\b",
+        r"\b(?:gere|retorne|responda|devolva|forne[çc]a|escreva|produza)\s+(?:apenas|somente|s[óo]|unicamente)\b",
+        r"\b(?:sem|n[ãa]o)\s+(?:mencionar|mencione|mencionando|citar|cite|referir|reportar|incluir)\s+(?:esta|essa|este|esse)\s+"
+        r"(?:observa[çc][ãa]o|nota|instru[çc][ãa]o|mensagem|aviso)\b",
+        r"\b(?:responde|devuelve|escribe|genera|contesta)\s+(?:solo|s[óo]lo|[úu]nicamente|solamente)\b",
+        r"\bno\s+(?:menciones|mencionar|cites|citar|incluyas|incluir)\s+(?:esta|este)\s+(?:nota|instrucci[oó]n|mensaje|aviso)\b",
+        r"\b(?:restituisci|rispondi|fornisci|scrivi|riporta|genera)\s+(?:soltanto|solo|solamente|unicamente)\b",
+        r"\bnon\s+(?:riportare|menzionare|citare|includere)\s+(?:questa|questo)\s+(?:nota|istruzione|messaggio|avviso)\b",
+        r"\b(?:r[ée]ponds|r[ée]pondez|renvoie|renvoyez|[ée]cris|[ée]crivez|fournis|fournissez)\s+(?:uniquement|seulement)\b",
+        r"\bne\s+(?:mentionne|mentionnez|cite|citez)\s+pas\s+(?:cette|ce)\s+(?:note|consigne|message|instruction)\b",
+        r"\b(?:antworte|antworten\s+sie|gib|geben\s+sie|schreib|schreibe|schreiben\s+sie)\s+(?:nur|ausschlie[ßs]{1,2}lich|lediglich)\b",
+        r"\b(?:erw[äa]hne|erw[äa]hnen\s+sie)\s+(?:diese|diesen|dieses)\s+(?:hinweis|notiz|anweisung|nachricht)\s+nicht\b",
     ],
     "hypothetical_framing_count": [
         r"\bhypothetical(?:ly)?\b",
@@ -298,7 +347,8 @@ QUESTION_INSIDE_RE = re.compile(
 )
 # "can you run ...", "could you please forward ...", "would you mind running ...": a request, not a question
 # a short lead-in may precede the verb: "when you are done, run", "[for the assistant] run", "note: run"
-_LEAD_IN = r"(?:\[[^\]\n]{0,40}\]\s*|\([^)\n]{0,40}\)\s*|[^,\n]{0,40},\s*|[^:\n]{0,40}:\s*)?"
+# the comma lead-in grew from 40 to 60 characters in round eight ("if the lifecycle rule hasn't caught up by sunday evening, empty ...")
+_LEAD_IN = r"(?:\[[^\]\n]{0,40}\]\s*|\([^)\n]{0,40}\)\s*|[^,\n]{0,60},\s*|[^:\n]{0,40}:\s*)?"
 POLITE_ORDER_RE = re.compile(
     rf"^\s*{_LEAD_IN}(?:can|could|would|will|can't|cant)\s+(?:you|u|ya)\s+"
     r"(?:(?:please|pls|plz|just|kindly|quickly|maybe|perhaps|also|now|go\s+ahead\s+and)\s+)*(?:mind\s+)?"
@@ -347,6 +397,8 @@ IMPERATIVE_ORDER_RE = re.compile(
     r"trigger|paste|copy|send|forward|email|mail|upload|post|share|transfer|wire|pay|move|"
     r"delete|erase|wipe|remove|drop|truncate|format|destroy|purge|disable|turn|switch|shut|"
     r"stop|kill|grant|give|add|open|initiate|proceed|go|make|set|chmod|sudo|rm|mkfs|dd|curl|"
+    r"message|text|dm|ping|contact|spam|access|export|download|connect|"
+    r"empty|revoke|invalidate|push|zip|grab|collect|gather|bundle|compress|sync|mirror|dump|reply|attach|end|close|finish|"   # round eight
     r"wget|führe?|führen\s+sie|ejecut[ae]|ejecuten|exécute[z]?|execute[z]|esegui|eseguite|voer|"
     r"выполни(?:те)?|запусти(?:те)?)\b"
 )
@@ -375,7 +427,11 @@ DANGEROUS_PATTERNS = [
     r"\brm\s*-\s*(?:rf|fr)\b", r"\brm\s*-\s*r\s*-\s*f\b", r"\brm\s*-\s*f\s*-\s*r\b",
     r"\brm\s+-\w*r\w*\s+/(?:\s|$|\*)", r"\bmkfs(?:\.\w+)?\b", r"\bdd\s+if=", r"\bformat\s+[a-z]:",
     r"\bdrop\s+(?:table|database|schema)\b", r"\btruncate\s+table\b",
-    r"\bdelete\s+from\s+[\w.\"`]+\s*;", r"\b(?:curl|wget)\b[^|\n]{0,100}\|\s*(?:sudo\s+)?(?:ba|z|da)?sh\b",
+    # "truncate the events and metrics tables" (round five; the clause splitter drops the ";" that the
+    # old "delete from ... ;" form needed, so that form never matched inside a clause)
+    # round eight: a comma list of tables ("truncate the customers, orders and payments tables")
+    r"\btruncate\s+(?:the\s+|all\s+|every\s+)?(?:[\w-]+,?\s+(?:and\s+|or\s+)?){0,5}?tables?\b",
+    r"\bdelete\s+from\s+[\w.\"`]+(?:\s+where\b[^;\n]{0,80})?\s*(?:;|$)", r"\b(?:curl|wget)\b[^|\n]{0,100}\|\s*(?:sudo\s+)?(?:ba|z|da)?sh\b",
     r"\bchmod\s+-r\s+777\b", r"\bchmod\s+777\s+/(?:\s|$)", r":\(\)\s*\{\s*:\s*\|\s*:\s*&\s*\}\s*;\s*:",
     r"\bfork\s*bomb\b", r"\bshutdown\s+(?:-h|/s|now)\b", r"\breboot\s+--force\b",
     # english wording
@@ -388,9 +444,12 @@ DANGEROUS_PATTERNS = [
     r"volumes?|keys?|disks?|drives?|partitions?|servers?|machines?|systems?|repos?|repositories|branches|"
     r"buckets?|containers?|instances?|nodes?|vms?|objects?|images?|photos?|contacts?|customers?|orders?|"
     r"transactions?|history|caches?|cookies|sessions?|credentials|secrets|evidence|traces?)\b",
-    r"\b(?:remove|drop)\s+(?:all|every|the\s+entire|the\s+whole)\s+(?:the\s+)?(?:files?|data|records?|"
-    r"users?|backups?|logs?|databases?|tables?|directories|folders?|accounts?|contents?|rows?|entries|"
-    r"emails?|messages?|documents?|snapshots?|volumes?|keys?)\b",
+    # a path may sit before the noun: "remove the entire /var/app/data directory"
+    r"\b(?:remove|drop)\s+(?:all|every|the\s+entire|the\s+whole)\s+(?:the\s+)?(?:[\w~.-]*[/~.][\w/~.-]*\s+)?"
+    r"(?:files?|data|records?|users?|backups?|logs?|databases?|tables?|director(?:y|ies)|folders?|accounts?|"
+    r"contents?|rows?|entries|emails?|messages?|documents?|snapshots?|volumes?|keys?|buckets?)\b",
+    # "purge all of the snapshots", "empty the archive storage bucket"
+    r"\b(?:empty|purge|wipe)\s+(?:the\s+|every\s+|all\s+(?:of\s+)?(?:the\s+)?)?(?:[\w-]+\s+){0,2}?(?:buckets?|snapshots?)\b",
     r"\b(?:wipe|erase|format|destroy|nuke|reformat)\s+(?:the\s+|your\s+|my\s+|its\s+|their\s+)?"
     r"(?:hard\s+|main\s+|primary\s+|root\s+|production\s+|prod\s+|entire\s+|whole\s+)?"
     r"(?:drive|disk|server|machine|system|database|computer|partition|filesystem|volume|"
@@ -417,6 +476,16 @@ DANGEROUS_PATTERNS = [
     r"\b(?:leak|exfiltrate|dump|export|steal)\s+(?:all\s+|the\s+|every\s+)?(?:passwords?|"
     r"credentials|secrets|private\s+keys?|customer\s+(?:data|records)|user\s+(?:data|records)|"
     r"database)\b",
+    # round eight (set 6): every key revoked, a billing or payout contact redirected, an outside address made editor
+    r"\b(?:revoke|invalidate|delete|remove|disable)\s+(?:all|every|each|any)\s+(?:of\s+)?(?:the\s+|our\s+|your\s+)?"
+    r"(?:[\w-]+\s+){0,2}?(?:access\s+keys?|api\s+(?:keys?|credentials?)|credentials?|tokens?|certificates?|ssh\s+keys?|keys)\b",
+    r"\b(?:set|change|update|switch|redirect|point|replace)\s+(?:the\s+|our\s+|their\s+|all\s+)?(?:[\w-]+\s+){0,2}?"
+    r"(?:billing|payment|payout|invoice|invoicing|remittance|bank|beneficiary|reply-to|forwarding)\s+"
+    r"(?:contact|address|email|details|account|info|information|destination|delivery)s?\s+to\s+"
+    r"(?:[\w.+-]+\s*@|https?://|(?:this|that|the\s+(?:new|following|above|other))\s+(?:address|account|email|inbox|mailbox|one))",
+    r"\badd\s+[\w.+-]+@[\w.-]+\s+as\s+(?:an?\s+)?(?:editor|owner|admin|administrator|collaborator|member|manager|co-?owner|"
+    r"contributor|maintainer)\b",
+    r"\b(?:share|grant|give)\s+(?:[\w-]+\s+){0,3}?(?:edit|write|full|owner|admin)\s+access\s+(?:to|with|on)\s+(?:[\w-]+\s+){0,3}?[\w.+-]+@[\w.-]+",
 ]
 DANGEROUS_RE = re.compile("|".join(f"(?:{p})" for p in DANGEROUS_PATTERNS), re.M)
 # a bare shell command: only an order when something around it says so
@@ -463,7 +532,9 @@ def _is_order(clause, previous):
             or AI_ADDRESSED_RE.search(clause) or ML_ORDER_RE.search(clause)):
         return True
     # a bare command right after "run the following on your server:"
-    return bool(previous and previous.rstrip().endswith(":") and ORDER_MARKER_RE.search(previous)
+    # (or after "Shopping assistant guidance:", round eight)
+    return bool(previous and previous.rstrip().endswith(":")
+                and (ORDER_MARKER_RE.search(previous) or AI_ADDRESSED_RE.search(previous))
                 and not WARNING_RE.search(previous) and not _is_question(previous))
 
 
@@ -512,12 +583,17 @@ TOOL_SYNTAX_RE = re.compile(
 )
 SEND_TO_RE = re.compile(
     r"\b(?:send|forward|email|mail|upload|post|share|submit|transmit|exfiltrate|leak|"
-    r"deliver|report|copy|cc|bcc)\b[^.!?\n]{0,100}?\bto\s+"
+    r"deliver|report|copy|cc|bcc|export|push|sync|mirror|dump|move|paste|attach)\b[^.!?\n]{0,100}?\bto\s+"   # export..attach: round eight
     r"(?:https?://\S+|www\.\S+|[\w.+-]+\s*(?:@|\(at\)|\[at\]|<at>|\{at\}|\bat\b)\s*[\w-]+\s*"
     r"(?:\.|\(dot\)|\[dot\]|<dot>|\{dot\}|\bdot\b)\s*\w+|(?:the\s+|this\s+)?(?:following|below|"
-    r"attached|given|above|this|that|my|our)\s+(?:address|url|email|endpoint|webhook|server|link|"
-    r"inbox|number|account)|[\w-]+\.(?:com|net|org|io|xyz|ru|cn|info|co|me|top|site|online|"
-    r"dev|app|ai|cc|tk|link|click)\b)"
+    r"attached|given|above|this|that|my|our|his|her|their|an?)\s+"
+    r"(?:(?:personal|private|own|home|other|new|external|secondary|backup|temporary|temp|throwaway|burner)\s+)?"   # round eight
+    r"(?:address|url|email|endpoint|webhook|server|link|"
+    r"inbox|number|account|mailbox|channel|bucket|drive)|[\w-]+\.(?:com|net|org|io|xyz|ru|cn|info|co|me|top|site|online|"
+    r"dev|app|ai|cc|tk|link|click|example|test|invalid|localhost)\b)|"
+    # round eight: a paste into a chat channel, a reply-all with an attachment
+    r"\b(?:paste|post|put|drop|share|send|publish)\b[^.!?\n]{0,60}?\b(?:in|into|on|to)\s+(?:the\s+)?#[\w-]+|"
+    r"\breply(?:\s+all|-all)?\b[^.!?\n]{0,80}?\b(?:attached|attachment|attach)\b"
 )
 EVASIVE_ADDRESS_RE = re.compile(
     r"\(at\)|\[at\]|<at>|\{at\}|\(dot\)|\[dot\]|<dot>|\{dot\}|\b\w+\s+at\s+\w+\s+dot\s+\w+\b|"
@@ -537,7 +613,11 @@ SECRECY_RE = re.compile(
     r"\bkeep\s+(?:this|it|that)\s+(?:a\s+)?(?:secret|hidden|between\s+us|quiet|to\s+yourself)\b|"
     r"\bthe\s+user\s+(?:must|should|will|won't|does)\s+not\s+(?:know|see|notice|be\s+told|"
     r"be\s+aware|find\s+out)\b|\bnobody\s+(?:will|needs\s+to)\s+(?:know|notice)\b|"
-    r"\bdelete\s+(?:this|the)\s+(?:message|email|instruction|note)\s+(?:after|afterwards|once)\b"
+    r"\bdelete\s+(?:this|the)\s+(?:message|email|instruction|note)\s+(?:after|afterwards|once)\b|"
+    # round eight: "don't bother with a confirmation", "no confirmation needed"
+    r"\b(?:don't|dont|do\s+not|no\s+need\s+to)\s+bother\s+(?:with\s+|about\s+)?(?:a\s+|the\s+|any\s+)?"
+    r"(?:confirmation|confirming|notice|notification|asking|checking|telling|informing|reply|replying)\b|"
+    r"\bno\s+confirmation\s+(?:needed|necessary|required|message|email)\b|\bskip\s+(?:the\s+|any\s+)?confirmation\b"
 )
 # data that belongs to the user or the system; plain words such as "contacts" or "location" do not count
 PRIVATE_DATA_RE = re.compile(
@@ -556,14 +636,21 @@ PRIVATE_DATA_RE = re.compile(
     r"personal\s+\w+|private\s+\w+|names?\s+and\s+\w+|email\s+address(?:es)?|phone\s+numbers?)|"
     r"(?:everything|all\s+(?:the\s+)?(?:emails?|messages?|files|documents|attachments|mail)|"
     r"each\s+message|every\s+(?:message|email|file))\s+(?:in|from)\s+(?:the|this|their|my|your|his|her|"
-    r"other\s+users'?)\s+(?:inbox|mailbox|account|drive|folder|conversation|sessions?|chats?)|"
+    r"other\s+users'?)\s+(?:[\w-]+\s+){0,2}?(?:inbox|mailbox|account|drive|folder|conversation|sessions?|chats?)|"   # "the clients folder": round eight
     r"(?:private|personal|confidential|sensitive|customer|patient|employee|medical|financial|"
-    r"payroll|hr)\s+(?:data|information|details|records|files|documents|info)|pii|"
+    r"payroll|hr)\s+(?:data|information|details|records|files|documents|info|folders?|archives?|emails?|messages?)|pii|"
     r"everything\s+(?:you|the\s+user)\s+(?:know|said|typed|wrote|shared)|system\s+prompt|"
-    r"your\s+(?:instructions|prompt|configuration|system\s+message))\b"
+    r"your\s+(?:instructions|prompt|configuration|system\s+message)|"
+    # round eight: env-style secret names, tax and identity documents, cards, sign-in history, a confidential marking
+    r"(?:api|access|auth|secret|private|deploy|admin|service|master|signing|session|aws|gcp|azure|github|gitlab|slack|"
+    r"stripe|db|database|root|bot|app|client|oauth|refresh|bearer|jwt|ssh|encryption|licen[sc]e)_"
+    r"(?:token|secret|key|password|passwd|pwd|credential|pass)s?|"
+    r"tax\s+returns?|id\s+scans?|passport(?:\s+scans?)?|payslips?|pay\s+stubs?|saved\s+cards?|payment\s+cards?|"
+    r"sign-?in\s+history|login\s+history|marked\s+(?:confidential|internal|restricted|secret))\b"
 )
 _AI = r"(?:ai|assistant|agent|chatbot|bot|llm|copilot|gpt|chatgpt|claude|gemini|siri|alexa|language\s+model)"
 AI_ADDRESSED_RE = re.compile(
+    rf"{ASSISTANT_LEAD}|{FOREIGN_NOTE}|"     # round eight
     rf"\b(?:if\s+you\s+are\s+an?\s+(?:ai|llm|assistant|agent|model|language\s+model|chatbot|bot)|"
     rf"{_AI}s?\s*[,:!\])]|(?:dear|hey|hello|hi|attention|yo)\s+(?:the\s+|any\s+|all\s+)?{_AI}s?\b|"
     rf"(?:note|message|instructions?|reminder|word|request|ps|p\.s\.)\s+(?:to|for)\s+(?:the\s+|any\s+|all\s+)?{_AI}s?\b|"
@@ -575,6 +662,16 @@ AI_ADDRESSED_RE = re.compile(
     r"who\s+reads?|must|should|will|is\s+to|needs?\s+to|has\s+to|shall)\b|"
     r"(?:the|any)\s+model\s+(?:reading|processing|summari[sz]ing|parsing|that\s+reads?|that\s+process(?:es)?)\b|"
     r"(?:your|the)\s+(?:system\s+prompt|function\s+calls?|tool\s+calls?|api\s+access|previous\s+instructions?)\b)"
+)
+
+
+# an order to message everyone the user knows counts on its own: no secrecy or address needed (round five)
+MASS_MESSAGE_RE = re.compile(
+    r"\b(?:message|text|dm|email|e-mail|mail|contact|spam|ping|write\s+to)\s+"
+    r"(?:every\s+(?:single\s+)?(?:one\s+(?:of\s+)?)?|all\s+(?:of\s+)?|each\s+(?:of\s+)?|everyone\s+(?:in|on)\s+|"
+    r"everybody\s+(?:in|on)\s+)(?:the\s+|my\s+|your\s+|their\s+|his\s+|her\s+|our\s+)?(?:[\w-]+\s+){0,2}?"
+    r"(?:contacts?|contact\s+list|address\s+book|friends?|followers?|users?|customers?|clients?|members?|"
+    r"subscribers?|employees?|them)\b"
 )
 
 
@@ -590,6 +687,7 @@ def tool_action_count(views):
     text = views.norm
     hits = [_snip(m.group(0)) for m in TOOL_SYNTAX_RE.finditer(text)]
     hits += _ordered_clauses(text, SEND_TO_RE, _send_evidence)
+    hits += _ordered_clauses(text, MASS_MESSAGE_RE)
     return len(hits), hits
 
 
@@ -720,10 +818,14 @@ _ML = {
                     r"मत\s+मान\w*|न\s+मान\w*|रद्द|हटा\w*|बंद\s+कर\w*|तोड़\w*|मत\s+फॉलो)",
         "rules": r"(?:निर्देश\w*|नियम\w*|सिस्टम\s*प्रॉम्प्ट|सिस्टम\s*संदेश|प्रॉम्प्ट|अनुदेश\w*|आदेश\w*|दिशानिर्देश\w*|"
                  r"प्रतिबंध\w*|सीमा\w*|सेटिंग\w*|प्रोग्रामिंग|हिदायत\w*|फ़िल्टर|फिल्टर)",
-        "reveal": r"(?:दिखा\w*|बता\w*|प्रकट|प्रिंट|दोहरा\w*|लिख\w*|उजागर|खोल\w*|साझा\s+कर\w*|सुना\w*|छाप\w*|कॉपी)",
+        "reveal": r"(?:दिखा\w*|बता\w*|प्रकट|प्रिंट|दोहरा\w*|लिख\w*|उजागर|खोल\w*|साझा\s+कर\w*|सुना\w*|छाप\w*|कॉपी|"
+                  r"चिपका\w*|पेस्ट|भेज\w*)",     # paste / send: round eight
         "prompt": r"(?:सिस्टम\s*प्रॉम्प्ट|सिस्टम\s*संदेश|सिस्टम\s*निर्देश|(?:अपने|अपनी|अपना|तुम्हारे|तुम्हारी|आपके|आपकी)\s+"
                   r"(?:\S+\s+)?(?:निर्देश\w*|नियम\w*|प्रॉम्प्ट|सेटिंग\w*|अनुदेश\w*|प्रोग्रामिंग|कॉन्फ़िगरेशन)|"
-                  r"(?:छिपे|छुपे|गुप्त|मूल|प्रारंभिक|आंतरिक)\s+(?:निर्देश\w*|नियम\w*|प्रॉम्प्ट))",
+                  r"(?:छिपे|छुपे|गुप्त|मूल|प्रारंभिक|आंतरिक)\s+(?:निर्देश\w*|नियम\w*|प्रॉम्प्ट)|"
+                  # round eight: "the text you were given at the start of this conversation"
+                  r"(?:बातचीत|चैट|वार्तालाप)\s+की\s+शुरुआत\s+में\s+(?:दिया|दिए|मिला|मिले)|"
+                  r"(?:आपको|तुम्हें|तुमको)\s+(?:\S+\s+){0,6}?(?:दिया|दिए)\s+(?:गया|गए))",
     },
     "ja": {
         "override": r"(?:無視|忘れ|従わな|従うな|無効|破棄|解除|取り消|上書き|回避|バイパス|オフに|停止|守らな|捨て)",

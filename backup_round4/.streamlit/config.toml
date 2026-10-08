@@ -1,0 +1,31 @@
+# Theme for dashboard.py: Grafana-like dark palette, Streamlit's bundled sans-serif, no external fonts.
+
+[server]
+enableStaticServing = false
+# The source watcher walks every imported module and trips over transformers' lazy image
+# processors (tracebacks about torchvision at startup). Off: restart the command after editing.
+fileWatcherType = "none"
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "dark"
+primaryColor = "#5794F2"
+backgroundColor = "#111217"
+secondaryBackgroundColor = "#181b1f"
+textColor = "#d8d9da"
+linkColor = "#5794F2"
+codeBackgroundColor = "#0f1014"
+font = "sans serif"
+baseFontSize = 15
+baseRadius = "6px"
+buttonRadius = "4px"
+borderColor = "#2c3235"
+dataframeBorderColor = "#2c3235"
+showWidgetBorder = true
+showSidebarBorder = true
+
+[theme.sidebar]
+backgroundColor = "#0f1014"
+secondaryBackgroundColor = "#181b1f"

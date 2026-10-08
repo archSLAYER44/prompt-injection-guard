@@ -1,0 +1,16 @@
+embedding with MiniLM-L12 (current)
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 10644.76it/s]
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 13239.22it/s]
+               model  dims  unseen payloads  unseen source  handwritten_dev  official_dev  deepset (unseen payloads)  jackhhao (unseen payloads)
+MiniLM-L12 (current)   384            0.973          0.812            0.947         0.995                      0.835                       0.912
+embedding with e5-small
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 18388.37it/s]
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 15149.86it/s]
+               model  dims  unseen payloads  unseen source  handwritten_dev  official_dev  deepset (unseen payloads)  jackhhao (unseen payloads)
+MiniLM-L12 (current)   384            0.973          0.812            0.947         0.995                      0.835                       0.912
+            e5-small   384            0.974          0.751            0.967         0.985                      0.837                       0.952
+embedding with mpnet-base
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 13675.88it/s]
+/usr/lib/python3.14/multiprocessing/resource_tracker.py:475: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/loky-29947-llwh9rnp'}
+  warnings.warn(

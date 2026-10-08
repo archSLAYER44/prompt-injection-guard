@@ -1,0 +1,25 @@
+  warning: data/drafted_train7.csv not found, skipped
+training pool, class balance by language:
+          benign  injection  rows  injection_share skewed
+language                                                 
+en          3841       2981  6822            0.437       
+(none)      2423       2416  4839            0.499       
+fr           126        148   274            0.540       
+es           120        140   260            0.538       
+it           120        131   251            0.522       
+de           110        134   244            0.549       
+pt           113        130   243            0.535       
+ar            16         16    32            0.500       
+ja            16         16    32            0.500       
+hi            16         16    32            0.500       
+nl            16         16    32            0.500       
+ru            16         16    32            0.500       
+tr            16         16    32            0.500       
+zh            16         16    32            0.500       
+25435 texts -> 120928 units (82568 distinct)
+training pieces dropped for matching a held-out piece: 1953 (jackhhao: 607, gandalf: 421, llmail: 401, wild: 269, contrast: 148, aya: 43, deepset: 31, dolly: 27, gsum: 6)
+grouped folds: 5; fitting one model per fold ...
+wrote /home/guts/Documents/Mlproject/report/score_distribution.json in 526s
+  source: out-of-fold scores of the training data: grouped folds, emb+rules20, linear SVC C=0.3, rule weight 1.0; one score per original text, from a fold model that did not see it
+  benign 6965, injection 6192; score scale -4.8096 to 13.0112, threshold 0.5472
+  at the threshold: 3.32% of benign scores are above it (false alarms), 9.95% of injection scores are below it (misses)

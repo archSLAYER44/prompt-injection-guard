@@ -1,0 +1,55 @@
+
+=== building r8_rules ===
+  grid pinned to C = 0.3, rule weight 1.0
+  data: the live new_train.csv / new_test.csv (live)
+  applying round_eight_rules.diff
+      patching file src/rules.py
+  applying round_eight_check_rules.diff
+      patching file scripts/check_rules.py
+
+=== checking r8_rules ===
+  [OK ] tree exists: /home/guts/Documents/Mlproject/rounds/round8/r8_rules
+  [OK ] data/cache symlink resolves to the live folder: ../../../../data/cache
+  [OK ] data/raw symlink resolves to the live folder: ../../../../data/raw
+  [OK ] live pickle and candidates absent in the tree
+  [OK ] report/ holds no run output yet: empty
+  [OK ] imports and pinned grid: [{"svc__kernel": "linear", "svc__C": 0.3, "features__rules__weight__weight": 1.0}]
+  [OK ] rules.py matches the spec: 20 lines with 'round eight'
+  [OK ] check_rules.py matches the spec
+  [OK ] new_train.csv / new_test.csv equal Mlproject's
+  [OK ] file-level diff against the live tree is exactly the intended set: scripts/check_rules.py, src/rules.py, src/train.py
+  [OK ] load_pool() rows (18 s): 13157 rows, expected about 13157
+        source
+        aya           769
+        contrast     2297
+        deepset       539
+        dolly         769
+        gandalf       887
+        gsum          126
+        jackhhao     1500
+        llmail        459
+        mirzaakhi    4209
+        wild          789
+        yanis         813
+  [OK ] scripts/check_rules.py full (342 s)
+        WARNING old rule second_person_command_ratio fires on 5.51% of extra_train benign
+        WARNING old rule payload_split_count fires on 3.27% of wild_regular
+        
+        coverage on contrast attacks with the rule's cue
+          dangerous_action_count: 154/154 (100%)
+          tool_action_count: 69/90 (77%)
+          multilingual_override_count: 102/216 (47%)
+          task_pivot_count: 106/180 (59%)
+  [OK ] git status shows no rounds/ entry
+
+=== smoke run in r8_rules (log: /home/guts/Documents/Mlproject/rounds/round8/r8_rules/report/smoke_log.txt) ===
+  [OK ] rc=0, 2 candidates saved, 164 s
+                      official recall   0.900   0.786  NO
+                   official precision   0.950   1.000 yes
+                  hand-written recall   0.850   0.818  NO
+        hand-written false alarm rate   0.071   0.000 yes
+        STANDARDS NOT MET
+        saved metrics to /tmp/detector_smoke/report/metrics.json
+
+ALL CHECKS PASSED
+setup rc=0

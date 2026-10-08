@@ -1,0 +1,17 @@
+{
+  "tree": "r8_rules",
+  "pickle_sha1": "9a6ca3abfe9f",
+  "rules_sha1": "227942430732",
+  "tests_scored_at": "2026-10-08 03:15:33 +0530",
+  "test_sets": [
+    "bipia",
+    "deepset",
+    "external",
+    "external_new",
+    "gandalf",
+    "injecagent",
+    "jackhhao",
+    "oasst1",
+    "official"
+  ]
+}

@@ -19,6 +19,29 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
   all 8 CPU cores. Ask before starting one if the user may be away or asleep. The laptop must be on AC
   power (a run drained the battery on 2026-10-01); see the machine notes below.
 - Always use `.venv/bin/python`. The GUI needs Tk (`sudo pacman -S tk`).
+- **Set 6 was scored once on 2026-10-05** (round seven's promoted model): recall 36.7%, false alarms 16.7%, both
+  standards missed. It is `data/agent_drafted_test6.csv` and development data now (`report/set6_scored.csv`; in the
+  gate's RECENT group since round eight). **There is no unread sentence set.** The next honest sentence-set number
+  needs a set 7 (same recipe: agents, chunks of six, no repo access, user review, sealed until a promotion).
+- **Gate since round seven:** `TOLERANCE = 0` and the probe clause non-strict (`src/gate.py` GROUPS): a candidate passes
+  when no count on POOLED, RECENT or probe_dev is worse than the champion's. **Since round eight (2026-10-08) the champion
+  is round seven** (`backup_round7/`, `BACKUP` in `src/gate.py`; `BAR_BY_ROUND` in `scripts/gate_round6.py`) and RECENT
+  is sets 4, 5 and 6. Round six (`report/round_six_results.md`)
+  used the strict probe clause and rejected the same rule-fixes candidate by 24 = 24; the clause was changed after
+  round six and before round seven's run, and the write-up must say so.
+- **Round eight (2026-10-08, 01:10 to 03:30) promoted the rule-patterns model.** Live model = round four's six-source
+  data, round seven's rules plus `report/round_eight_rules.diff` (the assistant addressed in passing, send / destructive
+  orders in the set-6 wording, output manipulation, pt/es/it/fr/de notes, Hindi), grid pinned C = 0.3 / weight 1.0,
+  threshold 0.546, pickle sha1 9a6ca3abfe9f. Gate against round seven: nothing worse; set 6 misses 19 -> 4, probe 24 -> 19,
+  false alarms identical. Test sets scored once: official 98.6% / 99.8% (identical), external 79.9% / 97.3% (85% recall
+  standard still missed), oasst1 6 false alarms, BIPIA 12.3% (two attacks lost). Record `report/round_eight_results.md`.
+  Round seven is frozen in `backup_round7/`. **Not committed yet (the user commits).**
+- **Round seven (2026-10-05) promoted the rule-fixes model.** Live model = round four's six-source data and 20 rules with
+  the two rule fixes (`DELETE FROM` / truncate / purge, mass messaging), threshold 0.547, pickle sha1 73b0883558c6.
+  Record `report/round_seven_results.md`. **Follow-up done 2026-10-06 (01:20 to 01:35):** out-of-fold score distribution
+  rebuilt for round seven (`report/score_distribution.json` + `_oof.csv`, 526 s, log `report/round7/export_score_distribution.log`),
+  charts (`rule_firing_rates.png` is the only one that changed), notebook rebuilt and executed (no errors), `report/writeup.md`
+  updated to round seven, dashboard AppTest passed (`report/round7/dashboard_apptest.txt`). **Not committed yet (the user commits).**
 - This laptop has no Ollama (checked 2026-10-03). The working chat model for the dashboard is the in-process
   option of `llm_client.py` (about 12 s to load, 1 to 6 s per reply on the CPU). The model is FROZEN while the
   dashboard is built: no retraining, no new rules, no change to the scoring code.
@@ -44,10 +67,24 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
 | `scripts/make_charts.py` | Regenerates the four charts the write-up embeds, from `report/metrics.json` |
 | `scripts/oof_floor_check.py` | Threshold per precision floor, from out-of-fold scores on the grouped folds |
 | `backup_round3/` | Frozen, runnable copy of round three (code, model, reports) |
-| `dashboard.py` | Streamlit demo (2026-10-04): tabs Live pipeline (composer, compact score-distribution panel, conversation, 9-stage inspector), Monitoring (hero panel on out-of-fold training scores, stat tiles, score per request, rules fired, allowed vs blocked donut, recent requests), History, About. Plotly charts, Grafana palette. Stub model built in; real models through `llm_client.py`; `Load demo data` runs the four presets |
+| `backup_round4/` | Frozen, runnable copy of round four (code, model, reports, the six-source data files); the gate's champion in rounds five to seven |
+| `backup_round7/` | Frozen, runnable copy of round seven (code, data, reports, pickle 73b0883558c6); the gate's champion since round eight |
+| `report/round_eight_results.md`, `report/round_eight_rules.diff`, `report/round_eight_check_rules.diff`, `report/round8/` | Round eight: the rules fixed before the run, the patterns per set-6 form, self-check rates before and after, the gate, the promotion, the test scores; the two diffs the run tree was built from; logs, metrics, self-checks |
+| `scripts/score_set.py`, `scripts/merge_set.py` | Score a held-out set once through `predict()` (refuses to re-score); merge agent-drafted chunks and check them |
+| `report/round_five_results.md`, `report/round_five_rules.diff` | The round-five record (frozen rules, data, gate FAIL, diagnosis) and the two rule fixes kept for round six |
+| `dashboard.py` | Streamlit demo (2026-10-04, extended 2026-10-08): tabs Live pipeline (composer with six presets, compact score-distribution panel, conversation, 9-stage inspector), Monitoring (source "This session" or "All sessions (live)": the shared log re-read every 3 s by a `st.fragment`; hero panel on out-of-fold training scores, stat tiles, score per request, rules fired, allowed vs blocked donut, recent requests with surface and session), Results (standards, held-out test table, the round-eight gate table, official test by category, all read from `report/metrics.json` and `report/round8_gate.json`), History, About. Plotly charts, Grafana palette. Stub model built in; real models through `llm_client.py` |
 | `.streamlit/config.toml` | Dashboard theme (Grafana-like dark palette, Streamlit's bundled font, no external fonts); the source watcher is off because it trips over transformers' lazy modules |
 | `scripts/export_score_distribution.py` | Out-of-fold scores of the training data (grouped folds, 5 fold fits, about 7 minutes) to `report/score_distribution.json` + `report/score_distribution_oof.csv`; `--from-csv` reuses a saved OOF file, `--official-test` is the labelled fallback |
+| `guard_core.py` | One chat request through the guard (2026-10-08): `handle_request(message, document, settings)` scans, decides, calls the model, returns a plain dict; `history_row()` flattens it. No Streamlit in it; shared by `dashboard.py` and `chat_app.py` |
+| `guard_log.py` | The shared decision log, `logs/guard_log.jsonl` (git-ignored; `GUARD_LOG_PATH` overrides): `append`, `read`, `clear`, `summary`. Both pages write it; the dashboard's live monitor reads it |
+| `chat_app.py` | The production chat page (2026-10-08): an end user talks to the assistant with the guard in front, no inspector; every request appended to the shared log. `streamlit run chat_app.py --server.port 8502` |
 | `llm_client.py` | Dashboard chat client (2026-10-03): `chat(provider, base_url, model, api_key, messages)` over ten providers: in-process transformers model (Qwen2.5-0.5B-Instruct, no server, no key), Ollama, OpenAI-compatible servers, OpenAI, Anthropic (official SDK), Gemini, Groq, OpenRouter, Mistral, DeepSeek. Keys only in request headers, never stored |
+| `scripts/round6_setup.py` | `--round N`: builds `rounds/roundN/<tree>` as copies of the working tree per the round's tree specs (grid pinned to C=0.3 / weight 1.0, data variant or `"live"`, a rules diff pair or `None` for an unpatched dev copy, extra training files), symlinked cache, and checks them; `--smoke TREE` |
+| `scripts/round6_overnight.sh` | `ROUND=N`: runs the round's trees in sequence under `systemd-inhibit` (refuses without AC power), then the gate. Launch line in its header |
+| `scripts/gate_round6.py` | `--round N`: report-only gate across the trees: each candidate scored by a subprocess in its own tree; `passes()` from `src/gate.py`; six source dev splits report-only; tie-break; writes `report/roundN_gate.{txt,json}`. `--self-check`; `--promote TREE/CANDIDATE` is the only writing mode (pickle, rules, check sentences, `new_train.csv`, drafted files, metrics, log) |
+| `scripts/score_tests.py` | `--round N --tree T [--ablation]`: scores the held-out test sets once for the promoted pickle exactly as `--final` would; refuses a second run |
+| `scripts/merge_drafted.py`, `scripts/check_set6_overlap.py` | Round seven: merge and check agent-drafted training chunks (columns, labels, lengths, languages, override words, duplicates, near copies of any `data/*.csv`); check a held-out set for copies of training or drafted rows before scoring it |
+| `rounds/round6/`, `rounds/round7/`, `rounds/round8/` | Git-ignored run trees, logs and candidates; `report/round_six_results.md`, `report/round_seven_results.md` and `report/round_eight_results.md` are the records; `report/round7/briefs.md` the drafting briefs; `rounds/round8/_dev` the unpatched copy the round-eight diff was developed in |
 
 ## Commands
 
@@ -57,11 +94,42 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
 .venv/bin/python -m src.dataset          # balance and duplicate report
 .venv/bin/python -m src.train            # development numbers only
 .venv/bin/python -m src.train --final    # also scores the held-out test sets (~65 min warm)
-.venv/bin/streamlit run dashboard.py     # the guard demo (model frozen; needs streamlit)
+.venv/bin/streamlit run dashboard.py     # the guard demo: test page, live monitor, results (needs streamlit)
+.venv/bin/streamlit run chat_app.py --server.port 8502   # the production chat page; its calls appear on the dashboard's live monitor
 .venv/bin/python llm_client.py --provider "Local (in-process)" "hi"   # chat client test
 ```
 
-## Status: round four is complete and committed (48b97d7, 2026-10-01 19:09)
+## Status: round eight promoted on 2026-10-08 (uncommitted); round four was the last committed model (48b97d7)
+
+**Round eight (2026-10-08 01:10 to 03:30).** One tree, `rounds/round8/r8_rules`: the live round-seven tree plus
+`report/round_eight_rules.diff` (13 hunks; developed in `rounds/round8/_dev`, checked with the rule self-check: every
+example passes, firing rates on harmless corpora unchanged except +1 and +4 in-the-wild prompts of 1,500), six-source
+data, grid pinned. Gate against round seven (frozen as `backup_round7/`, set 6 in RECENT, rule and floor unchanged, all
+written down before the run): r8_rules/emb+rules20 PASS, POOLED 7/7 (=), RECENT 11/18 (11/34), probe 12/19 (12/24),
+one yanis_dev miss more (report only); emb+rules16 fails. Promoted 02:58; tests scored once 03:10 to 03:17 (table in
+`report/round_eight_results.md`); ablation, charts, score distribution, write-up and notebook rebuilt afterwards. Two
+set-6 attacks round seven caught by a hair (0.55, 0.57) are missed by a hair (0.53, 0.52); the five set-6 false alarms
+are the same texts. **Round-nine questions:** a set 7 (nothing unread exists); the persona false alarms (3 of 6 on set 6,
+untouched since set 5); BIPIA's two lost attacks; whether the threshold should be read off a false-alarm budget.
+Launch note: the overnight driver's "already running" check (`pgrep -f src.train|gate_round6|score_tests`) matches the
+launching shell's own command line if that line mentions those names, so launch it from a command that does not.
+
+**Round seven (2026-10-05 01:30 to 03:35).** Round four's six-source data + the two rule fixes (+ a second candidate
+with 312 agent-drafted training rows, which lost the tie-break by one false alarm and did not help set 6 either). Gate
+"not worse than round four on any group", TOLERANCE 0, probe clause non-strict: r1_rules/emb+rules20 PASS with POOLED
+7/7 (= round four), RECENT 6/15 (round four 7/20), probe 12/24 (=); one llmail_dev miss more (report only). Promoted;
+test sets scored once: official 98.6% recall / 99.8% precision, external 79.6% / 96.9% (85% recall standard still
+missed), oasst1 7 false alarms in 289, injecagent 33.3% recall, bipia 13.6% recall; set 6 36.7% recall / 16.7% false
+alarms (both missed). Records: `report/round_seven_results.md`, `report/round7_gate.{txt,json}`, `report/round7/`,
+`report/round7_tests.txt`. Data: `data/new_train.csv` is six-source again, the nine-source file is
+`data/new_train_round5.csv` (loaded by nothing), `data/new_test.csv` keeps nine sources (three are test sets),
+`data/agent_drafted_test6.csv` = set 6. The drafted rows (`rounds/round7/drafted_train7.csv`, git-ignored) are not
+training data; `src/dataset.py` would read them from `data/drafted_train7.csv`. `backup_round4/` stays the gate's
+champion until the user decides to snapshot round seven as `backup_round7/`. Round-eight questions: a set 7; whether
+the drafted rows help with a different threshold rule (their twins raised the floor 0.547 -> 0.574); the persona false
+alarms (3 of 6 on set 6) and the tool-output insertions (2 of 6) that no rule reaches.
+
+### Round four (the previous promoted model, 2026-10-01)
 
 Model in `src/models/injection_model.pkl`: embedding + 20 rules, linear SVC, C = 0.3, rule weight 1.0,
 bounded rule scaling, threshold 0.548 (96% precision floor), 36,312 training pieces. Promoted by the
@@ -93,6 +161,31 @@ ten agents in chunks of six with no access to the repo, reviewed by the user (no
 `data/agent_drafted_test5.csv`, `report/set5_scored.csv`; write-up updated. Its mistakes have been read:
 **set 5 is development data; a round-five run needs a new held-out set.** It is not yet in the HELD_OUT
 list of `scripts/check_rules.py` or the dedup lists of `scripts/download_new_sources.py`.
+
+**Round five (2026-10-04): attempted, rejected by the gate; round four stays.** Three sources added to
+`data/new_train.csv` / `new_test.csv` (oasst1, InjecAgent, BIPIA; six round-four sources byte-identical), two rule
+fixes, gate against round four in `backup_round4/` with sets 4 and 5 as a second binding group. The 20-rule
+candidate (C=1, rule weight 2.0, threshold 0.852 from the 96% floor) matched round four on POOLED (6/8 vs 7/7),
+beat it on RECENT (7/14 vs 7/20: set 5 misses 13 -> 8) and lost on probe_dev (13/27 vs 12/24) at every
+threshold, so no candidate passed; the test sets were not scored and set 6 stays unscored. The live model, code
+and `report/metrics.json` are round four's again (`src/rules.py` restored; the rule fixes live in
+`report/round_five_rules.diff`). **`data/new_train.csv` now holds nine sources; the round-four model was trained
+on the six-source files in `backup_round4/data/`, so a `--final` run today trains on round-five data.** Record:
+`report/round_five_results.md`, log `report/train_log_round5_fail.txt`, metrics `report/metrics_round5_fail.json`,
+candidates in `src/models/candidates/` (git-ignored). Run time 2 h 9 min.
+
+**Round six (2026-10-04 23:05 to 2026-10-05 00:58, 1 h 53 min): three single-change runs, no candidate passed,
+round four stays.** Record `report/round_six_results.md`; gate `report/round_six_gate.{txt,json}`; per-run logs and
+metrics in `report/round_six/`. Three trees in `rounds/round6/` (git-ignored), one change each, grid pinned to
+round four's C = 0.3 / weight 1.0, gated once against round four with `TOLERANCE = 0` (user's rule: nothing worse,
+gains optional), six source dev splits report-only. r1_rules (rule fixes, six-source data): POOLED 7/7 = champion,
+RECENT 6/15 vs 7/20, probe 12/24 = champion, one llmail_dev miss more; failed only because probe misses were not
+strictly lower. r2_data / r3_rules_data (nine-source data): threshold 0.72 at the 96% floor, official_dev misses
+1 -> 48, fail at every threshold. So the rule fixes are safe, the benign oasst1 data raises the floor, and round
+five's grid move was compensating for that. Nothing in the live tree changed (pickle sha1 7165962019c3 = backup).
+Round-seven questions, decided before any run: whether the probe clause becomes "not worse" like the other groups
+(then r1_rules reruns in 25 min and is gated again, and the write-up says the rule changed after round six), and a
+threshold rule that benign prompts cannot raise. Set 6 stays unscored.
 
 **Dashboard (2026-10-03, model frozen).** `explain(text)` added to `src/predict.py` (predict() unchanged,
 proved on 20 texts), `llm_client.py` (ten providers), `dashboard.py` (Streamlit, dark SOC-style theme, chat
@@ -135,9 +228,9 @@ separately. The nine `src/__pycache__/*.pyc` files that slipped into history wer
 
 **How to test.** Every held-out set has been read, so only new text is an honest test.
 
-1. Set 5 is written and scored (2026-10-03) and is development data now. Write set 6 before touching
-   any code, with the same recipe: about 60 rows, half benign, drafted in chunks of six by agents that
-   cannot read the repo, reviewed by hand, kept out of the repo until scored once.
+1. Set 6 exists, reviewed by the user, UNSCORED (`/home/guts/Documents/set6_review/set6_draft.csv`). It is the
+   held-out set for the next promotion; if the project ends first, score it once on round four with
+   `scripts/score_set.py` and put the number in the write-up.
 2. Probe with the CLI (`cli.py check-text`, `--file` for documents) using real emails and documents,
    and paraphrase a known attack until one passes: that shows how much wording it takes.
 3. For data-set numbers, draw a second sample from `data/raw/new/`, deduplicated against every
@@ -159,9 +252,12 @@ separately. The nine `src/__pycache__/*.pyc` files that slipped into history wer
 5. External recall 79.6% against 85%: intent-only deepset attacks. Accept and document, or redefine
    the standard.
 
-**Process rule for round five.** Fix the gate rule and the precision floor before the run and do not
-change them after. New held-out sets are required: set 4 and the new-source test splits are
-development data now.
+**Process rule for round six.** Fix the gate rule and the precision floor before the run and do not
+change them after (round five did this and the gate rejected the candidate; the rules stayed). Round-six
+questions, in order: whether the probe-set loss comes from the new data, the rule fixes or the grid's
+choice of C=1 / rule weight 2.0 (one run per change, each gated); whether oasst1's 1,500 benign prompts
+should shrink; and whether the floor should be stated as a false-alarm budget per development set
+instead of OOF precision, decided before the run.
 
 **Stopping point.** Items 1 and 3 are an afternoon; 2 and 4 are a full round. If a deadline is near:
 commit, score set 5 once into the write-up, and leave the rest as future work.
@@ -184,6 +280,12 @@ commit, score set 5 once into the write-up, and leave the rest as future work.
   my contacts" order).
 - The rule self-check (`scripts/check_rules.py`) warns that several old rules fire on 9 to 35% of
   in-the-wild benign prompts, `second_person_command_ratio` most of all.
-- Set 5 (agent-drafted, scored once after the round): recall 56.7%, false alarms 13.3%. Attacks with no
+- Set 5 (agent-drafted, scored once after round four): recall 56.7%, false alarms 13.3%. Attacks with no
   override word in Turkish, Arabic and Chinese, hidden instructions in a policy clause, a README and an
   invoice, and a `DELETE FROM` order were all missed; three of six benign persona requests were flagged.
+- Set 6 (agent-drafted, scored once on round seven, 2026-10-05): recall 36.7%, false alarms 16.7%. Orders inside JSON
+  tool results, calendar entries, articles, tables and email threads scored well below zero with no rule firing;
+  destructive routines phrased as housekeeping and send orders dressed as sync tests or forwarding requests were missed;
+  three of six persona requests are flagged. 312 drafted training rows aimed at these categories did not move them.
+  Round eight's rule patterns do (set 6 as development data: 4 misses, same 5 false alarms), but that is the fix measured
+  on its own target: nothing unread has been scored on the round-eight model, and the persona false alarms are untouched.

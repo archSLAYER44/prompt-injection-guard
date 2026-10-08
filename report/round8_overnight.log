@@ -1,0 +1,5 @@
+[2026-10-08T02:32:57+05:30] round 8: r8_rules (python Python 3.14.7, 8 cores)
+[2026-10-08T02:32:57+05:30] r8_rules start
+[2026-10-08T02:53:43+05:30] r8_rules done rc=0 in 1246 s (20 min)
+[2026-10-08T02:53:43+05:30] gate start
+[2026-10-08T02:55:28+05:30] gate done rc=0; decision: DECISION: promote r8_rules/emb+rules20

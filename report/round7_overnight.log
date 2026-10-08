@@ -1,0 +1,7 @@
+[2026-10-05T02:20:30+05:30] round 7: r1_rules r7_rules_drafted (python Python 3.14.7, 8 cores)
+[2026-10-05T02:20:30+05:30] r1_rules start
+[2026-10-05T02:43:44+05:30] r1_rules done rc=0 in 1394 s (23 min)
+[2026-10-05T02:43:44+05:30] r7_rules_drafted start
+[2026-10-05T03:11:50+05:30] r7_rules_drafted done rc=0 in 1686 s (28 min)
+[2026-10-05T03:11:50+05:30] gate start
+[2026-10-05T03:15:24+05:30] gate done rc=0; decision: DECISION: promote r1_rules/emb+rules20

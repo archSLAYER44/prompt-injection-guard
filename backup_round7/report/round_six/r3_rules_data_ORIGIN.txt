@@ -1,0 +1,13 @@
+tree r3_rules_data
+created 2026-10-04 22:40:30 +0530
+copied from the live working tree at HEAD 55d97269db22a52d25b9dc1903f67bc45fcd448d (26 uncommitted entries in git status)
+changes relative to the live tree:
+  - grid pinned: SVC_GRID C in (0.3,), RULE_WEIGHTS (1.0,)
+  - data: nine-source files (live data/)
+  - rules: round four + report/round_five_rules.diff (+ check_rules sentences)
+md5 (tree / live):
+  src/train.py: aec834cba2eeb909c119d06d6233958e / 486cacb7aed017bbb5627521778c193e
+  src/rules.py: 3b1368bd513098777901e7b2c5d45c65 / d4fee1eb7853f1c0a007400f0d1d1ef2
+  scripts/check_rules.py: b0de4bb0cb1d441b58557e399e61de29 / cdb66848634f160fc712bf9ca52bfb63
+  data/new_train.csv: baf6a2e5df0a77a697e05a8323339245 / baf6a2e5df0a77a697e05a8323339245
+  data/new_test.csv: 5da0501bff29ccb1759976a4f0013537 / 5da0501bff29ccb1759976a4f0013537

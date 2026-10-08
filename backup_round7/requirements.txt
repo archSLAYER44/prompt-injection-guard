@@ -1,0 +1,16 @@
+# Install CPU-only torch first:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch
+scikit-learn
+pandas
+pyarrow
+sentence-transformers
+joblib
+jupyter
+matplotlib
+
+# dashboard (optional): the Anthropic option of llm_client.py; the in-process local model
+# needs only torch and transformers, which sentence-transformers already brings
+anthropic
+streamlit
+plotly

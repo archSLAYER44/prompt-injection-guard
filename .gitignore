@@ -11,3 +11,12 @@ report/train_log.txt
 data/cache/
 src/models/candidates/
 data/raw/
+
+# round-six run trees (scripts/round6_setup.py); each is a copy of the working tree
+rounds/
+
+# runtime guard log written by chat_app.py and dashboard.py
+logs/
+
+# the champion copies build their own embedding cache when the gate scores them; never commit it
+backup_round*/data/cache/

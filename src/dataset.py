@@ -22,16 +22,22 @@ EXTRA_TEST_CSV = DATA / "extra_test.csv"
 CONTRAST_CSV = DATA / "contrast_train.csv"            # written by scripts/make_contrast_set.py
 NEW_TRAIN_CSV = DATA / "new_train.csv"                # written by scripts/download_new_sources.py
 NEW_TEST_CSV = DATA / "new_test.csv"
+DRAFTED_TRAIN_CSV = DATA / "drafted_train7.csv"    # round seven: agent-drafted attacks with harmless twins (training only)
 HANDWRITTEN_DEV_CSVS = [DATA / "handwritten_dev.csv", DATA / "handwritten_dev2.csv"]
 HANDWRITTEN_DEV3_CSV = DATA / "handwritten_dev3.csv"  # the round-three final set, now development data
 PROBE_DEV_CSV = DATA / "probe_dev.csv"                # written independently of the rules
-HANDWRITTEN_CSV = DATA / "handwritten_test4.csv"      # the round-four final hand-written set
+HANDWRITTEN_CSV = None                                # round five: set 6 is scored after promotion by scripts/score_set.py
+HANDWRITTEN_DEV4_CSV = DATA / "handwritten_test4.csv"      # the round-four final set, development data since 2026-10-01
+AGENT_DRAFTED_DEV5_CSV = DATA / "agent_drafted_test5.csv"  # scored once on 2026-10-03, development data since
+AGENT_DRAFTED_DEV6_CSV = DATA / "agent_drafted_test6.csv"  # set 6: scored once on round seven (2026-10-05), development data since
+ROUND4_NEW_SOURCES = {"wild", "llmail", "gsum", "yanis", "aya", "dolly"}   # their test splits are development data since round five
 OFFICIAL_DEV_SHARE = 0.4
 COLUMNS = ["text", "label", "category", "technique", "language", "source"]
 
 # sources that share a style are held out together, so a fold cannot lean on a sibling source
 FAMILIES = {"jackhhao": "jailbreak", "wild": "jailbreak", "gandalf": "gandalf", "gsum": "gandalf",
-            "yanis": "multilingual", "aya": "multilingual"}
+            "yanis": "multilingual", "aya": "multilingual",
+            "injecagent": "indirect", "bipia": "indirect"}   # oasst1 is its own family
 
 # the sources name languages two ways; everything is mapped to one code so tables and caps line up
 LANGUAGE_CODES = {
@@ -45,7 +51,7 @@ LANGUAGE_CODES = {
 }
 # a benign-only source teaches "this language -> benign"; per language it is capped at the
 # number of injection rows in that language, so no language is known from one side only
-CAPPED_BENIGN_SOURCES = {"aya"}
+CAPPED_BENIGN_SOURCES = {"aya", "oasst1"}
 MIN_CAPPED_ROWS = 5
 
 NEAR_DUP_THRESHOLD = 0.90   # cosine similarity on char n-gram TF-IDF
@@ -125,6 +131,20 @@ def load_dev_sets():
     probe = load_optional(PROBE_DEV_CSV)
     if probe is not None:
         sets["probe_dev"] = probe.assign(source="probe")
+    dev4 = load_optional(HANDWRITTEN_DEV4_CSV)
+    if dev4 is not None:
+        sets["handwritten_dev4"] = dev4.assign(source="handwritten")
+    dev5 = load_optional(AGENT_DRAFTED_DEV5_CSV)
+    if dev5 is not None:
+        sets["agent_drafted_dev5"] = dev5.assign(source="agent_drafted")
+    dev6 = load_optional(AGENT_DRAFTED_DEV6_CSV)
+    if dev6 is not None:
+        sets["agent_drafted_dev6"] = dev6.assign(source="agent_drafted")
+    new = load_optional(NEW_TEST_CSV)
+    if new is not None:                       # the round-four source splits: reported, never gating
+        for source, part in new.groupby("source"):
+            if source in ROUND4_NEW_SOURCES:
+                sets[f"{source}_dev"] = part.reset_index(drop=True)
     return sets
 
 
@@ -136,8 +156,10 @@ def load_tests():
         frame = load_optional(path)
         if frame is not None:
             for source, part in frame.groupby("source"):
+                if path == NEW_TEST_CSV and source in ROUND4_NEW_SOURCES:
+                    continue                  # development data since round five, see load_dev_sets()
                 tests[source] = part.reset_index(drop=True)
-    written = load_optional(HANDWRITTEN_CSV)
+    written = load_optional(HANDWRITTEN_CSV) if HANDWRITTEN_CSV is not None else None
     if written is not None:
         tests["handwritten"] = written.assign(source="handwritten")
     return tests
@@ -150,7 +172,7 @@ def held_out_sets():
 def load_pool():
     """All training rows from every source, minus duplicates and anything held out."""
     parts = [load_train(), load(EXTRA_TRAIN_CSV)]
-    for path in (CONTRAST_CSV, NEW_TRAIN_CSV):
+    for path in (CONTRAST_CSV, NEW_TRAIN_CSV, DRAFTED_TRAIN_CSV):
         frame = load_optional(path)
         if frame is not None:
             parts.append(frame)

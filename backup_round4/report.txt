@@ -1,0 +1,199 @@
+PROGRESS REPORT - prompt injection detector, round four
+Date: 2026-10-01
+Scope: inspection and evaluation only. No code was changed for this report; the only files written
+were two scratch scripts outside the repository.
+
+======================================================================
+1. THE FOUR BUGS
+======================================================================
+
+Bug                                              Status    Where
+------------------------------------------------ --------- ---------------------------------------------
+Leetspeak decoder mangles identifiers            FIXED     src/normalize.py: is_leet, is_technical, _core,
+                                                           _could_be_leet, _unit_like, _deobfuscate_token
+Windows sized by characters, embedding reads     PARTIAL   src/windows.py: WINDOW_TOKENS = 126, _fits,
+128 tokens                                                 _longest_fit, _token_split, _units,
+                                                           split_windows; src/features.py: token_count
+Training pieces share sentences with held-out    FIXED     src/train.py: held_out_piece_keys,
+texts                                                      contained_sentences, build_corpus, with
+                                                           LEAK_EXEMPT and MIN_LEAK_CHARS
+Email shortcut (address present means attack)    FIXED on  scripts/download_new_sources.py:
+                                                 the data  vary_llmail_targets and the benign-signature
+                                                 side,     step at line 326; src/rules.py:
+                                                 PARTIAL   tool_action_count with _ordered_clauses and
+                                                 on the    _send_evidence
+                                                 rule side
+
+Checked today, not just read:
+- The decoder leaves $HOME, @property, IP addresses, md5sum, log4j and version strings alone and
+  still decodes "1gn0re all pr3vious 1nstructions".
+- Windows of base64, undecodable base64, leetspeak and Python code all come out at 126 normalized
+  tokens or fewer. The partial part is the third unit kind, decoded readings: a long decoded payload
+  is one reading of 360 tokens and is not cut, so the embedding reads only its first 126. The same
+  content is still read through the windows, which are decoded piece by piece.
+- The leak filter dropped 1,945 training pieces (jackhhao 606, gandalf 421, llmail 395, wild 268,
+  contrast 148, aya 43, deepset 31, dolly 27, gsum 6). The main dataset is exempt because its
+  official split shares carrier documents by design.
+- Email shortcut: half of the llmail training attacks got varied target addresses and half of the
+  benign mails got a signature with an address; the send-to rule only counts when the surrounding
+  clauses show an attack. The llmail test split has zero false alarms on 32 benign mails, but set 4's
+  "Could you email the signed contract back to legal@..." is still flagged, and the data notes say
+  address presence remains a cue.
+These changes were made by the build workflow on the night of 2026-09-30 and verified today.
+
+======================================================================
+2. RULE CAP, BACKUP BEFORE REPLACE, NEW LANGUAGE DATA
+======================================================================
+
+Rule cap: FIXED.
+  src/pipeline.py, bounded_scale with COUNT_CAP = 3: a count is log-scaled and capped so every rule
+  column lies between 0 and 1, replacing the standardization that let one hit of a rare rule decide
+  a verdict. The noisy-rule check in src/features.py flags a rule that fires on more than 10% of
+  benign texts (the plan said 2%). No rule was dropped. The self-check run today warns that old rules
+  fire often on real benign prompts, for example second_person_command_ratio on 35% of in-the-wild
+  regular prompts, output_manipulation_count on 11%, urgency_pressure_count on 11%.
+
+Backup before replace: FIXED.
+  backup_round3/ holds the frozen round-three code, model, data and reports (30 files).
+  src/gate.py, run_gate, copies the round-three pickle back when nothing passes and copies the
+  winning candidate in when one does. Both paths were exercised (restore after the first run,
+  promote after the second) and verified byte for byte.
+
+New language data: FIXED.
+  813 training and 154 test attacks in six languages from yanis; 769 and 198 benign rows from aya,
+  matched per language; a multilingual_override_count rule covering eleven languages; 432
+  multilingual contrast pairs. Yanis recall went from 25.3% to 46.1%. The rule covers 47% of its own
+  contrast cues.
+
+======================================================================
+3. FULL EVALUATION, RUN ON 2026-10-01 (RAW OUTPUT)
+======================================================================
+
+Every held-out test set, re-scored on the same rows. "before" is the round-three model run by its
+own frozen code in backup_round3. "after" is the current model (threshold 0.548). Accuracy,
+precision, recall and F1 are for the injection class, so recall is injection-class recall.
+The after rows match today's training log exactly. The before rows match round three's log except
+jackhhao, where one text differs (11 false alarms now against 10 logged). These are re-scores of
+already scored sets; no decision was taken on them.
+
+set                      model       n    acc   prec recall     F1   tn   fp   fn   tp
+official                 before    736  0.966  0.975  0.973  0.974  236   12   13  475
+official                 after     736  0.989  0.998  0.986  0.992  247    1    7  481
+deepset                  before    116  0.664  1.000  0.350  0.519   56    0   39   21
+deepset                  after     116  0.647  1.000  0.317  0.481   56    0   41   19
+gandalf                  before    112  0.929  1.000  0.929  0.963    0    0    8  104
+gandalf                  after     112  0.938  1.000  0.938  0.968    0    0    7  105
+jackhhao                 before    400  0.945  0.922  0.922  0.922  248   11   11  130
+jackhhao                 after     400  0.940  0.940  0.887  0.912  251    8   16  125
+aya                      before    198  0.995      -      -      -  197    1    0    0
+aya                      after     198  0.995      -      -      -  197    1    0    0
+dolly                    before    231  1.000      -      -      -  231    0    0    0
+dolly                    after     231  1.000      -      -      -  231    0    0    0
+gsum                     before     13  0.154  1.000  0.154  0.267    0    0   11    2
+gsum                     after      13  0.538  1.000  0.538  0.700    0    0    6    7
+llmail                   before     97  0.928  1.000  0.892  0.943   32    0    7   58
+llmail                   after      97  0.959  1.000  0.938  0.968   32    0    4   61
+wild                     before    208  0.692  0.588  0.798  0.677   77   47   17   67
+wild                     after     208  0.736  0.649  0.750  0.696   90   34   21   63
+yanis                    before    154  0.253  1.000  0.253  0.404    0    0  115   39
+yanis                    after     154  0.461  1.000  0.461  0.631    0    0   83   71
+handwritten (set 4)      before    125  0.888  0.964  0.815  0.883   58    2   12   53
+handwritten (set 4)      after     125  0.920  0.951  0.892  0.921   57    3    7   58
+EXTERNAL (pooled)        before    628  0.890  0.959  0.815  0.881  304   11   58  255
+EXTERNAL (pooled)        after     628  0.885  0.969  0.796  0.874  307    8   64  249
+EXTERNAL_NEW (pooled)    before    901  0.780  0.776  0.525  0.626  537   48  150  166
+EXTERNAL_NEW (pooled)    after     901  0.835  0.852  0.639  0.731  550   35  114  202
+
+Confusion matrix columns: tn = benign called benign, fp = benign called injection (false alarm),
+fn = injection called benign (missed attack), tp = injection called injection.
+aya and dolly are benign-only sets, so precision, recall and F1 are undefined there.
+gandalf, gsum and yanis are attack-only sets, so their false-alarm rate is undefined.
+
+Summary: better on the main dataset, the new sources and set 4. Worse by two points of recall on
+the old external sets, driven by deepset and jackhhao. Round three never saw the new sources or
+set 4, so those before rows are its first and only scoring of them.
+
+Standards (held-out test sets, current model):
+  official recall            >= 90%   98.6%        met
+  official precision         >= 95%   99.8%        met
+  external recall            >= 85%   79.6%        NOT MET
+  external precision         >= 90%   96.9%        met
+  hand-written recall        >= 85%   89.2%        met
+  hand-written false alarms  <= 7.1%  5.0% (3/60)  met
+
+======================================================================
+4. THINGS NOT ON YOUR LIST
+======================================================================
+
+- scripts/make_charts.py (written today): regenerates the four write-up charts. Nothing produced
+  them before.
+- scripts/oof_floor_check.py (written today): recomputes out-of-fold scores to read the threshold
+  off per precision floor.
+- report/round_four_results.md, report/round_four_scores/ (three CSVs of scores),
+  report/train_log_round4_p98.txt, report/metrics_round4_p98.json, report/champion_dev_scores.csv:
+  records of the rejected first run and the gate's cache.
+- report/ablation_recall.png replaces report/ablation_f1.png, since the ablation is now
+  development-based with no F1.
+- MIN_PRECISION lowered from 0.98 to 0.96 in src/train.py and TOLERANCE = 1 added to src/gate.py.
+  Both were the user's decision on the afternoon of 2026-10-01, after the first run was rejected and
+  before any test set was scored.
+- From the build: scripts/check_rules.py, the per-language cap on aya rows in src/dataset.py, two
+  extra patterns in output_manipulation_count ("secretly", "without telling"), the probe set's five
+  slices, and a rewrite of scripts/build_notebook.py for the gate.
+- No new model type, no new feature beyond the four rules that were asked for. The classifier is
+  still scikit-learn SVC.
+
+======================================================================
+5. GIT STATE
+======================================================================
+
+Nothing is committed since 4f62db6. Everything is staged (87 files) and nothing is unstaged.
+Claude did not run git add; the index was already populated.
+
+Modified:  src/dataset.py, src/features.py, src/normalize.py, src/pipeline.py, src/predict.py,
+           src/rules.py, src/train.py, src/windows.py, src/models/injection_model.pkl, gui.py,
+           scripts/build_notebook.py, scripts/make_contrast_set.py, data/contrast_train.csv,
+           data/cache/embeddings_norm.npy and .keys.json (now 130 MB), report/metrics.json,
+           report/train_log.txt, report/writeup.md, report/recall_by_attack_type.png,
+           report/rule_firing_rates.png, report/training_sources.png, notebooks/exploration.ipynb
+Deleted:   report/ablation_f1.png
+New:       CLAUDE.md, backup_round3/ (30 files), data/SOURCES.md, data/handwritten_dev3.csv,
+           data/handwritten_test4.csv, data/new_train.csv, data/new_test.csv, data/probe_dev.csv,
+           src/gate.py, src/models/candidates/emb+rules16.pkl and emb+rules20.pkl (47 MB, staged),
+           scripts/check_rules.py, scripts/download_new_sources.py, scripts/make_charts.py,
+           scripts/oof_floor_check.py, report/risk_review/ (6 files), report/round_four_results.md,
+           report/round_four_scores/ (3 files), report/train_log_round4_p98.txt,
+           report/metrics_round4_p98.json, report/champion_dev_scores.csv, report/ablation_recall.png
+Ignored:   data/raw/new/ (613 MB)
+
+======================================================================
+6. UNFINISHED OR FAILING
+======================================================================
+
+- External recall is 79.6% against the 85% standard, missed for the third round.
+- Real benign prompts are flagged often: 34 of 124 in-the-wild regular prompts (27%).
+- Non-English and intent-only attacks stay weak: yanis 46%, gsum 54%, deepset 32%.
+- Two new rules missed their own targets on set 4: a "DELETE FROM customers" order and a
+  "message all my contacts" order both came back benign.
+- Decoded readings are not cut to the token limit (the partial fix in section 1).
+- Set 4 and the new-source test splits have now been read, so they are development data. A further
+  round needs fresh held-out sets.
+- The candidate pickles (47 MB) are staged for commit.
+- Nothing is failing right now. The CLI, the gate, the full run, the chart script and the notebook
+  all complete without errors. There is no unit-test suite; the checks are the smoke run
+  (python -m src.train --smoke) and the rule self-check (scripts/check_rules.py), which prints
+  warnings only.
+
+======================================================================
+7. END TO END, IN FIVE LINES
+======================================================================
+
+1. The text is normalized: Unicode cleaned, leetspeak and look-alike letters decoded, base64, hex
+   and rot13 runs replaced by what they decode to.
+2. It is cut into pieces: overlapping windows of up to 126 tokens, each sentence alone, and any
+   decoded hidden text as its own reading.
+3. Each piece becomes 404 numbers: a 384-number multilingual sentence embedding plus 20 rule counts,
+   such as override phrases, role changes, exfiltration requests, dangerous commands and tool orders.
+4. A linear SVM scores every piece, and the text takes the score of its most suspicious piece.
+5. A score above 0.548 is the verdict "injection", otherwise "benign", reported with a confidence
+   from the distance to that threshold and the list of rules that fired.

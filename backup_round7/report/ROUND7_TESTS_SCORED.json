@@ -1,0 +1,17 @@
+{
+  "tree": "r1_rules",
+  "pickle_sha1": "73b0883558c6",
+  "rules_sha1": "e07dbba418fe",
+  "tests_scored_at": "2026-10-05 03:31:46 +0530",
+  "test_sets": [
+    "bipia",
+    "deepset",
+    "external",
+    "external_new",
+    "gandalf",
+    "injecagent",
+    "jackhhao",
+    "oasst1",
+    "official"
+  ]
+}
