@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head><title>Injection Guard · Monitoring</title><!--HEAD--></head>
+<body class="bg-surface font-body-default text-on-surface antialiased">
+<div id="shell"></div>
+<main class="w-full pt-20 bg-surface min-h-screen px-margin pb-space-2xl lg:pl-64">
+<div class="flex flex-col gap-space-md">
+  <div class="bg-surface-container-low rounded-lg p-space-md shadow-sm flex flex-col gap-space-xs">
+    <div class="flex flex-wrap items-center gap-space-sm"><span class="material-symbols-outlined text-primary text-[20px]">radar</span><span class="font-headline-lg text-headline-lg text-on-surface">Live guard telemetry</span><span class="font-mono-data text-body-sm text-outline">Engine: <span class="text-on-surface" id="t-engine">…</span></span><span class="font-mono-data text-body-sm text-outline">Sampling: <span class="text-secondary">every request, both pages</span></span></div>
+    <div class="flex flex-wrap items-center gap-space-sm font-mono-data text-badge-label"><span class="flex items-center gap-space-xs bg-surface-container-lowest px-space-sm py-space-2xs rounded border border-outline-variant/30"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span class="text-secondary font-medium">LOG CONNECTED</span><span class="text-outline-variant">|</span><span class="text-outline" id="t-path">…</span></span><span class="flex items-center gap-space-xs bg-primary/10 text-primary px-space-sm py-space-2xs rounded"><span class="material-symbols-outlined text-[14px]">sync</span>Auto-sync 2 s · last <span id="t-refresh">–</span></span><button class="flex items-center gap-space-xs bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-error px-space-sm py-space-2xs rounded transition-colors" id="clear-log" type="button"><span class="material-symbols-outlined text-[14px]">delete_sweep</span>Clear the shared log</button></div>
+  </div>
+  <!-- where the latest score sits -->
+  <div class="bg-surface-container-low rounded-lg p-space-md border border-outline-variant/30 flex flex-col gap-space-md shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs border-b border-outline-variant/20 pb-space-xs"><div><h3 class="font-panel-title text-panel-title text-on-surface-variant">Where the latest score sits among training data</h3><p class="font-body-sm text-body-sm text-outline" id="h-sub">loading the score distribution…</p></div><div class="flex items-center gap-space-md text-badge-label font-mono-data text-outline" id="h-legend"></div></div>
+    <div class="w-full relative bg-surface-container-lowest rounded p-space-sm border border-outline-variant/20 overflow-hidden" id="h-chart"></div>
+    <div class="flex items-center gap-space-sm bg-surface-container-lowest rounded p-space-sm font-mono-data text-body-sm" id="h-readout"><span class="material-symbols-outlined text-primary text-[16px]">analytics</span><span class="text-outline">no requests yet</span></div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-space-md" id="tiles"></div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-space-md">
+    <div class="bg-surface-container-low p-space-md rounded flex flex-col justify-between">
+      <div class="flex items-center justify-between mb-space-sm"><div class="flex items-center gap-space-xs"><span class="font-panel-title text-panel-title text-outline">Score per request</span><span class="font-mono-data text-badge-label text-outline bg-surface-container px-space-xs py-space-2xs rounded" id="sp-note">last 60</span></div><div class="flex items-center gap-space-xs text-badge-label font-mono-data"><span class="flex items-center gap-1 text-secondary"><span class="w-2 h-2 rounded-full bg-secondary inline-block"></span>clear</span><span class="flex items-center gap-1 text-[#FADE2A]"><span class="w-2 h-2 rounded-full bg-[#FADE2A] inline-block"></span>near</span><span class="flex items-center gap-1 text-tertiary"><span class="w-2 h-2 rounded-full bg-tertiary inline-block"></span>above</span></div></div>
+      <div class="w-full h-56 bg-surface-container-lowest rounded p-space-xs relative overflow-hidden" id="sparkline"></div>
+      <div class="flex items-center justify-between font-mono-data text-badge-label text-outline pt-space-xs"><span id="sp-first">–</span><span class="text-secondary font-medium">NOW (live)</span></div>
+    </div>
+    <div class="bg-surface-container-low p-space-md rounded flex flex-col justify-between">
+      <div class="flex items-center justify-between mb-space-sm"><span class="font-panel-title text-panel-title text-outline">Rules fired</span><span class="font-mono-data text-badge-label text-outline bg-surface-container px-space-xs py-space-2xs rounded" id="rules-total">–</span></div>
+      <div class="flex flex-col gap-space-sm py-space-2xs max-h-64 scroll-y" id="rules"></div>
+      <div class="flex items-center justify-between font-mono-data text-badge-label text-outline pt-space-xs"><span class="flex items-center gap-1 text-tertiary font-medium"><span class="w-1.5 h-1.5 rounded-full bg-tertiary inline-block"></span>top three</span><span class="flex items-center gap-1 text-primary font-medium"><span class="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>other trigger rules</span></div>
+    </div>
+    <div class="bg-surface-container-low p-space-md rounded flex flex-col justify-between">
+      <div class="flex items-center justify-between mb-space-sm"><span class="font-panel-title text-panel-title text-outline">Allowed vs blocked</span><span class="font-mono-data text-badge-label text-secondary bg-surface-container px-space-xs py-space-2xs rounded">every session</span></div>
+      <div id="donut"></div>
+      <div class="flex items-center justify-between font-mono-data text-badge-label text-outline pt-space-xs"><span id="d-leak">secret leaked: –</span><span class="text-primary" id="d-sessions">sessions: –</span></div>
+    </div>
+  </div>
+  <div class="bg-surface-container-low rounded p-space-md flex flex-col gap-space-md">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+      <div class="flex items-center gap-space-xs"><span class="font-panel-title text-panel-title text-on-surface">Recent requests</span><span class="font-mono-data text-badge-label text-outline bg-surface-container px-space-xs py-space-2xs rounded">live feed</span></div>
+      <div class="flex flex-wrap items-center gap-space-xs">
+        <div class="flex items-center gap-space-xs bg-surface-container-lowest border border-outline-variant/40 rounded px-space-sm py-space-2xs"><span class="material-symbols-outlined text-outline text-[16px]">search</span><input class="bg-transparent font-mono-data text-body-sm text-on-surface placeholder:text-outline focus:outline-none w-56" id="q" placeholder="search message, session, rule"></div>
+        <div class="flex items-center rounded bg-surface-container-lowest border border-outline-variant/40 font-mono-data text-badge-label" id="filters"><button data-f="all" class="px-space-sm py-space-2xs rounded bg-primary text-surface" type="button">All</button><button data-f="allowed" class="px-space-sm py-space-2xs text-outline hover:text-on-surface" type="button">Allowed</button><button data-f="blocked" class="px-space-sm py-space-2xs text-outline hover:text-on-surface" type="button">Blocked</button></div>
+        <a class="flex items-center gap-space-xs bg-surface-container hover:bg-surface-container-high text-on-surface-variant px-space-sm py-space-2xs rounded font-mono-data text-badge-label" href="/api/log.csv"><span class="material-symbols-outlined text-[14px]">download</span>CSV</a>
+      </div>
+    </div>
+    <div class="overflow-x-auto"><table class="w-full text-left"><thead><tr class="border-b border-outline-variant/30 text-outline font-panel-title text-panel-title"><th class="py-space-xs px-space-sm font-medium">Time</th><th class="py-space-xs px-space-sm font-medium">Surface</th><th class="py-space-xs px-space-sm font-medium">Session</th><th class="py-space-xs px-space-sm font-medium">Message</th><th class="py-space-xs px-space-sm font-medium text-right">Score</th><th class="py-space-xs px-space-sm font-medium text-center">Verdict</th><th class="py-space-xs px-space-sm font-medium text-center">Model reply</th><th class="py-space-xs px-space-sm font-medium text-right">Detector</th><th class="py-space-xs px-space-sm font-medium text-center">Actions</th></tr></thead><tbody class="divide-y divide-surface-container font-mono-data text-body-sm text-on-surface" id="rows"></tbody></table></div>
+    <div class="flex items-center justify-between font-mono-data text-badge-label text-outline"><span id="showing">–</span><span class="flex items-center gap-space-xs"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>tail mode: newest first</span></div>
+  </div>
+</div>
+</main>
+<script>
+(async () => {
+  const st = await shell("monitoring");
+  document.getElementById("t-engine").textContent = `${st.round} · ${st.embedding.model.split("/").pop()} + ${st.rules} rules`;
+  document.getElementById("t-path").textContent = st.log.path;
+  let dist = null; try { dist = await API.get("/api/distribution"); } catch (e) {}
+  if (dist) { document.getElementById("h-sub").textContent = `out-of-fold scores of the ${(dist.counts.benign + dist.counts.injection).toLocaleString()} training texts (a fold model that did not see each text) · generated ${dist.generated}`; document.getElementById("h-legend").innerHTML = `<div class="flex items-center gap-space-xs"><span class="w-2.5 h-2.5 rounded-full bg-secondary/80"></span><span>benign (${dist.counts.benign.toLocaleString()})</span></div><div class="flex items-center gap-space-xs"><span class="w-2.5 h-2.5 rounded-full bg-tertiary-container/80"></span><span>injection (${dist.counts.injection.toLocaleString()})</span></div>`; }
+  let filter = "all", query = "", lastJSON = "";
+  document.getElementById("q").addEventListener("input", e => { query = e.target.value; redraw(); });
+  document.querySelectorAll("#filters button").forEach(b => b.addEventListener("click", () => { filter = b.dataset.f; document.querySelectorAll("#filters button").forEach(x => x.className = "px-space-sm py-space-2xs text-outline hover:text-on-surface"); b.className = "px-space-sm py-space-2xs rounded bg-primary text-surface"; redraw(); }));
+  document.getElementById("clear-log").addEventListener("click", async () => { if (confirm("Clear the shared log file?")) { await API.post("/api/log/clear"); lastJSON = ""; poll(); } });
+  let rows = [];
+  function redraw() {
+    const thr = st.threshold;
+    const last = rows[rows.length - 1];
+    if (dist) { document.getElementById("h-chart").innerHTML = histogramSVG(dist, last ? last.score : null) + zoneBar(dist, last ? last.score : null); }
+    document.getElementById("h-readout").innerHTML = `<span class="material-symbols-outlined text-primary text-[16px]">analytics</span>` + (last && dist ? `<span class="text-on-surface">Latest score <b>${fmtScore(last.score)}</b> (${esc(last.message)}) is above <b class="text-secondary">${percentileBelow(dist, "benign", last.score).toFixed(1)}%</b> of benign and <b class="text-tertiary">${percentileBelow(dist, "injection", last.score).toFixed(1)}%</b> of injection training scores · ${last.blocked === "yes" ? badge("bad", "blocked", "gpp_maybe") : badge("ok", "allowed", "check_circle")}</span>` : `<span class="text-outline">no requests yet</span>`);
+    const blocked = rows.filter(r => r.blocked === "yes").length, ms = rows.map(r => r.scan_ms).filter(x => x != null), leaked = rows.filter(r => r["reply contains secret"] === "yes").length;
+    const sessions = new Set(rows.map(r => r.session)).size, surfaces = [...new Set(rows.map(r => r.surface))].join(", ");
+    document.getElementById("tiles").innerHTML =
+      tile({ label: "Requests", value: rows.length, note: sessions ? `${sessions} session(s)` : "", sub: surfaces ? `surfaces: ${surfaces}` : "nothing logged yet", icon: "query_stats", kind: "info" }) +
+      tile({ label: "Blocked rate", value: rows.length ? (100 * blocked / rows.length).toFixed(1) + "%" : "–", note: `${blocked} blocked`, sub: "flagged with the guard on", icon: "shield", kind: blocked ? "bad" : "ok" }) +
+      tile({ label: "Detector latency", value: ms.length ? fmtMs(median(ms)) : "–", note: ms.length ? `max ${fmtMs(Math.max(...ms))}` : "", sub: "median per request, explain() + predict()", icon: "speed", kind: "info" }) +
+      tile({ label: "Last verdict", value: last ? (last.blocked === "yes" ? "BLOCKED" : "ALLOWED") : "–", note: last ? fmtScore(last.score) : "", sub: last ? `${last.time} · ${last.message}` : "no requests yet", icon: last && last.blocked === "yes" ? "gpp_maybe" : "check_circle", kind: last ? (last.blocked === "yes" ? "bad" : "ok") : "neutral" });
+    document.getElementById("sparkline").innerHTML = sparklineSVG(rows.slice(-60), thr, dist);
+    document.getElementById("sp-first").textContent = rows.length ? (rows.length > 60 ? rows[rows.length - 60].time : rows[0].time) : "–";
+    document.getElementById("sp-note").textContent = rows.length > 60 ? "last 60" : `${rows.length} request(s)`;
+    document.getElementById("rules").innerHTML = rulesBarsHTML(rows, st.rule_names, st.descriptive);
+    document.getElementById("rules-total").textContent = `${rows.reduce((n, r) => n + (r._fired || []).length, 0)} matches`;
+    document.getElementById("donut").innerHTML = donutHTML(rows.length - blocked, blocked);
+    document.getElementById("d-leak").textContent = `secret leaked: ${leaked}`; document.getElementById("d-sessions").textContent = `sessions: ${sessions}`;
+    const t = tableRowsHTML(rows, { live: true, filter, query });
+    document.getElementById("rows").innerHTML = t.html || `<tr><td class="py-space-md px-space-sm text-outline" colspan="9">no requests match</td></tr>`;
+    document.getElementById("showing").textContent = `showing ${t.shown} of ${rows.length} request(s)`;
+    setHeaderMs(last ? last.scan_ms : null);
+  }
+  async function poll() {
+    try {
+      const log = await API.get("/api/log");
+      const j = JSON.stringify(log.rows.map(r => r.ts));
+      document.getElementById("t-refresh").textContent = new Date().toLocaleTimeString();
+      if (j !== lastJSON || !rows.length) { lastJSON = j; rows = log.rows; redraw(); refreshSideCounts(); }
+    } catch (e) { document.getElementById("t-refresh").textContent = "API unreachable"; }
+  }
+  await poll(); setInterval(poll, 2000);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head><title>Injection Guard · Results</title><!--HEAD--></head>
+<body class="bg-surface font-body-default text-on-surface antialiased">
+<div id="shell"></div>
+<main class="w-full pt-20 bg-surface min-h-screen px-margin pb-space-2xl lg:pl-64">
+<div class="flex flex-col gap-space-md">
+  <div class="bg-surface-container-low rounded-lg p-space-md shadow-sm flex flex-col gap-space-2xs">
+    <div class="flex items-center gap-space-sm"><span class="font-mono-data text-badge-label text-primary bg-primary/10 px-space-xs py-space-2xs rounded">EVALUATION · HELD-OUT TEST SETS</span><span class="font-mono-data text-badge-label text-secondary bg-secondary-container/20 px-space-xs py-space-2xs rounded flex items-center gap-space-2xs"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span><span id="scored-at">…</span></span></div>
+    <h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight">The model's results</h1>
+    <p class="font-body-sm text-body-sm text-on-surface-variant max-w-3xl">Read from report/metrics.json and report/round8_gate.json. Each test set was scored once, after the gate had decided; none of its rows were trained on. Nothing on this page comes from the live log.</p>
+  </div>
+  <section class="bg-surface-container-low p-space-md rounded-lg shadow-sm flex flex-col gap-space-md">
+    <div class="flex items-center justify-between"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[18px]">fact_check</span><h2 class="font-panel-title text-panel-title text-on-surface-variant tracking-wide">Standards</h2></div><span class="font-mono-data text-badge-label text-outline">set before round one, unchanged</span></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-space-sm" id="standards"></div>
+    <div class="p-space-sm bg-surface-container-lowest rounded font-mono-data text-badge-label text-outline">Hand-written sentence sets: set 6 was the last unread one; it was scored once on round seven (recall 36.7%, false alarms 16.7%, both standards missed) and is development data now. Neither sentence-set standard can be claimed for this model until a set 7 exists.</div>
+  </section>
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-space-md">
+    <section class="xl:col-span-7 bg-surface-container-low p-space-md rounded-lg shadow-sm flex flex-col gap-space-md">
+      <div class="flex items-center justify-between"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-outline text-[18px]">speed</span><h2 class="font-panel-title text-panel-title text-on-surface-variant tracking-wide">Held-out test sets · injection class</h2></div><span class="font-mono-data text-badge-label text-outline">scored once on the promoted model</span></div>
+      <div class="overflow-x-auto"><table class="w-full text-left font-mono-data text-body-sm"><thead><tr class="text-outline text-badge-label bg-surface-container-lowest"><th class="p-space-sm">TEST SET</th><th class="p-space-sm text-right">ROWS</th><th class="p-space-sm text-right">PRECISION</th><th class="p-space-sm text-right">RECALL</th><th class="p-space-sm text-right">FALSE ALARMS</th><th class="p-space-sm text-right">MISSED</th></tr></thead><tbody id="tests"></tbody></table></div>
+      <div class="p-space-sm bg-surface-container-lowest rounded font-mono-data text-badge-label text-outline">External recall has been missed in every round that scored it. On the InjecAgent and BIPIA documents the detector is quiet rather than wrong: precision stays above 95% while most inserted orders are missed.</div>
+    </section>
+    <section class="xl:col-span-5 bg-surface-container-low p-space-md rounded-lg shadow-sm flex flex-col gap-space-md">
+      <div class="flex items-center justify-between"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-outline text-[18px]">policy</span><h2 class="font-panel-title text-panel-title text-on-surface-variant tracking-wide">The gate · round eight against round seven</h2></div><span class="font-mono-data text-badge-label text-outline">false alarms / missed</span></div>
+      <div class="overflow-x-auto"><table class="w-full text-left font-mono-data text-body-sm"><thead><tr class="text-outline text-badge-label bg-surface-container-lowest"><th class="p-space-sm">DEVELOPMENT SET</th><th class="p-space-sm text-right">ROWS</th><th class="p-space-sm text-right">ROUND 7</th><th class="p-space-sm text-right">ROUND 8</th></tr></thead><tbody id="gate"></tbody></table></div>
+      <div class="p-space-sm bg-surface-container-lowest rounded font-mono-data text-badge-label text-outline" id="gate-note"></div>
+    </section>
+  </div>
+  <section class="bg-surface-container-low p-space-md rounded-lg shadow-sm flex flex-col gap-space-md">
+    <div class="flex items-center justify-between"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-outline text-[18px]">bar_chart</span><h2 class="font-panel-title text-panel-title text-on-surface-variant tracking-wide">Official test by category</h2></div><span class="font-mono-data text-badge-label text-outline">share correct per category (recall for attack categories) with a 95% interval</span></div>
+    <div class="overflow-x-auto"><table class="w-full text-left font-mono-data text-body-sm"><thead><tr class="text-outline text-badge-label bg-surface-container-lowest"><th class="p-space-sm">LABEL</th><th class="p-space-sm">CATEGORY</th><th class="p-space-sm text-right">ROWS</th><th class="p-space-sm text-right">CORRECT [95%]</th><th class="p-space-sm text-right">SEEN IN TRAINING</th></tr></thead><tbody id="cats"></tbody></table></div>
+  </section>
+</div>
+</main>
+<script>
+(async () => {
+  await shell("results");
+  const LABELS = [["official", "Official test, final part (main dataset)"], ["deepset", "deepset"], ["jackhhao", "jackhhao"], ["gandalf", "gandalf (attacks only)"], ["external", "External tests pooled (the three above)"], ["oasst1", "oasst1: real benign prompts"], ["injecagent", "InjecAgent: orders inside tool results, and clean twins"], ["bipia", "BIPIA: documents with an inserted order, and clean copies"], ["external_new", "Round-five sources pooled (the three above)"]];
+  const GATE = [["official_dev", "official development half"], ["handwritten_dev", "hand-written sets 1 and 2"], ["handwritten_dev3", "hand-written set 3"], ["handwritten_dev4", "set 4"], ["agent_drafted_dev5", "set 5"], ["agent_drafted_dev6", "set 6 (round eight's target)"], ["probe_dev", "probe set"]];
+  const m = await API.get("/api/metrics");
+  document.getElementById("scored-at").textContent = m.round8 ? "scored " + (m.round8.tests_scored_at || "").slice(0, 10) : "not scored";
+  document.getElementById("standards").innerHTML = (m.standards || []).map(s => { const met = String(s.met).toLowerCase() === "yes"; return tile({ label: s.standard, value: (100 * s.result).toFixed(1) + "%", note: met ? "met" : "MISSED", sub: `target ≥ ${(100 * s.target).toFixed(0)}%`, icon: met ? "check_circle" : "gpp_maybe", kind: met ? "ok" : "bad" }); }).join("");
+  const tests = m.tests || {};
+  document.getElementById("tests").innerHTML = LABELS.filter(([k]) => tests[k]).map(([k, label]) => { const r = tests[k]; const attacks = (r.tp || 0) + (r.fn || 0); return `<tr class="hover:bg-surface-container/50 transition-colors border-t border-outline-variant/20"><td class="p-space-sm font-medium text-on-surface">${esc(label)}</td><td class="p-space-sm text-right text-outline">${r.n}</td><td class="p-space-sm text-right ${attacks ? "text-secondary font-semibold" : "text-outline"}">${attacks ? (100 * r.precision).toFixed(1) + "%" : "benign only"}</td><td class="p-space-sm text-right ${attacks ? (r.recall >= 0.85 ? "text-secondary" : "text-tertiary") + " font-semibold" : "text-outline"}">${attacks ? (100 * r.recall).toFixed(1) + "%" : ""}</td><td class="p-space-sm text-right text-on-surface">${r.fp}</td><td class="p-space-sm text-right text-on-surface">${r.fn}</td></tr>`; }).join("");
+  if (m.gate) {
+    document.getElementById("gate").innerHTML = GATE.filter(([k]) => m.gate.champion_counts[k] && m.gate.candidate_counts[k]).map(([k, label]) => { const a = m.gate.champion_counts[k], b = m.gate.candidate_counts[k]; const better = (b.false_alarms + b.missed) < (a.false_alarms + a.missed); return `<tr class="hover:bg-surface-container/50 transition-colors border-t border-outline-variant/20"><td class="p-space-sm text-on-surface">${esc(label)}</td><td class="p-space-sm text-right text-outline">${m.gate.sets[k] || ""}</td><td class="p-space-sm text-right text-outline">${a.false_alarms} / ${a.missed}</td><td class="p-space-sm text-right ${better ? "text-secondary" : "text-on-surface"} font-semibold">${b.false_alarms} / ${b.missed}</td></tr>`; }).join("");
+    document.getElementById("gate-note").textContent = `Decision: promote ${m.gate.decision} (threshold ${m.gate.threshold.toFixed(3)}); nothing may be worse on any group, gains optional. Set 6 is the set the round-eight patterns were written from, so its row is the fix measured on its own target; the probe-set gain was not looked at while writing them.`;
+  }
+  document.getElementById("cats").innerHTML = (m.official_by_category || []).map(c => `<tr class="hover:bg-surface-container/50 transition-colors border-t border-outline-variant/20"><td class="p-space-sm">${c.label ? badge("bad", "attack", "gpp_maybe") : badge("ok", "benign", "check_circle")}</td><td class="p-space-sm text-on-surface">${esc(c.category)}</td><td class="p-space-sm text-right text-outline">${c.rows}</td><td class="p-space-sm text-right ${c.correct_share >= 0.95 ? "text-secondary" : "text-tertiary"} font-semibold">${esc(c["correct [95%]"])}</td><td class="p-space-sm text-right text-outline">${c.seen_in_train ? "yes" : "no"}</td></tr>`).join("");
+})();
+</script>
+</body>
+</html>

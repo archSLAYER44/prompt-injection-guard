@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head><title>Injection Guard · Chat</title><!--HEAD--></head>
+<body class="bg-surface font-body-default text-on-surface antialiased">
+<div id="shell"></div>
+<main class="w-full pt-20 bg-surface min-h-screen px-margin pb-space-2xl lg:pl-64">
+<div class="flex flex-col w-full">
+  <div class="relative w-full"><div class="absolute -top-10 left-1/3 w-96 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+  <!-- header card -->
+  <div class="w-full bg-surface-container-low rounded-lg p-space-md mb-gutter shadow-sm">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-sm">
+      <div class="flex items-center gap-space-sm min-w-0">
+        <div class="w-9 h-9 rounded bg-primary/10 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-primary text-[20px]">smart_toy</span></div>
+        <div class="min-w-0"><div class="flex items-center gap-space-xs"><span class="font-headline-lg text-headline-lg text-on-surface truncate">Rosa's Bakery assistant</span><span class="font-mono-data text-badge-label px-space-xs py-space-2xs rounded bg-surface-container-high text-on-surface-variant font-medium uppercase tracking-wider">Secured LLM</span></div>
+        <p class="font-body-sm text-body-sm text-outline truncate">The prompt-injection guard scans every message, and any retrieved document, before the model sees it.</p></div>
+      </div>
+      <div class="flex flex-wrap items-center gap-space-xs font-mono-data text-badge-label" id="hdr-chips"></div>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-gutter items-start">
+    <!-- conversation column -->
+    <div class="xl:col-span-8 flex flex-col gap-gutter">
+      <div class="bg-surface-container-low rounded-lg p-space-md shadow-sm flex flex-col">
+        <div class="flex items-center justify-between pb-space-sm mb-space-md bg-surface-container-lowest -mx-space-md -mt-space-md px-space-md py-space-xs rounded-t-lg">
+          <div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-outline text-[16px]">terminal</span><span class="font-panel-title text-panel-title text-outline">Session live stream • ID: <span id="sess-id"></span></span></div>
+          <div class="flex items-center gap-space-md font-mono-data text-badge-label"><span class="text-outline">Detector: <span class="text-secondary" id="sess-ms">–</span></span><span class="text-outline">Messages: <span class="text-on-surface" id="sess-count">0</span></span><span class="text-outline">Blocked: <span class="text-tertiary" id="sess-blocked">0</span></span></div>
+        </div>
+        <div class="flex flex-col gap-space-xl overflow-y-auto max-h-[620px] pr-space-xs stream" id="chat-stream"><div class="font-body-sm text-body-sm text-outline p-space-md" id="chat-empty">No messages yet. Ask about hours, bread or orders, or pick a test payload on the right.</div></div>
+      </div>
+      <!-- composer -->
+      <div class="bg-surface-container-low rounded-lg p-space-md shadow-sm flex flex-col gap-space-sm">
+        <div class="flex items-center justify-between bg-surface-container-lowest px-space-sm py-space-xs rounded hidden" id="doc-tray">
+          <div class="flex items-center gap-space-xs min-w-0"><span class="material-symbols-outlined text-primary text-[16px]">description</span><span class="font-mono-data text-body-sm text-on-surface font-medium truncate">retrieved document</span><span class="font-mono-data text-badge-label text-outline" id="doc-size"></span><span class="px-space-xs py-0.5 rounded bg-surface-container text-on-surface-variant font-mono-data text-[10px] uppercase font-bold tracking-wider">scanned separately with each message</span></div>
+          <button aria-label="Remove document" class="text-outline hover:text-error transition-colors flex items-center p-0.5 rounded hover:bg-surface-container" id="doc-remove" type="button"><span class="material-symbols-outlined text-[16px]">close</span></button>
+        </div>
+        <textarea class="w-full bg-surface-container-lowest border border-outline-variant/40 text-on-surface placeholder:text-outline font-mono-data text-mono-data p-space-sm rounded resize-y focus:outline-none focus:ring-1 focus:ring-primary hidden" id="doc-input" placeholder="Paste the document the assistant would retrieve: an email, a ticket, a web page. It is scanned on its own." rows="4"></textarea>
+        <div class="relative">
+          <textarea class="w-full bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-default text-body-default p-space-sm rounded resize-none focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" id="msg-input" placeholder="Type a message for the assistant, or a test payload… (Enter sends, Shift+Enter for a new line)" rows="3"></textarea>
+          <div class="absolute right-space-sm bottom-space-sm font-mono-data text-badge-label text-outline pointer-events-none" id="msg-count">0 characters</div>
+        </div>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pt-space-xs">
+          <div class="flex items-center gap-space-xs">
+            <button class="flex items-center gap-space-xs px-space-sm py-space-xs bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface rounded font-body-sm text-body-sm transition-colors" id="doc-toggle" type="button"><span class="material-symbols-outlined text-[16px] text-primary">attach_file</span><span>Attach a retrieved document</span></button>
+            <button class="flex items-center gap-space-xs px-space-sm py-space-xs bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-error rounded font-body-sm text-body-sm transition-colors" id="clear-chat" type="button"><span class="material-symbols-outlined text-[16px]">delete_sweep</span><span>Clear chat</span></button>
+          </div>
+          <button class="flex items-center justify-center gap-space-xs px-space-lg py-space-xs bg-primary-container hover:bg-primary-container/90 text-on-primary-container font-headline-sm text-headline-sm rounded transition-all shadow-md active:scale-95 disabled:opacity-60" id="send" type="button"><span id="send-label">Send message</span><span class="material-symbols-outlined text-[18px]">send</span></button>
+        </div>
+      </div>
+    </div>
+    <!-- right column -->
+    <div class="xl:col-span-4 flex flex-col gap-gutter">
+      <div class="bg-surface-container-low rounded-lg p-space-md shadow-sm flex flex-col gap-space-sm">
+        <div class="flex items-center justify-between"><span class="font-panel-title text-panel-title text-outline flex items-center gap-space-xs"><span class="material-symbols-outlined text-[16px] text-primary">security_update_good</span>Guard</span><span class="px-space-xs py-space-2xs rounded bg-surface-container text-secondary font-mono-data text-badge-label font-medium" id="guard-pill">9 stages</span></div>
+        <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed" id="guard-desc">Loading the detector's profile…</p>
+        <div class="bg-surface-container-lowest rounded p-space-sm flex items-center justify-between">
+          <div class="flex flex-col"><span class="font-mono-data text-badge-label text-outline uppercase">Block threshold</span><span class="font-mono-metric text-mono-metric text-on-surface" id="gauge-thr">–</span><span class="font-mono-data text-badge-label text-outline" id="gauge-note"></span></div>
+          <div class="w-14 h-14 relative flex items-center justify-center"><svg class="w-14 h-14 -rotate-90" viewBox="0 0 36 36"><circle class="stroke-surface-container-high" cx="18" cy="18" fill="none" r="15" stroke-width="3"></circle><circle class="stroke-secondary" cx="18" cy="18" fill="none" r="15" stroke-dasharray="94.2" stroke-dashoffset="94.2" stroke-width="3" id="gauge-ring"></circle></svg><span class="absolute font-mono-data text-badge-label text-secondary font-semibold" id="gauge-pct">–</span></div>
+        </div>
+      </div>
+      <div class="bg-surface-container-low rounded-lg p-space-md shadow-sm flex flex-col gap-space-sm">
+        <div class="flex items-center justify-between"><span class="font-panel-title text-panel-title text-outline flex items-center gap-space-xs"><span class="material-symbols-outlined text-[16px]">science</span>Test payloads</span><span class="font-mono-data text-badge-label text-outline">click to load, then send</span></div>
+        <div id="presets" class="flex flex-col gap-space-sm"><div class="font-mono-data text-badge-label text-outline">loading…</div></div>
+        <div class="mt-space-xs pt-space-xs bg-surface-container-lowest -mx-space-md -mb-space-md p-space-md rounded-b flex items-center justify-between">
+          <div class="flex items-center gap-space-xs text-badge-label font-mono-data text-outline"><span class="material-symbols-outlined text-[14px] text-secondary">sync</span><span id="preset-note">scores are the detector's own, computed at server start</span></div>
+          <a class="text-primary hover:text-on-surface font-body-sm text-body-sm font-medium transition-colors" href="/inspector">Open the inspector →</a>
+        </div>
+      </div>
+      <div class="bg-surface-container-low rounded-lg p-space-md shadow-sm flex flex-col gap-space-sm">
+        <div class="flex items-center justify-between"><span class="font-panel-title text-panel-title text-outline flex items-center gap-space-xs"><span class="material-symbols-outlined text-[16px]">tune</span>Assistant setup</span><span class="font-mono-data text-badge-label text-outline">this browser only</span></div>
+        <div id="settings"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+</main>
+<script>
+(async () => {
+  const st = await shell("chat");
+  const s = loadSettings();
+  document.getElementById("sess-id").textContent = "#" + SESSION;
+  document.getElementById("settings").innerHTML = settingsHTML(st, s);
+  bindSettings(st, s, renderChips);
+  let rows = []; try { rows = JSON.parse(localStorage.getItem("ig_chat_" + SESSION) || "[]"); } catch (e) {}
+  const stream = document.getElementById("chat-stream"), msg = document.getElementById("msg-input"), doc = document.getElementById("doc-input"), tray = document.getElementById("doc-tray");
+  let dist = null; try { dist = await API.get("/api/distribution"); } catch (e) {}
+
+  function renderChips() {
+    const d = doc.value.trim();
+    document.getElementById("hdr-chips").innerHTML =
+      chip("verified_user", "Guard:", s.guard_on ? "ON" : "OFF", s.guard_on ? "text-secondary" : "text-tertiary") +
+      chip("memory", "Model:", s.provider === st.stub ? "stub (no model called)" : (s.model || s.provider)) +
+      chip("attach_file", "Context:", d ? `document attached (${d.length} chars)` : "no document", d ? "text-primary" : "text-outline") +
+      chip("tune", "Threshold:", (s.threshold ?? st.threshold).toFixed(3), "text-[#FADE2A]");
+    tray.classList.toggle("hidden", !d); document.getElementById("doc-size").textContent = d ? `(${d.length} characters)` : "";
+  }
+  function renderGuard() {
+    const thr = s.threshold ?? st.threshold;
+    document.getElementById("gauge-thr").textContent = thr.toFixed(3);
+    document.getElementById("guard-desc").textContent = `${st.embedding.model.split("/").pop()} (${st.embedding.dimension}-d) + ${st.rules} rules into a linear SVM. The message and any attached document are normalized, split into pieces and scored separately; a score at or above the threshold is blocked before the model is called.`;
+    if (dist) {
+      const below = percentileBelow(dist, "benign", thr), inj = percentileBelow(dist, "injection", thr);
+      document.getElementById("gauge-pct").textContent = below.toFixed(0) + "%";
+      document.getElementById("gauge-ring").setAttribute("stroke-dashoffset", (94.2 * (1 - below / 100)).toFixed(1));
+      document.getElementById("gauge-note").textContent = `${below.toFixed(1)}% of benign and ${inj.toFixed(1)}% of injection training scores lie below it`;
+    }
+  }
+  function renderStream() {
+    if (!rows.length) { stream.innerHTML = `<div class="font-body-sm text-body-sm text-outline p-space-md">No messages yet. Ask about hours, bread or orders, or pick a test payload on the right.</div>`; }
+    else { stream.innerHTML = rows.map(r => turnHTML(r)).join(""); stream.scrollTop = stream.scrollHeight; }
+    const ms = rows.length ? rows[rows.length - 1].scan_ms : null;
+    document.getElementById("sess-ms").textContent = fmtMs(ms); setHeaderMs(ms);
+    document.getElementById("sess-count").textContent = rows.length; document.getElementById("sess-blocked").textContent = rows.filter(r => r.blocked === "yes").length;
+    localStorage.setItem("ig_chat_" + SESSION, JSON.stringify(rows.slice(-60)));
+  }
+  async function send() {
+    const text = msg.value.trim(); if (!text) { msg.focus(); return; }
+    const btn = document.getElementById("send"); btn.disabled = true; document.getElementById("send-label").textContent = "Scanning…";
+    try {
+      const out = await API.post("/api/chat", requestBody(s, text, doc.value, "chat"));
+      rows.push(out.row); sessionStorage.setItem("ig_last", JSON.stringify(out)); msg.value = ""; document.getElementById("msg-count").textContent = "0 characters";
+      renderStream(); refreshSideCounts();
+    } catch (e) { alert("The API refused the request: " + e.message); }
+    btn.disabled = false; document.getElementById("send-label").textContent = "Send message";
+  }
+  document.getElementById("send").addEventListener("click", send);
+  msg.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
+  msg.addEventListener("input", () => document.getElementById("msg-count").textContent = `${msg.value.length} characters`);
+  doc.addEventListener("input", renderChips);
+  document.getElementById("doc-toggle").addEventListener("click", () => { doc.classList.toggle("hidden"); if (!doc.classList.contains("hidden")) doc.focus(); });
+  document.getElementById("doc-remove").addEventListener("click", () => { doc.value = ""; doc.classList.add("hidden"); renderChips(); });
+  document.getElementById("clear-chat").addEventListener("click", () => { rows = []; renderStream(); });
+  try {
+    const presets = await API.get("/api/presets");
+    document.getElementById("presets").innerHTML = presets.map(p => {
+      const col = p.flagged ? "error" : (p.kind === "warn" ? "[#FADE2A]" : "secondary");
+      return `<div class="p-space-sm rounded bg-surface-container-lowest hover:bg-surface-container transition-all cursor-pointer flex flex-col gap-space-2xs" data-key="${esc(p.key)}">
+        <div class="flex items-center justify-between"><span class="font-badge-label text-badge-label text-on-surface font-medium flex items-center gap-space-xs"><span class="w-1.5 h-1.5 rounded-full bg-${col}"></span>${esc(p.label)}</span><span class="px-space-xs py-space-2xs rounded ${p.flagged ? "bg-error-container/30 text-error" : "bg-surface-container text-secondary"} font-mono-data text-badge-label">score ${fmtScore(p.score)} · ${p.flagged ? "blocked" : "allowed"}</span></div>
+        <p class="font-body-sm text-body-sm text-outline">${esc(p.note)}${p.document ? " · with a retrieved document" : ""}</p></div>`; }).join("");
+    document.querySelectorAll("#presets [data-key]").forEach(el => el.addEventListener("click", () => {
+      const p = presets.find(x => x.key === el.dataset.key); msg.value = p.message; doc.value = p.document || ""; doc.classList.toggle("hidden", !p.document);
+      document.getElementById("msg-count").textContent = `${msg.value.length} characters`; renderChips(); msg.focus();
+    }));
+  } catch (e) { document.getElementById("presets").innerHTML = `<div class="font-mono-data text-badge-label text-error">${esc(e.message)}</div>`; }
+  renderChips(); renderGuard(); renderStream();
+  document.getElementById("set-threshold").addEventListener("input", renderGuard);
+})();
+</script>
+</body>
+</html>

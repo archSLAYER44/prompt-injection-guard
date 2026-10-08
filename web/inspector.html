@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head><title>Injection Guard · Guard inspector</title><!--HEAD--></head>
+<body class="bg-surface font-body-default text-on-surface antialiased">
+<div id="shell"></div>
+<main class="w-full pt-20 bg-surface min-h-screen px-margin pb-space-2xl lg:pl-64">
+<div class="w-full grid grid-cols-1 xl:grid-cols-12 gap-gutter">
+  <!-- left: check a message -->
+  <div class="xl:col-span-5 flex flex-col gap-gutter">
+    <div class="bg-surface-container-low rounded-lg p-space-md border border-outline-variant/30 flex flex-col gap-space-md shadow-sm">
+      <div class="flex items-center justify-between"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-outline text-[18px]">terminal</span><span class="font-panel-title text-panel-title text-on-surface-variant">Check a message</span></div><span class="font-mono-data text-badge-label text-outline bg-surface-container-lowest px-space-xs py-space-2xs rounded border border-outline-variant/20">test page · every run is logged</span></div>
+      <div class="grid grid-cols-2 gap-space-xs" id="presets"></div>
+      <div class="flex flex-col gap-space-xs">
+        <div class="flex items-center justify-between"><label class="font-panel-title text-panel-title text-on-surface-variant flex items-center gap-space-xs" for="prompt-input"><span class="material-symbols-outlined text-outline text-[15px]">input</span>Candidate message</label><span class="font-mono-data text-badge-label text-outline" id="char-counter">0 characters</span></div>
+        <textarea class="w-full bg-surface-container-lowest border border-outline-variant/40 rounded p-space-sm font-mono-data text-mono-data text-on-surface placeholder:text-outline/60 focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all resize-y" id="prompt-input" rows="4" placeholder="Type a message, or pick a preset above"></textarea>
+      </div>
+      <div class="flex flex-col gap-space-xs">
+        <div class="flex items-center justify-between"><div class="flex items-center gap-space-xs"><label class="relative inline-flex items-center cursor-pointer"><input class="sr-only peer" id="doc-toggle" type="checkbox"><div class="w-7 h-4 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-primary-container"></div></label><label class="font-panel-title text-panel-title text-on-surface-variant cursor-pointer select-none" for="doc-toggle">Include a retrieved document</label></div><span class="font-mono-data text-badge-label text-outline">scanned on its own</span></div>
+        <textarea class="w-full bg-surface-container-lowest border border-outline-variant/40 rounded p-space-sm font-mono-data text-mono-data text-on-surface/90 placeholder:text-outline/60 focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all resize-y hidden" id="doc-input" rows="3" placeholder="An email, a ticket, a web page…"></textarea>
+      </div>
+      <div class="pt-space-xs border-t border-outline-variant/30 flex flex-col gap-space-md">
+        <div id="settings"></div>
+        <button class="w-full bg-primary-container hover:bg-primary hover:text-on-primary-fixed text-on-primary font-panel-title text-panel-title font-medium py-space-sm px-space-md rounded transition-all flex items-center justify-center gap-space-sm shadow-md active:scale-[0.99] disabled:opacity-60" id="eval" type="button"><span class="material-symbols-outlined text-[18px]">policy</span><span id="eval-label">Inspect &amp; evaluate message</span><span class="font-mono-data text-badge-label bg-on-primary/10 px-space-xs py-space-2xs rounded ml-space-xs" id="eval-ms">–</span></button>
+      </div>
+    </div>
+    <div class="bg-surface-container-low rounded-lg p-space-md border border-outline-variant/30 flex flex-col gap-space-sm shadow-sm">
+      <div class="flex items-center justify-between"><span class="font-mono-data text-badge-label text-outline uppercase tracking-wider">Live session intercepts</span><span class="font-mono-data text-badge-label text-outline" id="live-note">from the shared log</span></div>
+      <div class="grid grid-cols-3 gap-space-xs" id="live-tiles"></div>
+    </div>
+  </div>
+  <!-- right: the verdict and the stages -->
+  <div class="xl:col-span-7 flex flex-col gap-gutter" id="result">
+    <div class="bg-surface-container-low rounded-lg p-space-md border border-outline-variant/30 shadow-sm font-body-sm text-body-sm text-outline">Pick a preset or type a message, then press <b class="text-on-surface">Inspect &amp; evaluate</b>. The last request from the Chat page is shown here automatically.</div>
+  </div>
+</div>
+</main>
+<script>
+(async () => {
+  const st = await shell("inspector");
+  const s = loadSettings();
+  document.getElementById("settings").innerHTML = settingsHTML(st, s); bindSettings(st, s);
+  let dist = null; try { dist = await API.get("/api/distribution"); } catch (e) {}
+  const prompt = document.getElementById("prompt-input"), doc = document.getElementById("doc-input"), toggle = document.getElementById("doc-toggle");
+  prompt.addEventListener("input", () => document.getElementById("char-counter").textContent = `${prompt.value.length} characters`);
+  toggle.addEventListener("change", () => doc.classList.toggle("hidden", !toggle.checked));
+  let presets = [];
+  try {
+    presets = await API.get("/api/presets");
+    document.getElementById("presets").innerHTML = presets.map(p => `<button class="preset-card group text-left p-space-xs bg-surface-container-lowest hover:bg-surface-container border border-outline-variant/30 hover:border-outline-variant/60 rounded transition-all flex flex-col gap-space-2xs" data-key="${esc(p.key)}" type="button">
+      <div class="flex items-center justify-between w-full"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined ${p.flagged ? "text-tertiary-container" : "text-secondary"} text-[16px]">${p.flagged ? "error" : "check_circle"}</span><span class="font-panel-title text-body-sm text-on-surface font-medium">${esc(p.label)}</span></div><span class="font-badge-label text-badge-label ${p.flagged ? "text-tertiary-container bg-tertiary-container/15" : "text-secondary bg-secondary-container/20"} px-space-xs py-space-2xs rounded">${fmtScore(p.score)}</span></div>
+      <span class="font-body-sm text-badge-label text-outline truncate w-full">${esc(p.note)}</span></button>`).join("");
+    document.querySelectorAll("#presets [data-key]").forEach(el => el.addEventListener("click", () => {
+      const p = presets.find(x => x.key === el.dataset.key); prompt.value = p.message; doc.value = p.document || ""; toggle.checked = !!p.document; doc.classList.toggle("hidden", !p.document);
+      document.getElementById("char-counter").textContent = `${prompt.value.length} characters`;
+      document.querySelectorAll("#presets .preset-card").forEach(c => c.classList.remove("border-tertiary-container/50", "bg-surface-container")); el.classList.add("border-tertiary-container/50", "bg-surface-container");
+    }));
+  } catch (e) { document.getElementById("presets").innerHTML = `<div class="font-mono-data text-badge-label text-error col-span-2">${esc(e.message)}</div>`; }
+
+  function render(out) {
+    const r = out.result, row = out.row;
+    const top = r.scans.reduce((a, b) => (b.explain.score > a.explain.score ? b : a), r.scans[0]);
+    const flagged = r.any_flagged, blocked = r.blocked;
+    const head = blocked
+      ? `<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm bg-tertiary-container/10 border border-tertiary-container/40 rounded-lg p-space-md"><div class="flex items-center gap-space-md"><div class="w-11 h-11 rounded bg-tertiary-container/20 border border-tertiary-container/40 flex items-center justify-center text-tertiary-container shrink-0"><span class="material-symbols-outlined text-[24px]">gpp_bad</span></div><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-mono-data text-badge-label px-space-xs py-space-2xs rounded bg-tertiary-container text-on-tertiary font-bold tracking-wider">BLOCK</span><span class="font-mono-data text-badge-label text-outline">${esc((row.flagged || []).join(", ") || "user message")} flagged</span></div><h2 class="font-headline-lg text-headline-lg text-tertiary-container font-semibold tracking-tight">VERDICT: BLOCKED — PROMPT INJECTION DETECTED</h2></div></div><span class="font-mono-data text-badge-label bg-surface-container-lowest text-tertiary-container px-space-sm py-space-2xs rounded border border-tertiary-container/30">${row.top_rule ? "RULE: " + esc(row.top_rule) : "EMBEDDING ALONE"}</span></div>`
+      : `<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm ${flagged ? "bg-[#FADE2A]/5 border border-[#FADE2A]/40" : "bg-secondary-container/10 border border-secondary/40"} rounded-lg p-space-md"><div class="flex items-center gap-space-md"><div class="w-11 h-11 rounded ${flagged ? "bg-[#FADE2A]/15 border border-[#FADE2A]/40 text-[#FADE2A]" : "bg-secondary-container/20 border border-secondary/40 text-secondary"} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[24px]">${flagged ? "warning" : "verified_user"}</span></div><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-mono-data text-badge-label px-space-xs py-space-2xs rounded ${flagged ? "bg-[#FADE2A] text-surface" : "bg-secondary text-on-secondary"} font-bold tracking-wider">${flagged ? "FLAGGED" : "PASS"}</span><span class="font-mono-data text-badge-label text-outline">${flagged ? "sent with the guard off" : "nothing flagged"}</span></div><h2 class="font-headline-lg text-headline-lg ${flagged ? "text-[#FADE2A]" : "text-secondary"} font-semibold tracking-tight">VERDICT: ${flagged ? "FLAGGED — SENT ANYWAY" : "ALLOWED — SENT TO THE MODEL"}</h2></div></div><span class="font-mono-data text-badge-label bg-surface-container-lowest text-outline px-space-sm py-space-2xs rounded border border-outline-variant/30">${row.top_rule ? "RULE: " + esc(row.top_rule) : "NO RULE FIRED"}</span></div>`;
+    const conf = top.explain.confidence, margin = r.score - r.demo_threshold;
+    const cards = `<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm pt-space-2xs">
+      <div class="bg-surface-container-low p-space-sm rounded border border-outline-variant/30 flex flex-col gap-space-2xs"><div class="flex items-center justify-between text-outline"><span class="font-panel-title text-panel-title text-outline">Score</span><span class="material-symbols-outlined ${flagged ? "text-tertiary-container" : "text-secondary"} text-[16px]">${flagged ? "warning" : "check_circle"}</span></div><div class="flex items-baseline gap-space-xs"><span class="font-mono-metric text-mono-metric ${flagged ? "text-tertiary-container" : "text-secondary"} font-bold">${fmtScore3(r.score)}</span><span class="font-mono-data text-badge-label text-outline">SVM decision value</span></div><span class="font-badge-label text-badge-label ${flagged ? "text-tertiary-container" : "text-secondary"} font-medium">${dist ? `above ${percentileBelow(dist, "benign", r.score).toFixed(1)}% of benign training scores` : "of the top piece"}</span></div>
+      <div class="bg-surface-container-low p-space-sm rounded border border-outline-variant/30 flex flex-col gap-space-2xs"><div class="flex items-center justify-between text-outline"><span class="font-panel-title text-panel-title text-outline">Threshold</span><span class="material-symbols-outlined text-yellow-400 text-[16px]">tune</span></div><div class="flex items-baseline gap-space-xs"><span class="font-mono-metric text-mono-metric text-yellow-400 font-bold">${r.demo_threshold.toFixed(3)}</span><span class="font-mono-data text-badge-label text-outline">Δ ${fmtScore3(margin)}</span></div><span class="font-badge-label text-badge-label text-on-surface-variant font-medium">${Math.abs(r.demo_threshold - top.explain.threshold) < 1e-9 ? "the model's own threshold (96% precision floor)" : "demo override · model's own " + Number(top.explain.threshold).toFixed(3)}</span></div>
+      <div class="bg-surface-container-low p-space-sm rounded border border-outline-variant/30 flex flex-col gap-space-2xs"><div class="flex items-center justify-between text-outline"><span class="font-panel-title text-panel-title text-outline">Confidence</span><span class="material-symbols-outlined text-secondary text-[16px]">verified</span></div><div class="flex items-baseline gap-space-xs"><span class="font-mono-metric text-mono-metric text-secondary font-bold">${(100 * conf).toFixed(1)}%</span><span class="font-mono-data text-badge-label text-outline">${fmtMs(r.scan_ms)} detector</span></div><span class="font-badge-label text-badge-label text-secondary font-medium">distance from the model's threshold · injection probability ${(100 * top.explain.probability).toFixed(1)}%</span></div></div>`;
+    const hist = dist ? `<div class="bg-surface-container-low rounded-lg p-space-md border border-outline-variant/30 flex flex-col gap-space-md shadow-sm"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs border-b border-outline-variant/20 pb-space-xs"><div><h3 class="font-panel-title text-panel-title text-on-surface-variant">Where this score sits among training data</h3><p class="font-body-sm text-body-sm text-outline">out-of-fold scores of the ${(dist.counts.benign + dist.counts.injection).toLocaleString()} training texts (grouped folds, a fold model that did not see each text) · generated ${esc(dist.generated)}</p></div><div class="flex items-center gap-space-md text-badge-label font-mono-data text-outline"><div class="flex items-center gap-space-xs"><span class="w-2.5 h-2.5 rounded-full bg-secondary/80"></span><span>benign (${dist.counts.benign.toLocaleString()})</span></div><div class="flex items-center gap-space-xs"><span class="w-2.5 h-2.5 rounded-full bg-tertiary-container/80"></span><span>injection (${dist.counts.injection.toLocaleString()})</span></div></div></div>
+      <div class="w-full relative bg-surface-container-lowest rounded p-space-sm border border-outline-variant/20 overflow-hidden">${histogramSVG(dist, r.score)}${zoneBar(dist, r.score)}</div>
+      <div class="flex items-center gap-space-sm bg-surface-container-lowest rounded p-space-sm font-mono-data text-body-sm"><span class="material-symbols-outlined text-primary text-[16px]">analytics</span><span class="text-on-surface">Score <b>${fmtScore(r.score)}</b> is above <b class="text-secondary">${percentileBelow(dist, "benign", r.score).toFixed(1)}%</b> of benign training scores and <b class="text-tertiary">${percentileBelow(dist, "injection", r.score).toFixed(1)}%</b> of injection training scores.</span></div></div>` : "";
+    const tabs = r.scans.length > 1 ? `<div class="flex items-center gap-space-xs font-mono-data text-badge-label mb-space-sm">${r.scans.map((x, i) => `<button class="px-space-sm py-space-2xs rounded border ${x === top ? "border-primary text-primary bg-primary/10" : "border-outline-variant/40 text-outline hover:text-on-surface"}" data-scan="${i}" type="button">${esc(x.label)} · ${fmtScore(x.explain.score)}${x.flagged ? " · flagged" : ""}</button>`).join("")}</div>` : "";
+    const pipeline = (scan) => `<div class="flex items-center justify-between border-b border-outline-variant/20 pb-space-xs"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-outline text-[18px]">account_tree</span><h3 class="font-panel-title text-panel-title text-on-surface-variant">Inspection execution pipeline · ${esc(scan.label)}</h3></div><span class="font-mono-data text-badge-label ${blocked ? "text-tertiary-container bg-tertiary-container/15 border-tertiary-container/30" : "text-secondary bg-secondary-container/20 border-secondary/30"} px-space-xs py-space-2xs rounded border">${blocked ? "9 stages · halted at stage 7" : "9 stages · completed"}</span></div><div class="flex flex-col relative mt-space-md" id="stages">${stageRowsHTML(scan, r)}</div>`;
+    document.getElementById("result").innerHTML = head + cards + hist + `<div class="bg-surface-container-low rounded-lg p-space-md border border-outline-variant/30 shadow-sm">${tabs}<div id="pipeline">${pipeline(top)}</div></div>`;
+    document.querySelectorAll("[data-scan]").forEach(b => b.addEventListener("click", () => { document.getElementById("pipeline").innerHTML = pipeline(r.scans[Number(b.dataset.scan)]); document.querySelectorAll("[data-scan]").forEach(x => x.className = x.className.replace("border-primary text-primary bg-primary/10", "border-outline-variant/40 text-outline hover:text-on-surface")); b.className = b.className.replace("border-outline-variant/40 text-outline hover:text-on-surface", "border-primary text-primary bg-primary/10"); }));
+    document.getElementById("eval-ms").textContent = fmtMs(r.scan_ms); setHeaderMs(r.scan_ms);
+  }
+  async function evaluate(message, document_) {
+    const btn = document.getElementById("eval"); btn.disabled = true; document.getElementById("eval-label").textContent = "Scanning…";
+    try { const out = await API.post("/api/chat", requestBody(s, message, document_, "inspector")); sessionStorage.setItem("ig_last", JSON.stringify(out)); render(out); refreshSideCounts(); liveTiles(); }
+    catch (e) { alert("The API refused the request: " + e.message); }
+    btn.disabled = false; document.getElementById("eval-label").textContent = "Inspect & evaluate message";
+  }
+  document.getElementById("eval").addEventListener("click", () => { const m = prompt.value.trim(); if (!m) { prompt.focus(); return; } evaluate(m, toggle.checked ? doc.value : ""); });
+  async function liveTiles() {
+    try {
+      const log = await API.get("/api/log");
+      const ms = log.rows.map(r => r.scan_ms).filter(x => x != null);
+      document.getElementById("live-tiles").innerHTML = [["requests", log.total, `${log.summary.sessions} session(s)`], ["blocked", log.summary.blocked, log.total ? `${(100 * log.summary.blocked / log.total).toFixed(0)}% of requests` : "–"], ["detector", ms.length ? fmtMs(median(ms)) : "–", "median per request"]]
+        .map(([l, v, n]) => `<div class="bg-surface-container-lowest p-space-xs rounded border border-outline-variant/20 flex flex-col"><span class="font-mono-data text-badge-label text-outline uppercase">${l}</span><span class="font-mono-metric text-mono-metric text-on-surface">${esc(v)}</span><span class="font-mono-data text-badge-label text-outline">${esc(n)}</span></div>`).join("");
+    } catch (e) {}
+  }
+  liveTiles();
+  const replay = new URLSearchParams(location.search).get("replay");
+  if (replay !== null) {
+    try { const log = await API.get("/api/log"); const row = log.rows[Number(replay)]; if (row) { prompt.value = row._message; doc.value = row._document || ""; toggle.checked = !!row._document; doc.classList.toggle("hidden", !row._document); document.getElementById("char-counter").textContent = `${prompt.value.length} characters`; evaluate(row._message, row._document || ""); } } catch (e) {}
+  } else {
+    try { const last = JSON.parse(sessionStorage.getItem("ig_last") || "null"); if (last) { render(last); prompt.value = last.row._message; doc.value = last.row._document || ""; toggle.checked = !!last.row._document; doc.classList.toggle("hidden", !last.row._document); document.getElementById("char-counter").textContent = `${prompt.value.length} characters`; } } catch (e) {}
+  }
+})();
+</script>
+</body>
+</html>

@@ -79,7 +79,9 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
 | `guard_core.py` | One chat request through the guard (2026-10-08): `handle_request(message, document, settings)` scans, decides, calls the model, returns a plain dict; `history_row()` flattens it. No Streamlit in it; shared by `dashboard.py` and `chat_app.py` |
 | `guard_log.py` | The shared decision log, `logs/guard_log.jsonl` (git-ignored; `GUARD_LOG_PATH` overrides): `append`, `read`, `clear`, `summary`. Both pages write it; the dashboard's live monitor reads it |
 | `chat_app.py` | The production chat page (2026-10-08): an end user talks to the assistant with the guard in front, no inspector; a Guard panel, test payloads and a simulated retrieved document on the right; every request appended to the shared log. `streamlit run chat_app.py --server.port 8502` |
-| `guard_ui.py` | HTML pieces both pages share (palette, chips, badges with icons, tiles, the chat transcript as bubbles with the blocked card); no Streamlit calls |
+| `guard_ui.py` | HTML pieces both Streamlit pages share (palette, chips, badges with icons, tiles, the chat transcript as bubbles with the blocked card); no Streamlit calls |
+| `api.py` | **The Stitch-look front end's backend (2026-10-08 night):** FastAPI on port 8000 serving `web/` and the API: `GET /api/status`, `GET /api/presets` (the six presets with their real scores, computed at start), `POST /api/chat` (one request through `guard_core.handle_request`, logged; returns the row plus every `explain()` value), `GET /api/log`, `POST /api/log/clear`, `GET /api/log.csv`, `GET /api/metrics` (tests, standards, categories, the round-eight gate), `GET /api/distribution`. `.venv/bin/uvicorn api:app --port 8000` |
+| `web/` | The pages the user liked from Stitch, made real: `chat.html` (production chat), `inspector.html` (one request, nine stages, histogram), `monitoring.html` (every session live, polls the log every 2 s), `results.html`, `history.html`, `about.html`; `_head.html` (shared head: the Stitch Tailwind tokens, spliced in by `api.py`); `static/app.js` (shell, API client, components: badges, tiles, chat turns, histogram, sparkline, donut, rule bars, stage list, table), `static/app.css`, `static/vendor/` (Tailwind runtime, Geist and a Material Symbols subset, vendored so the pages work offline). Only the design's visual system was taken; every number shown is the detector's own |
 | `design/stitch/` | The user's Google Stitch export (five screens as HTML + `DESIGN.md`; `renders/` are Brave renders of them). Only its visual system was applied; every number in those screens is invented and none was copied |
 | `llm_client.py` | Dashboard chat client (2026-10-03): `chat(provider, base_url, model, api_key, messages)` over ten providers: in-process transformers model (Qwen2.5-0.5B-Instruct, no server, no key), Ollama, OpenAI-compatible servers, OpenAI, Anthropic (official SDK), Gemini, Groq, OpenRouter, Mistral, DeepSeek. Keys only in request headers, never stored |
 | `scripts/round6_setup.py` | `--round N`: builds `rounds/roundN/<tree>` as copies of the working tree per the round's tree specs (grid pinned to C=0.3 / weight 1.0, data variant or `"live"`, a rules diff pair or `None` for an unpatched dev copy, extra training files), symlinked cache, and checks them; `--smoke TREE` |
@@ -97,8 +99,9 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
 .venv/bin/python -m src.dataset          # balance and duplicate report
 .venv/bin/python -m src.train            # development numbers only
 .venv/bin/python -m src.train --final    # also scores the held-out test sets (~65 min warm)
-.venv/bin/streamlit run dashboard.py     # the guard demo: test page, live monitor, results (needs streamlit)
-.venv/bin/streamlit run chat_app.py --server.port 8502   # the production chat page; its calls appear on the dashboard's live monitor
+.venv/bin/uvicorn api:app --port 8000    # THE FRONT END (Stitch look): http://localhost:8000/ -> chat, inspector, monitoring, results, history, about
+.venv/bin/streamlit run dashboard.py     # the earlier Streamlit demo (fallback): test page, live monitor, results
+.venv/bin/streamlit run chat_app.py --server.port 8502   # the Streamlit production chat page; both share the log with the API
 .venv/bin/python llm_client.py --provider "Local (in-process)" "hi"   # chat client test
 ```
 
@@ -130,8 +133,13 @@ request (`scan_ms` in `guard_core.py`); `chat_app.py` got the same header plus a
 ticket; shared HTML pieces in `guard_ui.py`. Only the design's visual system was used: its sample numbers are invented
 and none was copied. Both pages pass AppTest; screenshots retaken (`report/dashboard_{chat,live,inspector,monitoring,
 results,about}.png`). To screenshot: scratch scripts start both servers by PID (never kill them with a pattern that the
-launching shell's own command line also matches). **Open for the submission (in two days from 2026-10-08):** a set 7 if
-an honest sentence-set number is wanted; otherwise the write-up already states the gap.
+launching shell's own command line also matches). **The user then said the Streamlit result differed from the Stitch
+sketch they liked, so the Stitch pages were made real (same night):** `api.py` + `web/` (see Layout). Screenshots
+`report/web_{chat,inspector,monitoring,results,history,about}.png`, taken headless with Brave + Playwright against the
+API on port 8000; no console errors except Tailwind's "not for production" notice from the vendored runtime. The
+Streamlit pages stay as the fallback. All three surfaces write the same `logs/guard_log.jsonl`. **Open for the
+submission (in two days from 2026-10-08):** a set 7 if an honest sentence-set number is wanted; otherwise the write-up
+already states the gap.
 
 **Round seven (2026-10-05 01:30 to 03:35).** Round four's six-source data + the two rule fixes (+ a second candidate
 with 312 agent-drafted training rows, which lost the tie-break by one false alarm and did not help set 6 either). Gate

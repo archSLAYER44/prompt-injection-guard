@@ -14,3 +14,7 @@ matplotlib
 anthropic
 streamlit
 plotly
+
+# web front end (api.py + web/): the Stitch-designed pages over a small HTTP API
+fastapi
+uvicorn[standard]

@@ -1,0 +1,21 @@
+/* Injection Guard web pages: vendored fonts and the few rules Tailwind utilities do not cover. */
+@import url("vendor/geist.local.css");
+@import url("vendor/symbols.local.css");
+
+@layer base {
+  html, body { margin: 0; padding: 0; }
+  body { overscroll-behavior: none; }
+  main > :first-child { margin-top: 0 !important; }
+  main > :last-child { margin-bottom: 0 !important; }
+}
+::-webkit-scrollbar { display: none; }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20; vertical-align: middle; }
+.stage-details.hidden { display: none; }
+.stage-toggle .material-symbols-outlined.open { transform: rotate(180deg); }
+.msg-body { white-space: pre-wrap; word-break: break-word; }
+.scroll-y { overflow-y: auto; }
+.stream { scroll-behavior: smooth; }
+select option { background: #1e1f25; color: #e3e1e9; }
+input[type="range"] { accent-color: #5794f2; }
+.nav-active { background: #1e1f25; color: #aac7ff; border-left: 2px solid #aac7ff; }
+.fade { transition: opacity .25s; }
