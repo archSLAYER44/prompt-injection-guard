@@ -35,13 +35,14 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
   threshold 0.546, pickle sha1 9a6ca3abfe9f. Gate against round seven: nothing worse; set 6 misses 19 -> 4, probe 24 -> 19,
   false alarms identical. Test sets scored once: official 98.6% / 99.8% (identical), external 79.9% / 97.3% (85% recall
   standard still missed), oasst1 6 false alarms, BIPIA 12.3% (two attacks lost). Record `report/round_eight_results.md`.
-  Round seven is frozen in `backup_round7/`. **Not committed yet (the user commits).**
+  Round seven is frozen in `backup_round7/`. **Committed as fe2d1d2 on 2026-10-08** (rounds five to eight, the
+  front end, under the user's git identity, at the user's request; commits still happen only when the user asks).
 - **Round seven (2026-10-05) promoted the rule-fixes model.** Live model = round four's six-source data and 20 rules with
   the two rule fixes (`DELETE FROM` / truncate / purge, mass messaging), threshold 0.547, pickle sha1 73b0883558c6.
   Record `report/round_seven_results.md`. **Follow-up done 2026-10-06 (01:20 to 01:35):** out-of-fold score distribution
   rebuilt for round seven (`report/score_distribution.json` + `_oof.csv`, 526 s, log `report/round7/export_score_distribution.log`),
   charts (`rule_firing_rates.png` is the only one that changed), notebook rebuilt and executed (no errors), `report/writeup.md`
-  updated to round seven, dashboard AppTest passed (`report/round7/dashboard_apptest.txt`). **Not committed yet (the user commits).**
+  updated to round seven, dashboard AppTest passed (`report/round7/dashboard_apptest.txt`). Committed in fe2d1d2.
 - This laptop has no Ollama (checked 2026-10-03). The working chat model for the dashboard is the in-process
   option of `llm_client.py` (about 12 s to load, 1 to 6 s per reply on the CPU). The model is FROZEN while the
   dashboard is built: no retraining, no new rules, no change to the scoring code.
@@ -99,7 +100,7 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
 .venv/bin/python llm_client.py --provider "Local (in-process)" "hi"   # chat client test
 ```
 
-## Status: round eight promoted on 2026-10-08 (uncommitted); round four was the last committed model (48b97d7)
+## Status: round eight promoted and committed on 2026-10-08 (fe2d1d2); the front end has a production chat page and a live monitor
 
 **Round eight (2026-10-08 01:10 to 03:30).** One tree, `rounds/round8/r8_rules`: the live round-seven tree plus
 `report/round_eight_rules.diff` (13 hunks; developed in `rounds/round8/_dev`, checked with the rule self-check: every
@@ -113,6 +114,15 @@ are the same texts. **Round-nine questions:** a set 7 (nothing unread exists); t
 untouched since set 5); BIPIA's two lost attacks; whether the threshold should be read off a false-alarm budget.
 Launch note: the overnight driver's "already running" check (`pgrep -f src.train|gate_round6|score_tests`) matches the
 launching shell's own command line if that line mentions those names, so launch it from a command that does not.
+
+**Front end (2026-10-08 evening, after the promotion).** `guard_core.py` (one request through the guard, no Streamlit),
+`guard_log.py` (shared log `logs/guard_log.jsonl`, git-ignored), `chat_app.py` (production chat page, port 8502),
+`dashboard.py` extended (round-eight wording, six presets, Results tab from the report files, Monitoring source
+"All sessions (live)" re-reading the log every 3 s). Both pages pass Streamlit AppTest runs; screenshots
+`report/dashboard_{chat,monitoring,results,live}.png` taken headless with Brave + Playwright (`playwright` in the venv
+only; its bundled chromium build does not match, so launch with `executable_path=/usr/bin/brave`). The user may bring a
+Google Stitch design to apply as layout and palette. **Open for the submission (in two days from 2026-10-08):** a set 7
+if an honest sentence-set number is wanted; otherwise the write-up already states the gap.
 
 **Round seven (2026-10-05 01:30 to 03:35).** Round four's six-source data + the two rule fixes (+ a second candidate
 with 312 agent-drafted training rows, which lost the tie-break by one false alarm and did not help set 6 either). Gate
