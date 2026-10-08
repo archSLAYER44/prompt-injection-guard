@@ -649,14 +649,25 @@ tested with Streamlit's AppTest harness: the dashboard runs its six presets and 
 an exception; the chat page allows the benign question, blocks the attack with the guard on, and lets the
 stub leak the secret with it off, and both write to the log.
 
-![The production chat page: a benign question answered, an attack blocked](dashboard_chat.png)
+**Layout after a Stitch design (2026-10-08, evening).** The author made a design in Google Stitch (five screens,
+`design/stitch/`): a 48 px top bar with status chips, a left navigation rail, dense panels with small muted titles,
+KPI tiles with monospace numbers, badges that pair an icon with a label, and tight tables. The dashboard was rebuilt
+on that system with Streamlit's page navigation: Chat, Guard inspector, Monitoring, Results, History, About, plus the
+production chat page. Only the visual system was taken: every number in the Stitch screens is invented (a 70B model,
+148,290 scans, "risk 0.942", "F1 0.994") and none appears in the pages; the values shown are the detector's own,
+including its real latency per request, measured around the two `explain()` and `predict()` calls (about 35 to 45 ms
+on this laptop once the model is loaded). Shared HTML pieces live in `guard_ui.py`.
 
-![The Monitoring tab in live mode, showing the chat page's calls and the six presets](dashboard_monitoring.png)
+![The production chat page: a question answered, an attack blocked, a ticket with a hidden order blocked](dashboard_chat.png)
 
-![The Results tab: standards, held-out test sets, the round-eight gate](dashboard_results.png)
+![The Guard inspector: verdict, tiles, the nine-stage status list and the stage details](dashboard_inspector.png)
 
-The screenshots were taken headless on 2026-10-08 on the round-eight model and its score distribution
-(`report/dashboard_live.png` shows the Live pipeline tab).
+![Monitoring in live mode: the chat page's calls and the six presets, from the shared log](dashboard_monitoring.png)
+
+![Results: standards, held-out test sets, the round-eight gate](dashboard_results.png)
+
+The screenshots were taken headless on 2026-10-08 on the round-eight model and its score distribution;
+`report/dashboard_live.png` shows the dashboard's Chat page and `report/dashboard_about.png` the About page.
 
 The GUI needs Tk (`sudo pacman -S tk` on Arch). The first run downloads the embedding model
 (about 470 MB); after that everything runs offline. A full training run takes about 65 minutes on
@@ -677,9 +688,10 @@ The GUI needs Tk (`sudo pacman -S tk` on Arch). The first run downloads the embe
 | `src/gate.py` | The gate: the three groups, `TOLERANCE = 0`, the probe clause; the champion is round seven in `backup_round7/` (round four in `backup_round4/` for rounds five to seven) |
 | `src/predict.py` | `predict(text)`, used by the CLI and the GUI; `explain(text)`, the same computation reported in full (normalization, every scored piece, the 20 rule values, the decision), for the dashboard |
 | `cli.py`, `gui.py` | Interfaces |
-| `dashboard.py` | The Streamlit test page and monitor (Live pipeline, Monitoring with a live all-sessions mode, Results, History, About tabs); `.streamlit/config.toml` holds its theme |
+| `dashboard.py` | The Streamlit test page and monitor, left navigation: Chat, Guard inspector, Monitoring (with a live all-sessions mode), Results, History, About; `.streamlit/config.toml` holds its theme |
 | `chat_app.py` | The production chat page: the assistant with the guard in front, every call logged; run on a second port |
-| `guard_core.py`, `guard_log.py` | One request through the guard, shared by both pages (no Streamlit); the shared decision log `logs/guard_log.jsonl` (git-ignored) |
+| `guard_core.py`, `guard_log.py`, `guard_ui.py` | One request through the guard, shared by both pages (no Streamlit); the shared decision log `logs/guard_log.jsonl` (git-ignored); the shared HTML pieces |
+| `design/stitch/` | The Stitch design the pages follow (five screens, `DESIGN.md`, renders); its sample numbers are not used |
 | `scripts/export_score_distribution.py` | Out-of-fold score distribution of the training data for the dashboard: `report/score_distribution.json`, per-text scores in `report/score_distribution_oof.csv` |
 | `llm_client.py` | `chat(provider, base_url, model, api_key, messages)` over ten providers for the dashboard; keys only in request headers |
 | `notebooks/exploration.ipynb` | Data exploration and result charts |

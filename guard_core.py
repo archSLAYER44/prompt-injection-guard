@@ -40,9 +40,12 @@ def call_model(provider, base_url, model, api_key, messages, secret):
 
 
 def scan(text, label, demo_threshold):
+    """One text through the detector, with the wall time the two calls took (real latency, for the telemetry)."""
+    started = time.perf_counter()
     info = explain(text)
     official = predict(text)
-    return {"label": label, "text": text, "explain": info, "official": official, "flagged": info["score"] >= demo_threshold}
+    ms = 1000 * (time.perf_counter() - started)
+    return {"label": label, "text": text, "explain": info, "official": official, "flagged": info["score"] >= demo_threshold, "ms": ms}
 
 
 def resolve_model(provider, state):
@@ -80,7 +83,8 @@ def handle_request(message, document, settings):
     return {"scans": scans, "blocked": blocked, "any_flagged": any_flagged, "guard_on": guard_on, "messages": messages,
             "reply": reply, "error": error, "elapsed": elapsed, "leaked": leaked, "provider": settings["provider"],
             "model": settings["model"], "base_url": settings["base_url"], "demo_threshold": demo_threshold,
-            "score": top["explain"]["score"]}
+            "score": top["explain"]["score"], "scan_ms": sum(x["ms"] for x in scans),
+            "top_rules": sorted(((k, v["value"]) for k, v in top["explain"]["fired"].items()), key=lambda kv: -kv[1])[:3]}
 
 
 def history_row(result, message, document, session=None, surface=None):
@@ -97,4 +101,5 @@ def history_row(result, message, document, session=None, surface=None):
         "ts": now.isoformat(timespec="seconds"), "session": session, "surface": surface,
         "elapsed": round(result["elapsed"], 2), "threshold": result["demo_threshold"],
         "flagged": [x["label"] for x in result["scans"] if x["flagged"]],
+        "scan_ms": round(result["scan_ms"], 1), "top_rule": result["top_rules"][0][0] if result["top_rules"] else "",
     }
