@@ -107,9 +107,9 @@ confidence and the rules that fired. No LLM API calls, nothing executed, offline
 .venv/bin/python llm_client.py --provider "Local (in-process)" "hi"   # chat client test
 ```
 
-## Status: round eight promoted and committed on 2026-10-08 (fe2d1d2); the front end has a production chat page and a live monitor
+## Status: round eight promoted and committed on 2026-10-08 (fe2d1d2); the two sites (dashboard + Nimbus chat) committed as 3a067c5 on 2026-10-15; working tree clean after that
 
-**Two sites (2026-10-14, uncommitted when written).** The user asked for a normal chat front end for the live demo (pick a
+**Two sites (2026-10-14; committed as 3a067c5 on 2026-10-15 together with the History snapshots and the gitignore tidy).** The user asked for a normal chat front end for the live demo (pick a
 model, paste an API key, chat; every message verified by the detector, then sent to the model; every chat visible on the
 dashboard), then that the chat and the dashboard be different sites with the chat under another name. Result: the chat
 product **Nimbus** (`chat_api.py`, port 8001, light theme, `web/assistant.html` + `web/_head_chat.html`) and the dashboard
@@ -121,7 +121,7 @@ stub flow, blocked attack and blocked ticket, guard-off leak marked, the local Q
 connection test (stub, local, Ollama refused, OpenAI 401 with a fake key, Anthropic fields), deletion, the dashboard's
 Chats view and links, phone width, no console errors; screenshots `report/web_nimbus_*.png`, `report/web_history_chats.png`.
 The detector, `predict()` and the Streamlit pages are untouched (`history_row` gained an optional `conversation=None`).
-Write-up section rewritten. Good point to commit. Run both servers for the demo; the laptop can hold both (two detector
+Write-up section rewritten. Run both servers for the demo; the laptop can hold both (two detector
 copies; only the process that chats with the local model loads Qwen).
 **Same day, later:** the user asked that History show, for every message, the detail the Monitoring page shows. Done: per-row
 snapshot logged by `guard_core.snapshot()` and rendered by `detailPanelHTML()` in both History views (see `web/` row);
