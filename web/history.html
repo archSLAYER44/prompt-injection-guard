@@ -6,28 +6,72 @@
 <main class="w-full pt-20 bg-surface min-h-screen px-margin pb-space-2xl lg:pl-64">
 <div class="bg-surface-container-low rounded p-space-md flex flex-col gap-space-md">
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
-    <div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-outline text-[18px]">history</span><span class="font-panel-title text-panel-title text-on-surface">Every request the guard handled</span><span class="font-mono-data text-badge-label text-outline bg-surface-container px-space-xs py-space-2xs rounded" id="count">–</span></div>
+    <div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-outline text-[18px]">history</span><span class="font-panel-title text-panel-title text-on-surface" id="title">Every request the guard handled</span><span class="font-mono-data text-badge-label text-outline bg-surface-container px-space-xs py-space-2xs rounded" id="count">–</span>
+      <div class="flex items-center rounded bg-surface-container-lowest border border-outline-variant/40 font-mono-data text-badge-label" id="views"><button data-v="conversations" class="px-space-sm py-space-2xs rounded bg-primary text-surface flex items-center gap-space-2xs" type="button"><span class="material-symbols-outlined text-[13px]">forum</span>Chats</button><button data-v="requests" class="px-space-sm py-space-2xs text-outline hover:text-on-surface flex items-center gap-space-2xs" type="button"><span class="material-symbols-outlined text-[13px]">list</span>Requests</button></div></div>
     <div class="flex flex-wrap items-center gap-space-xs">
-      <div class="flex items-center gap-space-xs bg-surface-container-lowest border border-outline-variant/40 rounded px-space-sm py-space-2xs"><span class="material-symbols-outlined text-outline text-[16px]">search</span><input class="bg-transparent font-mono-data text-body-sm text-on-surface placeholder:text-outline focus:outline-none w-56" id="q" placeholder="search message, session, rule"></div>
+      <div class="flex items-center gap-space-xs bg-surface-container-lowest border border-outline-variant/40 rounded px-space-sm py-space-2xs"><span class="material-symbols-outlined text-outline text-[16px]">search</span><input class="bg-transparent font-mono-data text-body-sm text-on-surface placeholder:text-outline focus:outline-none w-56" id="q" placeholder="search message, chat, session, rule"></div>
       <div class="flex items-center rounded bg-surface-container-lowest border border-outline-variant/40 font-mono-data text-badge-label" id="filters"><button data-f="all" class="px-space-sm py-space-2xs rounded bg-primary text-surface" type="button">All</button><button data-f="allowed" class="px-space-sm py-space-2xs text-outline hover:text-on-surface" type="button">Allowed</button><button data-f="blocked" class="px-space-sm py-space-2xs text-outline hover:text-on-surface" type="button">Blocked</button></div>
       <a class="flex items-center gap-space-xs bg-surface-container hover:bg-surface-container-high text-on-surface-variant px-space-sm py-space-2xs rounded font-mono-data text-badge-label" href="/api/log.csv"><span class="material-symbols-outlined text-[14px]">download</span>Download CSV</a>
       <button class="flex items-center gap-space-xs bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-error px-space-sm py-space-2xs rounded font-mono-data text-badge-label" id="clear" type="button"><span class="material-symbols-outlined text-[14px]">delete_sweep</span>Clear the log</button>
     </div>
   </div>
-  <div class="overflow-x-auto"><table class="w-full text-left"><thead><tr class="border-b border-outline-variant/30 text-outline font-panel-title text-panel-title"><th class="py-space-xs px-space-sm font-medium">Time</th><th class="py-space-xs px-space-sm font-medium">Surface</th><th class="py-space-xs px-space-sm font-medium">Session</th><th class="py-space-xs px-space-sm font-medium">Message</th><th class="py-space-xs px-space-sm font-medium text-right">Score</th><th class="py-space-xs px-space-sm font-medium text-center">Verdict</th><th class="py-space-xs px-space-sm font-medium text-center">Model reply</th><th class="py-space-xs px-space-sm font-medium text-right">Detector</th><th class="py-space-xs px-space-sm font-medium text-center">Actions</th></tr></thead><tbody class="divide-y divide-surface-container font-mono-data text-body-sm text-on-surface" id="rows"></tbody></table></div>
+  <div class="flex flex-col gap-space-sm" id="convs"></div>
+  <div class="overflow-x-auto hidden" id="table-wrap"><table class="w-full text-left"><thead><tr class="border-b border-outline-variant/30 text-outline font-panel-title text-panel-title"><th class="py-space-xs px-space-sm font-medium" title="click a row for its snapshot">Time</th><th class="py-space-xs px-space-sm font-medium">Surface</th><th class="py-space-xs px-space-sm font-medium">Session</th><th class="py-space-xs px-space-sm font-medium">Message</th><th class="py-space-xs px-space-sm font-medium text-right">Score</th><th class="py-space-xs px-space-sm font-medium text-center">Verdict</th><th class="py-space-xs px-space-sm font-medium text-center">Model reply</th><th class="py-space-xs px-space-sm font-medium text-right">Detector</th><th class="py-space-xs px-space-sm font-medium text-center">Actions</th></tr></thead><tbody class="divide-y divide-surface-container font-mono-data text-body-sm text-on-surface" id="rows"></tbody></table></div>
   <div class="font-mono-data text-badge-label text-outline" id="showing">–</div>
 </div>
 </main>
 <script>
 (async () => {
   await shell("history");
-  let rows = [], filter = "all", query = "";
-  const redraw = () => { const t = tableRowsHTML(rows, { live: true, filter, query }); document.getElementById("rows").innerHTML = t.html || `<tr><td class="py-space-md px-space-sm text-outline" colspan="9">nothing logged yet</td></tr>`; document.getElementById("showing").textContent = `showing ${t.shown} of ${rows.length}`; document.getElementById("count").textContent = `${rows.length} request(s)`; };
-  const load = async () => { rows = (await API.get("/api/log")).rows; redraw(); };
+  let rows = [], convs = [], filter = "all", query = "", view = "conversations", open = new Set(), openRows = new Set(), openTurns = new Set();
+  try { window.DIST = await API.get("/api/distribution"); } catch (e) { window.DIST = null; }
+  const timeOf = ts => { try { return new Date(ts).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }); } catch (e) { return ts || ""; } };
+  function matches(c) {
+    const q = query.trim().toLowerCase();
+    const mine = rows.filter(r => (r.conversation || r.session) === c.id);
+    if (filter === "blocked" && !c.blocked) return false;
+    if (filter === "allowed" && c.blocked === c.turns) return false;
+    return !q || (c.title || "").toLowerCase().includes(q) || c.id.includes(q) || (c.session || "").includes(q) || mine.some(r => (r._message || "").toLowerCase().includes(q) || (r.top_rule || "").includes(q));
+  }
+  function convHTML(c) {
+    const mine = rows.filter(r => (r.conversation || r.session) === c.id);
+    const isOpen = open.has(c.id);
+    const model = c.model && c.model !== "stub" ? c.model : (c.provider || "");
+    return `<div class="rounded-lg bg-surface-container-lowest border border-outline-variant/20">
+      <div class="flex items-center gap-space-sm px-space-sm py-space-xs cursor-pointer hover:bg-surface-container/60 rounded-lg" data-open="${esc(c.id)}">
+        <span class="material-symbols-outlined text-[18px] ${c.blocked ? "text-tertiary" : "text-outline"}">${c.blocked ? "gpp_maybe" : "chat_bubble"}</span>
+        <div class="flex-1 min-w-0"><div class="font-body-default text-body-default text-on-surface truncate">${esc(c.title || "(empty)")}</div>
+          <div class="font-mono-data text-badge-label text-outline truncate">${timeOf(c.started)} · ${c.turns} message${c.turns === 1 ? "" : "s"} · ${esc(model)} · ${esc(c.surface || "?")}${c.grouped_by_session ? " · grouped by session" : ""} · <span class="text-outline-variant">${esc(c.id)}</span></div></div>
+        <div class="flex items-center gap-space-xs shrink-0">${c.blocked ? badge("bad", `${c.blocked} blocked`, "shield") : ""}${c.flagged > c.blocked ? badge("warn", `${c.flagged - c.blocked} flagged, sent`, "warning") : ""}${c.leaked ? badge("bad", `${c.leaked} leak`, "gpp_maybe") : ""}${!c.blocked && !c.flagged ? badge("ok", "clean", "check_circle") : ""}
+          <a class="px-space-xs py-1 rounded bg-surface-container text-primary hover:bg-primary hover:text-surface font-body-sm text-badge-label inline-flex items-center gap-1" href="${chatAppLink(c.id)}" target="_blank" rel="noopener" title="open this chat in the chat app">${icon("open_in_new", "text-[13px]")}Open</a>
+          <span class="material-symbols-outlined text-[18px] text-outline">${isOpen ? "expand_less" : "expand_more"}</span></div></div>
+      ${isOpen ? `<div class="border-t border-outline-variant/20 p-space-md flex flex-col gap-space-lg max-h-[40rem] overflow-y-auto">${mine.map(r => { const k = r.ts + "|" + rows.indexOf(r); const on = openTurns.has(k); return turnHTML(r) + `<div class="flex flex-col gap-space-sm -mt-space-sm"><button class="self-start flex items-center gap-1 px-space-sm py-space-2xs rounded bg-surface-container hover:bg-surface-container-high text-primary font-mono-data text-badge-label" data-turn="${esc(k)}" type="button">${icon(on ? "expand_less" : "policy", "text-[14px]")}${on ? "hide the snapshot" : "snapshot: score among training data, rules, parts"}</button>${on ? `<div class="rounded-lg bg-surface-container-lowest border border-outline-variant/20 p-space-sm">${detailPanelHTML(r, window.DIST, window.STATUS)}</div>` : ""}</div>`; }).join("")}</div>` : ""}</div>`;
+  }
+  const redraw = () => {
+    const isConv = view === "conversations";
+    document.getElementById("convs").classList.toggle("hidden", !isConv); document.getElementById("table-wrap").classList.toggle("hidden", isConv);
+    document.getElementById("title").textContent = isConv ? "Every chat the guard handled" : "Every request the guard handled";
+    document.querySelectorAll("#views button").forEach(b => b.className = `px-space-sm py-space-2xs flex items-center gap-space-2xs ${b.dataset.v === view ? "rounded bg-primary text-surface" : "text-outline hover:text-on-surface"}`);
+    if (isConv) {
+      const shown = convs.filter(matches);
+      document.getElementById("convs").innerHTML = shown.length ? shown.map(convHTML).join("") : `<div class="py-space-md px-space-sm text-outline font-body-sm text-body-sm">no chats match</div>`;
+      document.querySelectorAll("#convs [data-open]").forEach(el => el.addEventListener("click", e => { if (e.target.closest("a")) return; const id = el.dataset.open; open.has(id) ? open.delete(id) : open.add(id); redraw(); }));
+      document.querySelectorAll("#convs [data-turn]").forEach(el => el.addEventListener("click", () => { const k = el.dataset.turn; openTurns.has(k) ? openTurns.delete(k) : openTurns.add(k); redraw(); }));
+      document.getElementById("showing").textContent = `showing ${shown.length} of ${convs.length} chat(s), ${rows.length} request(s) in all`;
+      document.getElementById("count").textContent = `${convs.length} chat(s)`;
+    } else {
+      const t = tableRowsHTML(rows, { live: true, filter, query, expandable: true, open: openRows });
+      document.getElementById("rows").innerHTML = t.html || `<tr><td class="py-space-md px-space-sm text-outline" colspan="9">nothing logged yet</td></tr>`;
+      document.querySelectorAll("#rows tr[data-detail]").forEach(tr => tr.addEventListener("click", e => { if (e.target.closest("a")) return; const i = Number(tr.dataset.detail); openRows.has(i) ? openRows.delete(i) : openRows.add(i); redraw(); }));
+      document.getElementById("showing").textContent = `showing ${t.shown} of ${rows.length}`; document.getElementById("count").textContent = `${rows.length} request(s)`;
+    }
+  };
+  const load = async () => { const [log, cv] = await Promise.all([API.get("/api/log"), API.get("/api/conversations")]); rows = log.rows; window.LOGROWS = rows; convs = cv.conversations; redraw(); };
   document.getElementById("q").addEventListener("input", e => { query = e.target.value; redraw(); });
+  document.querySelectorAll("#views button").forEach(b => b.addEventListener("click", () => { view = b.dataset.v; redraw(); }));
   document.querySelectorAll("#filters button").forEach(b => b.addEventListener("click", () => { filter = b.dataset.f; document.querySelectorAll("#filters button").forEach(x => x.className = "px-space-sm py-space-2xs text-outline hover:text-on-surface"); b.className = "px-space-sm py-space-2xs rounded bg-primary text-surface"; redraw(); }));
   document.getElementById("clear").addEventListener("click", async () => { if (confirm("Clear the shared log file?")) { await API.post("/api/log/clear"); await load(); refreshSideCounts(); } });
-  await load();
+  await load(); setInterval(load, 5000);
 })();
 </script>
 </body>

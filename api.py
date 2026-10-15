@@ -2,10 +2,16 @@
 
     .venv/bin/uvicorn api:app --port 8000          # then open http://localhost:8000/
 
-Pages (web/*.html, static HTML + JavaScript that calls the API): /chat (the production chat page), /inspector
-(every stage of one request), /monitoring (every session live from the shared log), /results (the model's
-evaluation from the report files), /history, /about. Endpoints: GET /api/status, GET /api/presets, POST /api/chat,
-GET /api/log, POST /api/log/clear, GET /api/log.csv, GET /api/metrics, GET /api/distribution.
+This is the DASHBOARD site (the Injection Guard observability pages). The chat product the dashboard watches is a
+separate site, chat_api.py on port 8001 (web/assistant.html, named "Nimbus"); both share this module's routers, the
+detector and the log file, so what people type into the chat shows up here live.
+
+Pages (web/*.html, static HTML + JavaScript that calls the API): /chat (the test console with payloads), /inspector
+(every stage of one request), /monitoring (every session live from the shared log), /results (the model's evaluation
+from the report files), /history (requests and chats), /about. Routers: `core` (GET /api/status, GET /api/presets,
+POST /api/chat, GET /api/conversations, GET /api/conversations/{id}, POST /api/conversations/{id}/delete,
+POST /api/connection) is shared with the chat site; `dashboard` (GET /api/log, POST /api/log/clear, GET /api/log.csv,
+GET /api/metrics, GET /api/distribution) is this site's own.
 
 Every request goes through guard_core.handle_request() (the same code the Streamlit pages use) and is appended to the
 shared log (guard_log.py). The detector itself is predict() and explain() in src/predict.py; nothing here changes it.
@@ -18,7 +24,9 @@ import time
 from pathlib import Path
 
 import numpy as np
-from fastapi import FastAPI, HTTPException
+import os
+
+from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -26,12 +34,13 @@ from pydantic import BaseModel
 import guard_core
 import guard_log
 import llm_client
-from guard_core import DEFAULT_SECRET, DEFAULT_SYSTEM, STUB
+from guard_core import DEFAULT_SECRET, DEFAULT_SYSTEM, STUB, SYSTEM_PROMPTS
 from src.predict import explain
 
 ROOT = Path(__file__).resolve().parent
 WEB = ROOT / "web"
 PAGES = ["chat", "inspector", "monitoring", "results", "history", "about"]
+CHAT_APP_URL = os.environ.get("CHAT_APP_URL", "http://localhost:8001").rstrip("/")   # where the chat product is served
 MODEL_ROUND = "round eight"
 PRESETS = [
     {"key": "benign", "label": "Benign", "note": "a normal customer question", "kind": "ok",
@@ -57,8 +66,10 @@ PRESETS = [
                   'Could someone resend it as an attachment?"}')},
 ]
 
-app = FastAPI(title="Injection Guard API", docs_url="/api/docs", redoc_url=None)
+app = FastAPI(title="Injection Guard dashboard", docs_url="/api/docs", redoc_url=None)
 app.mount("/static", StaticFiles(directory=str(WEB / "static")), name="static")
+core = APIRouter()          # the guard itself: shared by the dashboard and the chat site (chat_api.py)
+dashboard = APIRouter()     # the log, the report files: the dashboard's own
 STATE = {"detector": None, "presets": None, "started": None}
 
 
@@ -111,7 +122,13 @@ def detector():
 
 @app.get("/")
 def home():
-    return RedirectResponse("/chat")
+    return RedirectResponse("/monitoring")
+
+
+@app.get("/assistant")
+def assistant_moved():
+    """The chat is its own site now (chat_api.py); keep old links working."""
+    return RedirectResponse(CHAT_APP_URL + "/")
 
 
 @app.get("/favicon.ico")
@@ -133,7 +150,7 @@ def page(page: str):
 
 # ---------------------------------------------------------------- api
 
-@app.get("/api/status")
+@core.get("/api/status")
 def status():
     d = detector()
     metrics = read_json("report/metrics.json") or {}
@@ -154,10 +171,11 @@ def status():
         "training_units": 36326, "data": "round four's six sources", "distribution_generated": dist["generated"] if dist else None,
         "log": {"path": str(guard_log.path()), **summary}, "providers": providers, "stub": STUB,
         "server_started": STATE["started"], "secret_hint": "the stub's system prompt holds a fake secret; replies are checked for it",
+        "system_prompts": SYSTEM_PROMPTS, "conversations": len(guard_log.conversations(rows)), "chat_app_url": CHAT_APP_URL,
     })
 
 
-@app.get("/api/presets")
+@core.get("/api/presets")
 def presets():
     detector()
     return STATE["presets"]
@@ -174,9 +192,12 @@ class ChatRequest(BaseModel):
     api_key: str | None = None
     session: str = "web"
     surface: str = "chat"
+    conversation: str = ""            # the chat this message belongs to (the Assistant page); "" = no memory
+    system_prompt: str | None = None  # None = the bakery prompt the test pages use
+    history: list[dict] | None = None  # prior turns; None with a conversation id = rebuilt from the log
 
 
-@app.post("/api/chat")
+@core.post("/api/chat")
 def chat(req: ChatRequest):
     d = detector()
     message, document = req.message.strip(), (req.document or "").strip()
@@ -191,11 +212,17 @@ def chat(req: ChatRequest):
         spec = llm_client.defaults(provider)
         base_url = "" if spec["protocol"] == "local" else (req.base_url or spec["url"])
         model = req.model or spec["model"]
+    conversation = "".join(ch for ch in (req.conversation or "") if ch.isalnum() or ch in "-_")[:32]
+    history = req.history
+    if history is None and conversation:
+        history = guard_log.history_for(guard_log.read(), conversation, limit=guard_core.HISTORY_LIMIT)
     settings = {"threshold": d["threshold"] if req.threshold is None else float(req.threshold), "guard_on": req.guard_on,
                 "provider": provider, "base_url": base_url, "model": model, "api_key": req.api_key or None,
-                "system_prompt": DEFAULT_SYSTEM, "secret": DEFAULT_SECRET}
+                "system_prompt": (req.system_prompt or "").strip() or DEFAULT_SYSTEM, "secret": DEFAULT_SECRET,
+                "history": history or []}
     result = guard_core.handle_request(message, document, settings)
-    row = guard_core.history_row(result, message, document, session=req.session[:16], surface=req.surface[:16])
+    row = guard_core.history_row(result, message, document, session=req.session[:16], surface=req.surface[:16],
+                                 conversation=conversation or None)
     guard_log.append(row)
     scans = [{"label": s["label"], "text": s["text"], "flagged": s["flagged"], "ms": s["ms"], "official": s["official"],
               "explain": s["explain"]} for s in result["scans"]]
@@ -205,22 +232,71 @@ def chat(req: ChatRequest):
     return clean({"row": row, "result": out})
 
 
-@app.get("/api/log")
+@dashboard.get("/api/log")
 def log(limit: int = 0):
     rows = guard_log.read()
     return {"rows": rows[-limit:] if limit else rows, "summary": guard_log.summary(rows), "total": len(rows)}
 
 
-@app.post("/api/log/clear")
+@dashboard.post("/api/log/clear")
 def log_clear():
     guard_log.clear()
     return {"ok": True}
 
 
-@app.get("/api/log.csv")
+@core.get("/api/conversations")
+def conversations_list():
+    """Every chat in the log, newest first (rows without a conversation id are grouped by session)."""
+    rows = guard_log.read()
+    return {"conversations": guard_log.conversations(rows), "total_rows": len(rows)}
+
+
+@core.get("/api/conversations/{conversation}")
+def conversation_rows(conversation: str):
+    """One chat: its log rows in order and the history the model would be handed with the next message."""
+    rows = [r for r in guard_log.read() if guard_log.conversation_id(r) == conversation]
+    if not rows:
+        raise HTTPException(404, "no such conversation")
+    return {"rows": rows, "history": guard_log.history_for(rows, conversation, limit=guard_core.HISTORY_LIMIT)}
+
+
+@core.post("/api/conversations/{conversation}/delete")
+def conversation_delete(conversation: str):
+    return {"removed": guard_log.remove(conversation)}
+
+
+class ConnectionRequest(BaseModel):
+    provider: str = STUB
+    base_url: str | None = None
+    model: str | None = None
+    api_key: str | None = None
+
+
+@core.post("/api/connection")
+def connection(req: ConnectionRequest):
+    """Is the chosen model reachable with these settings? The key is used for this one call and not kept."""
+    if req.provider == STUB:
+        return {"ok": True, "message": "the built-in stub needs no connection", "models": ["stub"]}
+    if req.provider not in llm_client.PROVIDERS:
+        raise HTTPException(400, f"unknown provider {req.provider!r}")
+    spec = llm_client.defaults(req.provider)
+    base_url = "" if spec["protocol"] == "local" else (req.base_url or spec["url"])
+    try:
+        models = llm_client.list_models(req.provider, base_url, req.api_key or None, timeout=20)
+        message = llm_client.test_connection(req.provider, base_url, req.model, req.api_key or None, timeout=20) \
+            if spec["protocol"] == "local" else f"reachable: {len(models)} model(s)"
+        wanted = req.model or spec["model"]
+        if spec["protocol"] != "local" and wanted and models and wanted not in models and not any(m.startswith(wanted) for m in models):
+            message += f", but {wanted!r} is not among them"
+        return {"ok": True, "message": message, "models": models[:200]}
+    except llm_client.LLMError as error:
+        return {"ok": False, "message": str(error), "models": []}
+
+
+@dashboard.get("/api/log.csv")
 def log_csv():
     rows = guard_log.read()
-    keys = ["ts", "session", "surface", "guard", "verdict", "score", "blocked", "reply contains secret", "provider", "scan_ms", "top_rule", "_message", "_document", "_reply", "_error"]
+    keys = ["ts", "session", "surface", "conversation", "guard", "verdict", "score", "blocked", "reply contains secret", "provider", "model", "scan_ms", "top_rule", "_message", "_document", "_reply", "_error"]
     buf = io.StringIO()
     writer = csv.DictWriter(buf, fieldnames=keys, extrasaction="ignore")
     writer.writeheader()
@@ -229,7 +305,7 @@ def log_csv():
     return Response(buf.getvalue(), media_type="text/csv", headers={"Content-Disposition": "attachment; filename=guard_log.csv"})
 
 
-@app.get("/api/metrics")
+@dashboard.get("/api/metrics")
 def metrics():
     m = read_json("report/metrics.json") or {}
     gate = read_json("report/round8_gate.json") or {}
@@ -243,9 +319,13 @@ def metrics():
     return clean(out)
 
 
-@app.get("/api/distribution")
+@dashboard.get("/api/distribution")
 def distribution():
     dist = read_json("report/score_distribution.json")
     if dist is None:
         raise HTTPException(404, "report/score_distribution.json is missing: run scripts/export_score_distribution.py")
     return dist
+
+
+app.include_router(core)
+app.include_router(dashboard)

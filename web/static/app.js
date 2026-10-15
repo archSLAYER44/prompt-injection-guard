@@ -62,8 +62,9 @@ function panelTitle(iconName, title, right) {
 }
 
 // ---------------------------------------------------------------- the shell: header bar, profile line, navigation rail
-const NAV = [["chat", "chat", "Chat"], ["inspector", "policy", "Guard inspector"], ["monitoring", "query_stats", "Monitoring"],
-             ["results", "fact_check", "Results"], ["history", "history", "History"], ["about", "info", "About"]];
+const NAV = [["monitoring", "query_stats", "Monitoring"], ["history", "history", "History"], ["chat", "science", "Test console"], ["inspector", "policy", "Guard inspector"],
+             ["results", "fact_check", "Results"], ["about", "info", "About"]];
+function chatAppLink(conversation) { return `${(window.STATUS && window.STATUS.chat_app_url) || "http://localhost:8001"}/?c=${encodeURIComponent(conversation)}`; }
 async function shell(active) {
   const host = document.getElementById("shell");
   host.innerHTML = `
@@ -95,6 +96,7 @@ async function shell(active) {
     <nav class="flex flex-col gap-space-2xs mt-space-xs">${NAV.map(([p, ic, label]) => `<a href="/${p}" class="flex items-center gap-space-sm px-space-sm py-space-xs rounded font-panel-title text-panel-title transition-colors ${p === active ? "bg-surface-container text-primary font-medium border-l-2 border-primary" : "hover:bg-surface-container text-on-surface-variant hover:text-on-surface"}">${icon(ic, "text-[18px]" + (p === active ? " text-primary" : ""))}<span>${label}</span></a>`).join("")}</nav>
   </div>
   <div class="px-space-sm py-space-xs border-t border-outline-variant/30 flex flex-col gap-space-2xs font-mono-data text-[10px] text-outline">
+    <a class="flex items-center justify-between py-space-2xs text-on-surface-variant hover:text-primary" href="http://localhost:8001/" id="side-chat-app" target="_blank" rel="noopener"><span>CHAT APP (SEPARATE SITE)</span>${icon("open_in_new", "text-[14px]")}</a>
     <div class="flex items-center justify-between"><span>DETECTOR</span><span class="text-secondary" id="side-status">loading</span></div>
     <div class="flex items-center justify-between"><span>REQUESTS LOGGED</span><span class="text-on-surface" id="side-count">–</span></div>
     <div class="flex items-center justify-between"><span>BLOCKED</span><span class="text-tertiary" id="side-blocked">–</span></div>
@@ -110,6 +112,7 @@ async function shell(active) {
     document.getElementById("hdr-thr").textContent = `threshold ${st.threshold.toFixed(3)}`;
     document.getElementById("hdr-log").textContent = `log: ${st.log.requests} request(s) · ${st.log.sessions} session(s)`;
     document.getElementById("side-status").textContent = "ready";
+    if (st.chat_app_url) document.getElementById("side-chat-app").href = st.chat_app_url + "/";
     document.getElementById("side-count").textContent = st.log.requests;
     document.getElementById("side-blocked").textContent = st.log.blocked;
     return st;
@@ -226,20 +229,64 @@ function rulesBarsHTML(rows, ruleNames, descriptive) {
   const top = Math.max(1, ...ordered.map(e => e[1]));
   return ordered.map(([k, v], i) => `<div class="flex flex-col gap-1"><div class="flex items-center justify-between font-mono-data text-body-sm"><span class="text-on-surface font-medium truncate">${esc(k)}</span><span class="${v ? (i < 3 ? "text-tertiary" : "text-primary") : "text-outline"} font-semibold">${v}</span></div><div class="w-full bg-surface-container h-2 rounded overflow-hidden"><div class="h-full rounded" style="width:${(100 * v / top).toFixed(0)}%;background-color:${v ? (i < 3 ? RED : BLUE) : "transparent"}"></div></div></div>`).join("");
 }
-function tableRowsHTML(rows, { live = true, filter = "all", query = "" } = {}) {
+function tableRowsHTML(rows, { live = true, filter = "all", query = "", expandable = false, open = null } = {}) {
   const q = query.trim().toLowerCase();
-  const shown = rows.filter(r => (filter === "all" || (filter === "blocked") === (r.blocked === "yes")) && (!q || (r._message || "").toLowerCase().includes(q) || (r.session || "").includes(q) || (r.top_rule || "").includes(q)));
+  const shown = rows.filter(r => (filter === "all" || (filter === "blocked") === (r.blocked === "yes")) && (!q || (r._message || "").toLowerCase().includes(q) || (r.session || "").includes(q) || (r.conversation || "").includes(q) || (r.top_rule || "").includes(q)));
   const html = [...shown].reverse().map((r, i) => {
     const idx = rows.indexOf(r);
     const verdict = r.blocked === "yes" ? badge("bad", "blocked", "gpp_maybe") : (r.verdict === "injection" ? badge("warn", "flagged, sent", "warning") : badge("ok", "allowed", "check_circle"));
     const reply = r["reply contains secret"] === "yes" ? badge("bad", "secret leaked", "gpp_maybe") : (r.blocked === "yes" ? badge("neutral", "not sent", "") : (r._error ? badge("warn", "error", "warning") : badge("ok", "clean", "check")));
-    return `<tr class="hover:bg-surface-container/60 transition-colors"><td class="py-space-xs px-space-sm text-outline whitespace-nowrap">${esc(r.time)}</td>
-      ${live ? `<td class="py-space-xs px-space-sm whitespace-nowrap"><span class="px-space-xs py-space-2xs rounded ${r.surface === "chat" ? "bg-primary/10 text-primary" : "bg-surface-container text-on-surface-variant"} text-badge-label">${esc(r.surface || "?")}</span></td><td class="py-space-xs px-space-sm font-semibold text-primary whitespace-nowrap">${esc(r.session || "")}</td>` : ""}
+    const isOpen = open && open.has(idx);
+    return `<tr class="hover:bg-surface-container/60 transition-colors ${expandable ? "cursor-pointer" : ""} ${isOpen ? "bg-surface-container/40" : ""}" ${expandable ? `data-detail="${idx}"` : ""}><td class="py-space-xs px-space-sm text-outline whitespace-nowrap">${expandable ? icon(isOpen ? "expand_less" : "expand_more", "text-[16px] text-outline mr-1") : ""}${esc(r.time)}</td>
+      ${live ? `<td class="py-space-xs px-space-sm whitespace-nowrap"><span class="px-space-xs py-space-2xs rounded ${["chat", "inspector", "dashboard"].includes(r.surface) ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"} text-badge-label">${esc(r.surface || "?")}</span></td><td class="py-space-xs px-space-sm font-semibold text-primary whitespace-nowrap">${esc(r.session || "")}${r.conversation ? `<a class="block font-normal text-outline hover:text-primary text-[10px]" href="${chatAppLink(r.conversation)}" target="_blank" rel="noopener" title="open this chat in the chat app">chat ${esc(r.conversation.slice(0, 8))}</a>` : ""}</td>` : ""}
       <td class="py-space-xs px-space-sm max-w-xs font-body-sm truncate text-on-surface" title="${esc(r._message)}">${r.top_rule ? `<span class="text-tertiary font-mono-data font-semibold mr-1">[${esc(r.top_rule.replace("_count", "").replace("_score", "").replace("_ratio", "").toUpperCase())}]</span>` : ""}${esc(r.message)}</td>
       <td class="py-space-xs px-space-sm text-right font-bold ${r.verdict === "injection" ? "text-tertiary" : "text-secondary"}">${fmtScore3(r.score)}</td><td class="py-space-xs px-space-sm text-center whitespace-nowrap">${verdict}</td><td class="py-space-xs px-space-sm text-center whitespace-nowrap">${reply}</td>
-      <td class="py-space-xs px-space-sm text-right text-outline whitespace-nowrap">${fmtMs(r.scan_ms)}</td><td class="py-space-xs px-space-sm text-center whitespace-nowrap"><a class="px-space-xs py-1 rounded bg-surface-container text-primary hover:bg-primary hover:text-surface font-body-sm text-badge-label transition-colors inline-flex items-center gap-1" href="/inspector?replay=${idx}">${icon("visibility", "text-[13px]")} Inspect</a></td></tr>`;
+      <td class="py-space-xs px-space-sm text-right text-outline whitespace-nowrap">${fmtMs(r.scan_ms)}</td><td class="py-space-xs px-space-sm text-center whitespace-nowrap"><a class="px-space-xs py-1 rounded bg-surface-container text-primary hover:bg-primary hover:text-surface font-body-sm text-badge-label transition-colors inline-flex items-center gap-1" href="/inspector?replay=${idx}">${icon("visibility", "text-[13px]")} Inspect</a></td></tr>${isOpen ? `<tr class="detail-row"><td class="p-space-sm bg-surface-container-lowest" colspan="${live ? 9 : 7}">${detailPanelHTML(r, window.DIST, window.STATUS)}</td></tr>` : ""}`;
   }).join("");
   return { html, shown: shown.length };
+}
+
+/* The per-message snapshot the History page shows: the monitoring page's charts and tiles for one request.
+   Works from a log row alone (score, threshold, _fired) and shows more when the row carries snapshot(): _parts, _rules. */
+function detailPanelHTML(r, dist, st) {
+  const thr = Number(r.threshold ?? (st ? st.threshold : 0.546));
+  const score = Number(r.score);
+  const blocked = r.blocked === "yes", flagged = r.verdict === "injection", leaked = r["reply contains secret"] === "yes";
+  const parts = r._parts || [], rules = r._rules || {};
+  const ruleName = n => (n || "").replace(/_(count|score|ratio)$/, "").replace(/_/g, " ");
+  const pb = dist ? percentileBelow(dist, "benign", score) : null, pi = dist ? percentileBelow(dist, "injection", score) : null;
+  const chart = dist ? `<div class="bg-surface-container-lowest rounded border border-outline-variant/20 p-space-xs overflow-hidden">${histogramSVG(dist, score, { compact: true })}${zoneBar(dist, score)}</div>
+      <div class="font-mono-data text-body-sm text-on-surface-variant">Score <b class="text-on-surface">${fmtScore(score)}</b> is above <b class="text-secondary">${pb.toFixed(1)}%</b> of benign and <b class="text-tertiary">${pi.toFixed(1)}%</b> of injection training scores · threshold ${thr.toFixed(3)} · ${fmtScore3(score - thr)} from it</div>`
+    : `<div class="font-mono-data text-body-sm text-outline">score distribution not loaded</div>`;
+  const tiles =
+    tile({ label: "Score", value: fmtScore(score), note: `thr ${thr.toFixed(3)}`, sub: flagged ? "at or above the threshold" : "below the threshold", icon: "analytics", kind: flagged ? "bad" : "ok" }) +
+    tile({ label: "Action", value: blocked ? "BLOCKED" : (flagged ? "SENT" : "ALLOWED"), note: blocked ? "guard on" : (flagged ? "guard off" : ""), sub: blocked ? `${(r.flagged || []).join(", ") || "user message"} flagged` : (flagged ? "flagged but the model received it" : "clean, sent to the model"), icon: blocked ? "shield" : (flagged ? "warning" : "check_circle"), kind: blocked ? "bad" : (flagged ? "warn" : "ok") }) +
+    tile({ label: "Detector", value: fmtMs(r.scan_ms), note: parts.length > 1 ? `${parts.length} parts` : "", sub: parts.length ? parts.map(p => `${p.label.toLowerCase()} ${fmtMs(p.ms)}`).join(" · ") : "explain() + predict()", icon: "speed", kind: "info" }) +
+    tile({ label: "Model reply", value: blocked ? "none" : (r._error ? "error" : (leaked ? "LEAKED" : "clean")), note: r.elapsed != null && !blocked ? `${Number(r.elapsed).toFixed(1)} s` : "", sub: `${r.model && r.model !== "stub" ? r.model : (r.provider || "")}${r.turns_sent ? ` · remembered ${r.turns_sent / 2 | 0} turn(s)` : ""}`, icon: leaked ? "gpp_maybe" : "memory", kind: blocked ? "neutral" : (leaked || r._error ? "bad" : "ok") });
+  const ruleRows = Object.entries(rules).sort((a, b) => b[1].value - a[1].value);
+  const topVal = Math.max(1, ...ruleRows.map(([, v]) => v.value));
+  const rulesHTML = ruleRows.length
+    ? ruleRows.map(([k, v], i) => `<div class="flex flex-col gap-1"><div class="flex items-center justify-between font-mono-data text-body-sm"><span class="text-on-surface font-medium truncate">${esc(k)}</span><span class="${i < 3 ? "text-tertiary" : "text-primary"} font-semibold">${Number.isInteger(v.value) ? v.value : v.value.toFixed(2)}</span></div><div class="w-full bg-surface-container h-2 rounded overflow-hidden"><div class="h-full rounded" style="width:${(100 * v.value / topVal).toFixed(0)}%;background-color:${i < 3 ? RED : BLUE}"></div></div>${(v.snippets || []).length ? `<div class="font-mono-data text-badge-label text-outline truncate" title="${esc(v.snippets.join(" | "))}">${v.snippets.map(x => `“${esc(x)}”`).join(" · ")}</div>` : ""}</div>`).join("")
+    : ((r._fired || []).length ? (r._fired || []).map(k => `<div class="flex items-center justify-between font-mono-data text-body-sm"><span class="text-on-surface">${esc(k)}</span><span class="text-tertiary">fired</span></div>`).join("") : `<div class="font-mono-data text-body-sm text-outline">no rule fired: the embedding alone decided</div>`);
+  const partsHTML = parts.length ? parts.map(p => `<div class="flex flex-col gap-space-2xs bg-surface-container-lowest rounded p-space-sm border-l-[3px]" style="border-left-color:${p.flagged ? RED : GREEN}">
+      <div class="flex items-center justify-between font-mono-data text-body-sm"><span class="text-on-surface font-medium">${esc(p.label)}</span><span class="${p.flagged ? "text-tertiary" : "text-secondary"} font-semibold">${fmtScore(p.score)} · ${esc(p.verdict || "")}</span></div>
+      <div class="font-mono-data text-badge-label text-outline">${p.pieces} piece(s) scored · confidence ${(100 * p.confidence).toFixed(0)}% · P(injection) ${(100 * p.probability).toFixed(0)}% · ${fmtMs(p.ms)}${p.decoded && p.decoded.length ? ` · decoded: ${esc(p.decoded.join(", "))}` : ""}</div>
+      ${p.max_piece ? `<div class="font-mono-data text-badge-label text-on-surface-variant truncate" title="${esc(p.max_piece.text)}">highest ${esc(p.max_piece.kind || "piece")} (${fmtScore(p.max_piece.score)}): “${esc(p.max_piece.text)}”</div>` : ""}</div>`).join("") : "";
+  const texts = `<div class="flex flex-col gap-space-xs">
+      <div><div class="font-panel-title text-panel-title text-outline mb-space-2xs">Message</div><div class="font-body-sm text-body-sm text-on-surface msg-body bg-surface-container-lowest rounded p-space-sm max-h-32 overflow-y-auto">${esc(r._message || "")}</div></div>
+      ${r._document ? `<div><div class="font-panel-title text-panel-title text-outline mb-space-2xs">Retrieved document (${r._document.length} chars)</div><div class="font-mono-data text-badge-label text-on-surface-variant msg-body bg-surface-container-lowest rounded p-space-sm max-h-32 overflow-y-auto">${esc(r._document)}</div></div>` : ""}
+      <div><div class="font-panel-title text-panel-title text-outline mb-space-2xs">${blocked ? "Reply" : (r._error ? "Model error" : "Model reply")}</div><div class="font-body-sm text-body-sm ${blocked ? "text-error" : "text-on-surface"} msg-body bg-surface-container-lowest rounded p-space-sm max-h-32 overflow-y-auto">${esc(blocked ? "Sorry, I can't help with that request. (the model was not called)" : (r._error || r._reply || ""))}</div></div></div>`;
+  return `<div class="flex flex-col gap-space-md">
+    <div class="flex flex-wrap items-center gap-space-sm font-mono-data text-badge-label text-outline">${icon("policy", "text-[16px] text-primary")}<span class="text-on-surface font-medium">Request snapshot</span><span>${esc(r.ts || r.time || "")}</span><span>·</span><span>${esc(r.surface || "")}${r.session ? ` / ${esc(r.session)}` : ""}${r.conversation ? ` / chat ${esc(r.conversation)}` : ""}</span><span>·</span><span>guard ${esc(r.guard || "on")}</span>${blocked ? badge("bad", "blocked", "gpp_maybe") : (flagged ? badge("warn", "flagged, sent", "warning") : badge("ok", "allowed", "check_circle"))}${leaked ? badge("bad", "secret leaked", "gpp_maybe") : ""}</div>
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-space-sm">${tiles}</div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-space-md">
+      <div class="lg:col-span-2 flex flex-col gap-space-xs"><div class="font-panel-title text-panel-title text-outline">Where this score sits among the training data</div>${chart}</div>
+      <div class="flex flex-col gap-space-sm"><div class="flex items-center justify-between"><span class="font-panel-title text-panel-title text-outline">Rules fired on the highest-scoring part</span><span class="font-mono-data text-badge-label text-outline">${ruleRows.length || (r._fired || []).length}</span></div><div class="flex flex-col gap-space-sm max-h-64 scroll-y">${rulesHTML}</div></div>
+    </div>
+    ${partsHTML ? `<div class="flex flex-col gap-space-xs"><div class="font-panel-title text-panel-title text-outline">Scanned parts</div><div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm">${partsHTML}</div></div>` : ""}
+    ${texts}
+    <div class="flex items-center gap-space-sm font-mono-data text-badge-label"><a class="text-primary hover:underline flex items-center gap-1" href="/inspector?replay=${window.LOGROWS ? window.LOGROWS.indexOf(r) : ""}">${icon("visibility", "text-[13px]")}replay in the inspector (re-scores it; adds a row)</a></div>
+  </div>`;
 }
 
 // ---------------------------------------------------------------- the inspection pipeline (from design/stitch/guard_inspector)

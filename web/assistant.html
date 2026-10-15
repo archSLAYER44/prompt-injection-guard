@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><title>{{BRAND}}</title><!--HEAD-->
+<style>
+  .dots span { animation: blink 1.2s infinite; } .dots span:nth-child(2) { animation-delay: .2s; } .dots span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: .2; } 40% { opacity: 1; } }
+  #sidebar { transition: transform .2s ease; }
+  .conv-item:hover .conv-del { opacity: 1; }
+  details > summary { list-style: none; cursor: pointer; } details > summary::-webkit-details-marker { display: none; }
+  textarea { field-sizing: content; }
+</style>
+</head>
+<body class="bg-surface font-body-default text-on-surface antialiased h-screen overflow-hidden">
+<div class="flex h-screen">
+  <!-- conversations -->
+  <aside class="fixed lg:static inset-y-0 left-0 z-40 w-72 shrink-0 bg-surface-container-low border-r border-outline-variant/30 flex flex-col -translate-x-full lg:translate-x-0" id="sidebar">
+    <div class="h-12 px-space-md flex items-center justify-between border-b border-outline-variant/20">
+      <div class="flex items-center gap-space-xs min-w-0"><span class="w-7 h-7 rounded-lg bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">forum</span></span><span class="font-headline-lg text-headline-lg font-semibold truncate brand">{{BRAND}}</span></div>
+      <button class="lg:hidden text-outline hover:text-on-surface" id="close-sidebar" type="button" aria-label="Close"><span class="material-symbols-outlined text-[20px]">close</span></button>
+    </div>
+    <div class="p-space-sm">
+      <button class="w-full flex items-center justify-center gap-space-xs px-space-md py-space-sm rounded-lg bg-primary-container hover:bg-primary-container/90 text-on-primary-container font-headline-sm text-headline-sm shadow-sm active:scale-[.98] transition-all" id="new-chat" type="button"><span class="material-symbols-outlined text-[18px]">edit_square</span>New chat</button>
+    </div>
+    <div class="px-space-md pt-space-xs pb-space-2xs flex items-center justify-between font-mono-data text-badge-label text-outline uppercase tracking-wider"><span>Chats</span><span id="conv-count"></span></div>
+    <nav class="flex-1 overflow-y-auto px-space-sm pb-space-sm flex flex-col gap-space-2xs" id="conv-list"><div class="px-space-sm py-space-sm font-body-sm text-body-sm text-outline">loading…</div></nav>
+    <div class="border-t border-outline-variant/40 p-space-sm flex flex-col gap-space-2xs font-body-sm text-body-sm">
+      <button class="flex items-center gap-space-sm px-space-sm py-space-xs rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-on-surface w-full text-left" id="settings-btn" type="button"><span class="material-symbols-outlined text-[18px]">tune</span>Settings</button>
+      <div class="flex items-center gap-space-sm px-space-sm py-space-xs text-on-surface-variant"><span class="material-symbols-outlined text-[18px] text-secondary" id="side-shield">verified_user</span><span id="side-protect">Protected by a prompt-injection guard</span></div>
+      <div class="px-space-sm pt-space-xs font-body-sm text-badge-label text-outline"><span class="brand">{{BRAND}}</span> · <span id="side-tagline">your AI assistant</span></div>
+    </div>
+  </aside>
+  <div class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden" id="sidebar-backdrop"></div>
+
+  <!-- the chat -->
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="h-12 shrink-0 px-space-md flex items-center justify-between border-b border-outline-variant/20 bg-surface">
+      <div class="flex items-center gap-space-sm min-w-0">
+        <button class="lg:hidden text-outline hover:text-on-surface" id="open-sidebar" type="button" aria-label="Chats"><span class="material-symbols-outlined text-[22px]">menu</span></button>
+        <span class="lg:hidden font-headline-lg text-headline-lg font-semibold brand">{{BRAND}}</span>
+        <span class="hidden lg:inline font-headline-sm text-headline-sm text-on-surface truncate" id="conv-title">New chat</span>
+        <span class="hidden lg:inline font-mono-data text-badge-label text-outline" id="conv-meta"></span>
+      </div>
+      <div class="flex items-center gap-space-xs">
+        <button class="flex items-center gap-space-xs px-space-sm py-space-xs rounded-full font-body-sm text-body-sm" id="guard-btn" type="button" title="Protection status (change it under Settings)"><span class="material-symbols-outlined text-[16px]" id="guard-icon">verified_user</span><span id="guard-label">Protected</span></button>
+        <button class="flex items-center gap-space-xs px-space-sm py-space-xs rounded-lg bg-surface-container hover:bg-surface-container-high font-body-sm text-body-sm max-w-[16rem]" id="model-btn" type="button" title="Model, API key and system prompt"><span class="material-symbols-outlined text-[16px] text-primary">memory</span><span class="truncate" id="model-label">…</span><span class="material-symbols-outlined text-[16px] text-outline">expand_more</span></button>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto" id="transcript">
+      <div class="max-w-3xl mx-auto px-space-md py-space-lg flex flex-col gap-space-xl" id="turns"></div>
+    </div>
+
+    <div class="shrink-0 bg-surface">
+      <div class="max-w-3xl mx-auto px-space-md pb-space-sm pt-space-2xs flex flex-col gap-space-xs">
+        <div class="hidden flex-col gap-space-xs rounded-xl bg-surface-container-low border border-outline-variant/30 p-space-sm" id="doc-box">
+          <div class="flex items-center justify-between font-mono-data text-badge-label text-outline"><span class="flex items-center gap-space-2xs"><span class="material-symbols-outlined text-[14px] text-primary">description</span>Retrieved document · scanned on its own, then handed to the model with your message</span><button class="hover:text-error" id="doc-remove" type="button" aria-label="Remove document"><span class="material-symbols-outlined text-[16px]">close</span></button></div>
+          <textarea class="w-full bg-surface-container-lowest text-on-surface placeholder:text-outline font-mono-data text-mono-data p-space-sm rounded resize-none focus:outline-none focus:ring-1 focus:ring-primary max-h-40 overflow-y-auto" id="doc-input" placeholder="Paste the email, ticket, web page or file the assistant would read…" rows="3"></textarea>
+        </div>
+        <div class="rounded-2xl bg-surface-container-low border border-outline-variant/60 focus-within:border-primary/60 shadow-sm">
+          <textarea class="w-full bg-transparent text-on-surface placeholder:text-outline font-body-default text-body-default px-space-md pt-space-sm pb-space-2xs resize-none focus:outline-none max-h-48 overflow-y-auto" id="msg-input" placeholder="Message the assistant…" rows="1"></textarea>
+          <div class="flex items-center justify-between px-space-sm pb-space-sm">
+            <div class="flex items-center gap-space-2xs">
+              <button class="flex items-center gap-space-2xs px-space-sm py-space-xs rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm" id="doc-toggle" type="button" title="Attach a document the assistant retrieves (indirect injection demo)"><span class="material-symbols-outlined text-[18px]">attach_file</span><span class="hidden sm:inline">Attach document</span></button>
+              <div class="relative"><button class="flex items-center gap-space-2xs px-space-sm py-space-xs rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm" id="ex-btn" type="button"><span class="material-symbols-outlined text-[18px]">science</span><span class="hidden sm:inline">Examples</span></button>
+                <div class="hidden absolute bottom-full left-0 mb-space-xs w-80 rounded-lg bg-surface-container-high border border-outline-variant/40 shadow-md p-space-xs flex-col gap-space-2xs z-20" id="ex-menu"></div></div>
+            </div>
+            <button class="w-9 h-9 rounded-lg bg-primary-container hover:bg-primary-container/90 disabled:opacity-40 text-on-primary-container flex items-center justify-center transition-all active:scale-95" id="send" type="button" aria-label="Send"><span class="material-symbols-outlined text-[20px]">arrow_upward</span></button>
+          </div>
+        </div>
+        <div class="flex items-center justify-center gap-space-xs font-body-sm text-badge-label text-outline text-center" id="footnote">Messages are screened for prompt injection before they reach the model · Enter to send, Shift+Enter for a new line</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- settings dialog -->
+<div class="hidden fixed inset-0 z-50 bg-black/60 items-center justify-center p-space-md" id="modal">
+  <div class="w-full max-w-lg max-h-[92vh] overflow-y-auto rounded-xl bg-surface-container-low border border-outline-variant/30 shadow-md flex flex-col">
+    <div class="flex items-center justify-between px-space-md py-space-sm border-b border-outline-variant/20"><span class="font-headline-lg text-headline-lg flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[20px]">tune</span>Settings</span><button class="text-outline hover:text-on-surface" id="modal-close" type="button" aria-label="Close"><span class="material-symbols-outlined text-[20px]">close</span></button></div>
+    <div class="p-space-md flex flex-col gap-space-md font-body-sm text-body-sm">
+      <label class="flex flex-col gap-space-2xs"><span class="font-mono-data text-badge-label text-outline uppercase">Provider</span><select class="bg-surface-container-lowest border border-outline-variant/40 rounded-lg p-space-sm font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary" id="f-provider"></select><span class="font-mono-data text-badge-label text-outline" id="f-note"></span></label>
+      <label class="flex flex-col gap-space-2xs" id="f-url-row"><span class="font-mono-data text-badge-label text-outline uppercase">Server URL</span><input class="bg-surface-container-lowest border border-outline-variant/40 rounded-lg p-space-sm font-mono-data text-body-sm text-on-surface focus:outline-none focus:border-primary" id="f-url"></label>
+      <label class="flex flex-col gap-space-2xs" id="f-model-row"><span class="font-mono-data text-badge-label text-outline uppercase">Model</span><input class="bg-surface-container-lowest border border-outline-variant/40 rounded-lg p-space-sm font-mono-data text-body-sm text-on-surface focus:outline-none focus:border-primary" id="f-model" list="model-list" placeholder="model name"><datalist id="model-list"></datalist></label>
+      <label class="flex flex-col gap-space-2xs" id="f-key-row"><span class="font-mono-data text-badge-label text-outline uppercase">API key</span>
+        <div class="flex items-center gap-space-xs"><input class="flex-1 bg-surface-container-lowest border border-outline-variant/40 rounded-lg p-space-sm font-mono-data text-body-sm text-on-surface focus:outline-none focus:border-primary" id="f-key" type="password" placeholder="paste the key" autocomplete="off"><button class="px-space-sm py-space-xs rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant" id="f-key-show" type="button">show</button></div>
+        <span class="font-mono-data text-badge-label text-outline">kept in this browser tab only and sent with each message; the server uses it for that call and never stores it</span></label>
+      <div class="flex items-center gap-space-sm"><button class="flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm" id="f-test" type="button"><span class="material-symbols-outlined text-[16px]">network_check</span>Test connection</button><span class="font-mono-data text-badge-label text-outline" id="f-test-out"></span></div>
+      <label class="flex flex-col gap-space-2xs"><div class="flex items-center justify-between"><span class="font-mono-data text-badge-label text-outline uppercase">System prompt</span><span class="flex items-center gap-space-xs font-mono-data text-badge-label"><button class="text-primary hover:underline" data-sys="general" type="button">default</button><span class="text-outline">·</span><button class="text-primary hover:underline" data-sys="bakery" type="button">Rosa's bakery</button></span></div><textarea class="bg-surface-container-lowest border border-outline-variant/40 rounded-lg p-space-sm font-mono-data text-body-sm text-on-surface focus:outline-none focus:border-primary max-h-40 overflow-y-auto" id="f-system" rows="3"></textarea><span class="font-mono-data text-badge-label text-outline">the fake secret in it lets the pages check whether a reply leaked it</span></label>
+      <div class="flex items-center justify-between bg-surface-container-lowest p-space-sm rounded-lg border border-outline-variant/20"><div class="flex flex-col"><span class="font-body-sm text-body-sm text-on-surface font-medium">Prompt-injection guard</span><span class="font-mono-data text-badge-label text-outline" id="f-guard-note"></span></div><label class="relative inline-flex items-center cursor-pointer"><input class="sr-only peer" id="f-guard" type="checkbox"><div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div></label></div>
+    </div>
+    <div class="px-space-md py-space-sm border-t border-outline-variant/20 flex items-center justify-end gap-space-sm"><button class="px-space-md py-space-xs rounded-lg bg-primary-container hover:bg-primary-container/90 text-on-primary-container font-headline-sm text-headline-sm" id="modal-done" type="button">Done</button></div>
+  </div>
+</div>
+
+<script>
+(async () => {
+  const $ = id => document.getElementById(id);
+  const BRAND = "{{BRAND}}", SURFACE = BRAND.toLowerCase();
+  const SHORT = { "Local (in-process)": "Local model", "Ollama (local)": "Ollama", "OpenAI-compatible (LM Studio, llama.cpp, vLLM, ...)": "OpenAI-compatible server", "Stub (built-in, no model)": "Stub" };
+  const short = p => SHORT[p] || p;
+  const ruleName = r => (r || "").replace(/_(count|score|ratio)$/, "").replace(/_/g, " ");
+  const newId = () => Math.random().toString(16).slice(2, 10) + Date.now().toString(16).slice(-4);
+  const timeOf = ts => { try { return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); } catch (e) { return ""; } };
+
+  let st;
+  try { st = await API.get("/api/status"); window.STATUS = st; }
+  catch (e) { $("turns").innerHTML = `<div class="text-error font-body-default">${BRAND} is not reachable: ${esc(e.message)}. Start it with <code>.venv/bin/uvicorn chat_api:app --port 8001</code>.</div>`; return; }
+  try { const b = await API.get("/api/brand"); $("side-tagline").textContent = b.tagline; } catch (e) {}
+  const generalPrompt = () => st.system_prompts.general.replace("You are a helpful assistant", `You are ${BRAND}, a helpful assistant`);
+
+  // settings: provider, url, model and guard in localStorage (shared with the test console); the key in this tab only
+  const s = loadSettings();
+  s.system_prompt = localStorage.getItem("ig_system") || generalPrompt();
+  s.api_key = sessionStorage.getItem("ig_key::" + s.provider) || "";
+  const spec = () => st.providers.find(p => p.name === s.provider) || st.providers[0];
+  const modelName = () => s.provider === st.stub ? "stub" : (s.model || spec().model || "(no model)");
+  function persist() { saveSettings(s); localStorage.setItem("ig_system", s.system_prompt || ""); if (s.api_key) sessionStorage.setItem("ig_key::" + s.provider, s.api_key); else sessionStorage.removeItem("ig_key::" + s.provider); renderHeader(); }
+  function renderHeader() {
+    $("model-label").textContent = s.provider === st.stub ? "Demo model (stub)" : `${modelName()} · ${short(s.provider)}`;
+    $("guard-label").textContent = s.guard_on ? "Protected" : "Guard off";
+    $("guard-icon").textContent = s.guard_on ? "verified_user" : "gpp_bad"; $("guard-icon").className = `material-symbols-outlined text-[16px] ${s.guard_on ? "text-secondary" : "text-tertiary"}`;
+    $("guard-btn").className = `flex items-center gap-space-xs px-space-sm py-space-xs rounded-full font-body-sm text-body-sm ${s.guard_on ? "bg-secondary-container text-on-secondary-container" : "bg-tertiary-container text-on-tertiary-container"}`;
+    $("side-shield").textContent = s.guard_on ? "verified_user" : "gpp_bad"; $("side-shield").className = `material-symbols-outlined text-[18px] ${s.guard_on ? "text-secondary" : "text-tertiary"}`;
+    $("side-protect").textContent = s.guard_on ? "Protected by a prompt-injection guard" : "Guard off: messages are not screened";
+    $("footnote").textContent = s.guard_on ? `Messages are screened for prompt injection before they reach ${modelName() === "stub" ? "the model" : modelName()} · Enter to send, Shift+Enter for a new line` : `Guard off: messages reach ${modelName() === "stub" ? "the model" : modelName()} unscreened · Enter to send`;
+  }
+
+  // ---- settings dialog
+  function openModal() {
+    $("f-provider").innerHTML = st.providers.map(p => `<option value="${esc(p.name)}" ${p.name === s.provider ? "selected" : ""}>${esc(p.name)}</option>`).join("");
+    fillFields(); $("f-system").value = s.system_prompt; $("f-guard").checked = !!s.guard_on; guardNote(); $("f-test-out").textContent = "";
+    $("modal").classList.remove("hidden"); $("modal").classList.add("flex");
+  }
+  function closeModal() { $("modal").classList.add("hidden"); $("modal").classList.remove("flex"); }
+  function guardNote() { $("f-guard-note").textContent = $("f-guard").checked ? "on: flagged messages are blocked before the model" : "off: flagged messages reach the model (for the comparison)"; }
+  function fillFields() {
+    const p = spec();
+    $("f-note").textContent = p.note || "";
+    $("f-url-row").style.display = (p.protocol === "ollama" || p.protocol === "openai") ? "" : "none"; $("f-url").value = s.base_url || p.url || "";
+    $("f-model-row").style.display = p.protocol === "stub" ? "none" : ""; $("f-model").value = s.model || p.model || ""; $("f-model").placeholder = p.model || "model name";
+    $("f-key-row").style.display = p.key === "none" || p.protocol === "stub" ? "none" : ""; $("f-key").value = s.api_key || ""; $("f-key").placeholder = p.key === "optional" ? "optional for this server" : "paste the key";
+    $("model-list").innerHTML = "";
+  }
+  $("f-provider").addEventListener("change", e => { s.provider = e.target.value; s.model = ""; s.base_url = ""; s.api_key = sessionStorage.getItem("ig_key::" + s.provider) || ""; persist(); fillFields(); $("f-test-out").textContent = ""; });
+  $("f-url").addEventListener("input", e => { s.base_url = e.target.value.trim(); persist(); });
+  $("f-model").addEventListener("input", e => { s.model = e.target.value.trim(); persist(); });
+  $("f-key").addEventListener("input", e => { s.api_key = e.target.value.trim(); persist(); });
+  $("f-key-show").addEventListener("click", () => { const k = $("f-key"); k.type = k.type === "password" ? "text" : "password"; $("f-key-show").textContent = k.type === "password" ? "show" : "hide"; });
+  $("f-system").addEventListener("input", e => { s.system_prompt = e.target.value; persist(); });
+  document.querySelectorAll("[data-sys]").forEach(b => b.addEventListener("click", () => { s.system_prompt = b.dataset.sys === "general" ? generalPrompt() : st.system_prompts[b.dataset.sys]; $("f-system").value = s.system_prompt; persist(); }));
+  $("f-guard").addEventListener("change", e => { s.guard_on = e.target.checked; guardNote(); persist(); });
+  $("f-test").addEventListener("click", async () => {
+    const out = $("f-test-out"); out.textContent = "testing…"; out.className = "font-mono-data text-badge-label text-outline";
+    try {
+      const r = await API.post("/api/connection", { provider: s.provider, base_url: s.base_url || null, model: s.model || null, api_key: s.api_key || null });
+      out.textContent = r.message; out.className = `font-mono-data text-badge-label ${r.ok ? "text-secondary" : "text-error"}`;
+      $("model-list").innerHTML = (r.models || []).map(m => `<option value="${esc(m)}">`).join("");
+    } catch (e) { out.textContent = e.message; out.className = "font-mono-data text-badge-label text-error"; }
+  });
+  $("model-btn").addEventListener("click", openModal); $("settings-btn").addEventListener("click", openModal); $("guard-btn").addEventListener("click", openModal);
+  $("modal-close").addEventListener("click", closeModal); $("modal-done").addEventListener("click", closeModal);
+  $("modal").addEventListener("click", e => { if (e.target === $("modal")) closeModal(); });
+
+  // ---- sidebar
+  const showSidebar = on => { $("sidebar").classList.toggle("-translate-x-full", !on); $("sidebar-backdrop").classList.toggle("hidden", !on); };
+  $("open-sidebar").addEventListener("click", () => showSidebar(true)); $("close-sidebar").addEventListener("click", () => showSidebar(false)); $("sidebar-backdrop").addEventListener("click", () => showSidebar(false));
+
+  // ---- conversations
+  let conv = null, rows = [], convs = [], presets = [];
+  async function loadList() {
+    try { convs = (await API.get("/api/conversations")).conversations; } catch (e) { return; }
+    $("conv-count").textContent = convs.length || "";
+    $("conv-list").innerHTML = convs.length ? convs.map(c => `
+      <div class="conv-item group flex items-center gap-space-xs px-space-sm py-space-xs rounded-lg cursor-pointer ${c.id === conv ? "bg-surface-container text-on-surface" : "hover:bg-surface-container/70 text-on-surface-variant"}" data-id="${esc(c.id)}">
+        <span class="material-symbols-outlined text-[16px] ${c.blocked ? "text-tertiary" : "text-outline"}">${c.blocked ? "gpp_maybe" : "chat_bubble"}</span>
+        <div class="flex-1 min-w-0"><div class="font-body-sm text-body-sm truncate">${esc(c.title || "(empty)")}</div>
+          <div class="font-mono-data text-[10px] text-outline truncate">${c.turns} message${c.turns === 1 ? "" : "s"}${c.blocked ? ` · <span class="text-tertiary">${c.blocked} blocked</span>` : ""}${c.leaked ? ` · <span class="text-error">leak</span>` : ""}${c.surface && c.surface !== SURFACE ? ` · ${esc(c.surface)}` : ""} · ${timeOf(c.last)}</div></div>
+        <button class="conv-del opacity-0 text-outline hover:text-error shrink-0" data-del="${esc(c.id)}" type="button" title="Delete this chat from the log"><span class="material-symbols-outlined text-[16px]">delete</span></button>
+      </div>`).join("") : `<div class="px-space-sm py-space-sm font-body-sm text-body-sm text-outline">No chats yet.</div>`;
+    $("conv-list").querySelectorAll("[data-id]").forEach(el => el.addEventListener("click", e => { if (e.target.closest("[data-del]")) return; openConv(el.dataset.id); showSidebar(false); }));
+    $("conv-list").querySelectorAll("[data-del]").forEach(el => el.addEventListener("click", async e => {
+      e.stopPropagation(); const id = el.dataset.del, c = convs.find(x => x.id === id);
+      if (!confirm(`Delete "${(c && c.title) || id}" (${c ? c.turns : "?"} messages)?`)) return;
+      await API.post(`/api/conversations/${encodeURIComponent(id)}/delete`); if (id === conv) newChat(); await loadList();
+    }));
+  }
+  async function openConv(id) {
+    conv = id; history.replaceState(null, "", `/?c=${encodeURIComponent(id)}`);
+    try { rows = (await API.get(`/api/conversations/${encodeURIComponent(id)}`)).rows; } catch (e) { rows = []; }
+    render(); loadList();
+  }
+  function newChat() { conv = newId(); rows = []; history.replaceState(null, "", "/"); render(); loadList(); $("msg-input").focus(); }
+  $("new-chat").addEventListener("click", () => { newChat(); showSidebar(false); });
+
+  // ---- transcript
+  function userHTML(r, draft = false) {
+    const flagged = r.verdict === "injection", blocked = r.blocked === "yes";
+    const doc = r._document ? `<details class="max-w-[85%] sm:max-w-[75%] w-full"><summary class="flex items-center gap-space-2xs font-mono-data text-badge-label text-primary justify-end"><span class="material-symbols-outlined text-[14px]">description</span>retrieved document · ${r._document.length} characters</summary><pre class="mt-space-2xs p-space-sm rounded-lg bg-surface-container-lowest font-mono-data text-badge-label text-on-surface-variant whitespace-pre-wrap break-words max-h-48 overflow-y-auto text-left">${esc(r._document)}</pre></details>` : "";
+    return `<div class="flex flex-col items-end gap-space-2xs">
+      <div class="max-w-[85%] sm:max-w-[75%] rounded-xl px-space-md py-space-sm ${blocked ? "bg-error-container border border-error/30" : "bg-surface-container"} text-on-surface font-body-default text-body-default msg-body">${esc(r._message)}</div>${doc}
+      ${draft ? "" : `<div class="flex items-center gap-space-xs font-mono-data text-badge-label text-outline">${icon(blocked ? "gpp_maybe" : (flagged ? "warning" : "verified_user"), "text-[13px] " + (blocked ? "text-error" : flagged ? "text-warn" : "text-secondary"))}<span>${blocked ? "blocked" : flagged ? "flagged" : "clean"}</span><span>·</span><span>score ${fmtScore(r.score)}</span><span>·</span><span>${fmtMs(r.scan_ms)}</span><span>·</span><span>${esc(r.time || "")}</span></div>`}</div>`;
+  }
+  function assistantHTML(r, isLast) {
+    const avatar = kind => `<div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center ${kind === "bad" ? "bg-error-container/40" : kind === "warn" ? "bg-warn/15" : "bg-primary/15"}"><span class="material-symbols-outlined text-[18px] ${kind === "bad" ? "text-error" : kind === "warn" ? "text-warn" : "text-primary"}">${kind === "bad" ? "shield" : kind === "warn" ? "warning" : "smart_toy"}</span></div>`;
+    const thr = Number(r.threshold ?? st.threshold).toFixed(3);
+    if (r.blocked === "yes") {
+      const part = (r.flagged || []).join(" and ").toLowerCase() || "user message";
+      return `<div class="flex items-start gap-space-sm">${avatar("bad")}<div class="flex-1 min-w-0 flex flex-col gap-space-xs">
+        <div class="rounded-xl border border-error/30 bg-error-container/60 p-space-md flex flex-col gap-space-xs">
+          <div class="flex flex-wrap items-center gap-space-xs"><span class="px-space-xs py-space-2xs rounded bg-error text-on-error font-badge-label text-badge-label font-semibold uppercase flex items-center gap-space-2xs">${icon("shield", "text-[13px]")}Message blocked</span><span class="font-mono-data text-badge-label text-error">${esc(part)} flagged</span></div>
+          <p class="font-body-default text-body-default text-on-surface">${BRAND} can't act on this message. Its prompt-injection guard stopped it before it reached ${esc(r.model && r.model !== "stub" ? r.model : "the model")}.</p>
+          <div class="flex flex-wrap items-center gap-space-md font-mono-data text-badge-label text-outline"><span>score ${fmtScore(r.score)} · threshold ${thr}</span>${r.top_rule ? `<span>rule: ${esc(ruleName(r.top_rule))}</span>` : `<span>no rule fired: the embedding alone</span>`}<span>${fmtMs(r.scan_ms)}</span></div>
+        </div></div></div>`;
+    }
+    if (r._error) {
+      return `<div class="flex items-start gap-space-sm">${avatar("warn")}<div class="flex-1 min-w-0 flex flex-col gap-space-2xs"><div class="rounded-xl border border-warn/40 bg-warn-container p-space-md font-body-default text-body-default text-on-surface msg-body"><b>The model could not be reached.</b> ${esc(r._error)}</div><div class="font-mono-data text-badge-label text-outline">check the model and key under Settings</div></div></div>`;
+    }
+    const flaggedNote = r.verdict === "injection" ? `<div class="flex items-center gap-space-xs rounded-lg bg-warn-container border border-warn/40 px-space-sm py-space-xs font-mono-data text-badge-label text-warn">${icon("warning", "text-[13px]")}flagged (score ${fmtScore(r.score)}) but the guard was off, so the model received it</div>` : "";
+    const leak = r["reply contains secret"] === "yes" ? `<span class="px-space-xs py-space-2xs rounded bg-error text-on-error font-badge-label text-badge-label font-semibold uppercase flex items-center gap-space-2xs">${icon("gpp_maybe", "text-[13px]")}secret leaked</span>` : "";
+    return `<div class="flex items-start gap-space-sm">${avatar("ok")}<div class="flex-1 min-w-0 flex flex-col gap-space-xs">${flaggedNote}
+      <div class="font-body-default text-body-default text-on-surface leading-relaxed msg-body">${esc(r._reply || "")}</div>
+      <div class="flex flex-wrap items-center gap-space-xs font-mono-data text-badge-label text-outline">${leak}<span>${esc(r.model && r.model !== "stub" ? r.model : BRAND + " demo model")}</span><span>·</span><span>${Number(r.elapsed || 0).toFixed(1)} s</span>${r.turns_sent ? `<span>·</span><span>remembered ${r.turns_sent / 2 | 0} earlier turn${r.turns_sent === 2 ? "" : "s"}</span>` : ""}<span>·</span><span>${esc(r.time || "")}</span></div></div></div>`;
+  }
+  function emptyHTML() {
+    const ideas = [["Plan a three-day trip to Lisbon on a budget", "travel_explore"], ["Explain how a prompt-injection attack works", "school"], ["Draft a polite reply to a late-delivery complaint", "mail"], ["Summarise the document I attach", "description"]];
+    return `<div class="flex flex-col items-center justify-center text-center gap-space-md pt-[10vh]">
+      <div class="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-on-primary text-[30px]">forum</span></div>
+      <div><div class="font-headline-xl text-headline-xl text-on-surface">Hi, I'm ${BRAND}. How can I help?</div><p class="font-body-default text-body-default text-outline mt-space-2xs max-w-md">Ask anything, or attach a document for me to read.</p></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm w-full max-w-xl mt-space-sm">${ideas.map(([t, ic]) => `<button class="text-left p-space-sm rounded-xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/40 flex items-center gap-space-sm" data-idea="${esc(t)}" type="button"><span class="material-symbols-outlined text-[18px] text-primary">${ic}</span><span class="font-body-sm text-body-sm text-on-surface">${esc(t)}</span></button>`).join("")}</div></div>`;
+  }
+  function render() {
+    const host = $("turns");
+    host.innerHTML = rows.length ? rows.map((r, i) => userHTML(r) + assistantHTML(r, i === rows.length - 1)).join("") : emptyHTML();
+    host.querySelectorAll("[data-idea]").forEach(b => b.addEventListener("click", () => { msg.value = b.dataset.idea; msg.focus(); }));
+    const first = rows[0];
+    $("conv-title").textContent = first ? (first._message || "").slice(0, 60) : "New chat";
+    $("conv-meta").textContent = rows.length ? `${rows.length} message${rows.length === 1 ? "" : "s"} · ${rows.filter(r => r.blocked === "yes").length} blocked` : "";
+    $("transcript").scrollTop = $("transcript").scrollHeight;
+  }
+  function pendingHTML() { return `<div class="flex items-start gap-space-sm" id="pending"><div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center bg-primary/15"><span class="material-symbols-outlined text-[18px] text-primary">smart_toy</span></div><div class="flex flex-col gap-space-2xs pt-space-xs"><div class="dots font-headline-xl text-primary leading-none"><span>·</span><span>·</span><span>·</span></div><div class="font-mono-data text-badge-label text-outline" id="pending-note">screening the message…</div></div></div>`; }
+
+  // ---- composer
+  const msg = $("msg-input"), doc = $("doc-input");
+  function loadPreset(key) { const p = presets.find(x => x.key === key); if (!p) return; msg.value = p.message; doc.value = p.document || ""; $("doc-box").classList.toggle("hidden", !p.document); $("doc-box").classList.toggle("flex", !!p.document); $("ex-menu").classList.add("hidden"); msg.focus(); }
+  async function send() {
+    const text = msg.value.trim(); if (!text) { msg.focus(); return; }
+    const p = spec();
+    if (p.key === "required" && p.protocol !== "anthropic" && !s.api_key) { openModal(); $("f-test-out").textContent = `${short(s.provider)} needs an API key`; $("f-test-out").className = "font-mono-data text-badge-label text-error"; $("f-key").focus(); return; }
+    const draft = { _message: text, _document: doc.value.trim(), verdict: "benign", score: 0, scan_ms: null, time: "" };
+    $("send").disabled = true; msg.disabled = true;
+    const host = $("turns"); if (!rows.length) host.innerHTML = "";
+    host.insertAdjacentHTML("beforeend", `<div id="draft">${userHTML(draft, true)}</div>` + pendingHTML());
+    $("transcript").scrollTop = $("transcript").scrollHeight;
+    const t0 = performance.now(); const tick = setInterval(() => { const n = $("pending-note"); if (n && performance.now() - t0 > 1500) n.textContent = `${modelName() === "stub" ? BRAND : modelName()} is replying…`; }, 300);
+    try {
+      const body = { ...requestBody(s, text, doc.value, SURFACE), conversation: conv, system_prompt: s.system_prompt, threshold: null };
+      const out = await API.post("/api/chat", body);
+      sessionStorage.setItem("ig_last", JSON.stringify(out));
+      rows.push(out.row); msg.value = ""; doc.value = ""; $("doc-box").classList.add("hidden"); $("doc-box").classList.remove("flex");
+      history.replaceState(null, "", `/?c=${encodeURIComponent(conv)}`);
+      render(); renderHeader(); loadList();
+    } catch (e) { $("draft") && $("draft").remove(); $("pending") && $("pending").remove(); alert("The request failed: " + e.message); if (!rows.length) render(); }
+    clearInterval(tick); $("send").disabled = false; msg.disabled = false; msg.focus();
+  }
+  $("send").addEventListener("click", send);
+  msg.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
+  $("doc-toggle").addEventListener("click", () => { const on = $("doc-box").classList.contains("hidden"); $("doc-box").classList.toggle("hidden", !on); $("doc-box").classList.toggle("flex", on); if (on) doc.focus(); });
+  $("doc-remove").addEventListener("click", () => { doc.value = ""; $("doc-box").classList.add("hidden"); $("doc-box").classList.remove("flex"); });
+  $("ex-btn").addEventListener("click", e => { e.stopPropagation(); $("ex-menu").classList.toggle("hidden"); $("ex-menu").classList.toggle("flex"); });
+  document.addEventListener("click", e => { if (!e.target.closest("#ex-menu") && !e.target.closest("#ex-btn")) { $("ex-menu").classList.add("hidden"); $("ex-menu").classList.remove("flex"); } });
+
+  // ---- start
+  try { presets = await API.get("/api/presets"); } catch (e) { presets = []; }
+  $("ex-menu").innerHTML = `<div class="px-space-sm pt-space-xs pb-space-2xs font-mono-data text-badge-label text-outline uppercase tracking-wider">Demo payloads</div>` + presets.map(p => `<button class="text-left px-space-sm py-space-xs rounded-lg hover:bg-surface-container flex flex-col" data-preset="${esc(p.key)}" type="button"><span class="font-body-sm text-body-sm text-on-surface flex items-center gap-space-xs"><span class="w-1.5 h-1.5 rounded-full ${p.flagged ? "bg-tertiary" : p.kind === "warn" ? "bg-warn" : "bg-secondary"}"></span>${esc(p.label)}<span class="font-mono-data text-badge-label text-outline ml-auto">${fmtScore(p.score)}</span></span><span class="font-body-sm text-badge-label text-outline">${esc(p.note)}</span></button>`).join("");
+  $("ex-menu").querySelectorAll("[data-preset]").forEach(b => b.addEventListener("click", () => loadPreset(b.dataset.preset)));
+  renderHeader();
+  const wanted = new URLSearchParams(location.search).get("c");
+  if (wanted) await openConv(wanted); else newChat();
+  setInterval(loadList, 5000);
+})();
+</script>
+</body>
+</html>
