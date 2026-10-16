@@ -96,7 +96,7 @@
 (async () => {
   const $ = id => document.getElementById(id);
   const BRAND = "{{BRAND}}", SURFACE = BRAND.toLowerCase();
-  const SHORT = { "Local (in-process)": "Local model", "Ollama (local)": "Ollama", "OpenAI-compatible (LM Studio, llama.cpp, vLLM, ...)": "OpenAI-compatible server", "Stub (built-in, no model)": "Stub" };
+  const SHORT = { "Local (in-process)": "Local model", "Ollama (local)": "Ollama", "OpenAI-compatible (LM Studio, llama.cpp, vLLM, ...)": "OpenAI-compatible server", "Colab (Cloudflare tunnel)": "Colab / Gemma", "Stub (built-in, no model)": "Stub" };
   const short = p => SHORT[p] || p;
   const ruleName = r => (r || "").replace(/_(count|score|ratio)$/, "").replace(/_/g, " ");
   const newId = () => Math.random().toString(16).slice(2, 10) + Date.now().toString(16).slice(-4);

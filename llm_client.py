@@ -30,7 +30,7 @@ import sys
 import urllib.error
 import urllib.request
 
-TIMEOUT = 60
+TIMEOUT = 120
 LOCAL_DEFAULT_MODEL = "Qwen/Qwen2.5-0.5B-Instruct"
 LOCAL_MAX_NEW_TOKENS = 300
 
@@ -42,6 +42,8 @@ PROVIDERS = {
     "OpenAI-compatible (LM Studio, llama.cpp, vLLM, ...)": {"protocol": "openai", "url": "http://localhost:1234",
                                                            "model": "", "key": "optional",
                                                            "note": "any server with /v1/chat/completions"},
+    "Colab (Cloudflare tunnel)": {"protocol": "openai", "url": "", "model": "gemma-4-e4b", "key": "optional",
+                                 "note": "paste the https://xxxx.trycloudflare.com URL from your Colab cell; model is gemma-4-e4b"},
     "OpenAI": {"protocol": "openai", "url": "https://api.openai.com/v1", "model": "gpt-4o-mini", "key": "required",
                "note": ""},
     "Anthropic": {"protocol": "anthropic", "url": "", "model": "claude-opus-5-5", "key": "required",
@@ -109,7 +111,10 @@ def _error_text(body):
 
 def _request(url, payload=None, api_key=None, timeout=TIMEOUT):
     """GET (payload None) or POST JSON, returning the parsed JSON reply."""
-    headers = {"Accept": "application/json"}
+    headers = {
+        "Accept": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Nimbus/1.0",
+    }
     if api_key:
         headers["Authorization"] = f"Bearer {api_key}"
     data = None
